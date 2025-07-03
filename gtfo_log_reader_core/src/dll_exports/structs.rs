@@ -67,7 +67,7 @@ pub struct MainThread {
 }
 
 impl MainThread {
-    pub fn create(folder_path: PathBuf) -> MainThread {
+    pub fn create(folder_path: Option<PathBuf>) -> MainThread {
         let (recv, folder_watcher) = FolderWatcher::new_watcher(folder_path);
         let (shutdown_sender, shutdown_recv) = mpsc::channel::<()>();
         let (callback_sender, callback_recv) = mpsc::channel::<CallbackInfo>();
@@ -87,9 +87,10 @@ impl MainThread {
         let _ = self.send_callbacks.send(callback);
     }
 
-    pub fn remove_callback(&self, id: u32) {
+    pub fn remove_callback(&self, code: SubscribeCode, id: u32) {
         let _ = self.send_callbacks.send(CallbackInfo {
             channel_id: id,
+            code,
             ..Default::default()
         });
     }

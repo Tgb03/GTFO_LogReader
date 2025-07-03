@@ -28,7 +28,7 @@ impl Drop for FolderWatcher {
 }
 
 impl FolderWatcher {
-    pub fn new_watcher(folder_path: PathBuf) -> (Receiver<PathBuf>, FolderWatcher) {
+    pub fn new_watcher(folder_path: Option<PathBuf>) -> (Receiver<PathBuf>, FolderWatcher) {
         println!("Thread started");
 
         let (sender, recv) = channel::<PathBuf>();
@@ -52,7 +52,7 @@ impl FolderWatcher {
     }
 
     fn watch(
-        mut folder_path: PathBuf,
+        mut folder_path: Option<PathBuf>,
         sender: Sender<PathBuf>,
         shutdown: Receiver<()>,
         update_folder_path: Receiver<PathBuf>,
@@ -66,32 +66,37 @@ impl FolderWatcher {
             }
 
             if let Ok(path) = update_folder_path.try_recv() {
-                folder_path = path;
+                folder_path = Some(path);
             }
 
             // not using notify cause of issues with large folders just in case
-            let path = fs::read_dir(&folder_path)
-                .expect("Couldn't access local directory")
+            let path = folder_path
+                .as_ref()
+                .map(|f| fs::read_dir(&f).ok())
                 .flatten()
-                .filter(|f| {
-                    let metadata = match f.metadata() {
-                        Ok(metadata) => metadata,
-                        Err(_) => {
-                            return false;
-                        }
-                    };
+                .map(|rd| 
+                    rd.flatten()
+                        .filter(|f| {
+                            let metadata = match f.metadata() {
+                                Ok(metadata) => metadata,
+                                Err(_) => {
+                                    return false;
+                                }
+                            };
 
-                    metadata.is_file()
-                        && f.file_name()
-                            .to_str()
-                            .unwrap_or_default()
-                            .contains("NICKNAME_NETSTATUS")
-                })
-                .max_by_key(|x| match x.metadata() {
-                    Ok(metadata) => metadata.modified().ok(),
-                    Err(_) => Default::default(),
-                })
-                .map(|v| v.path());
+                            metadata.is_file()
+                                && f.file_name()
+                                    .to_str()
+                                    .unwrap_or_default()
+                                    .contains("NICKNAME_NETSTATUS")
+                        })
+                        .max_by_key(|x| match x.metadata() {
+                            Ok(metadata) => metadata.modified().ok(),
+                            Err(_) => Default::default(),
+                        })
+                        .map(|v| v.path())
+                )
+                .flatten();
 
             if path != last_path {
                 if let Some(path) = path {

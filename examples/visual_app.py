@@ -88,9 +88,6 @@ userprofile = os.getenv('USERPROFILE')
 local_low = os.path.join(userprofile, 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO')
 local_low = str(local_low)
 
-# Start the listener thread
-lib.start_listener(local_low.encode('utf-8'))
-
 # Add a callback with dummy values
 code = 4          # e.g., SubscribeCode::Tokenizer
 msg_type = 1      # e.g., SubscriptionType::JSON
@@ -98,5 +95,8 @@ channel_id = 1    # your app-defined channel ID
 callback_fn_ptr = ctypes.cast(my_event_callback, c_void_p)
 
 lib.add_callback(code, msg_type, channel_id, callback_fn_ptr)
+
+# Start the listener thread
+lib.start_listener(local_low.encode('utf-8'))
 
 root.mainloop()

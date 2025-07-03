@@ -31,8 +31,8 @@ pub extern "C" fn start_listener(file_path: *const c_char) {
         PathBuf::from(&*string)
     };
 
-    let thread = MAIN_THREAD.get_or_init(|| MainThread::create(path.clone()));
-    thread.change_logs_folder(path);
+    MAIN_THREAD.get_or_init(|| MainThread::create(None))
+        .change_logs_folder(path);
 }
 
 ///
@@ -56,12 +56,16 @@ pub extern "C" fn add_callback(
 
     let callback_info = CallbackInfo::new(code, message_type, channel_id, event_callback);
     MAIN_THREAD
-        .get()
-        .map(|t| t.register_callback(callback_info));
+        .get_or_init(|| MainThread::create(None))
+        .register_callback(callback_info);
 }
 
 ///
 #[unsafe(no_mangle)]
-pub extern "C" fn remove_callback(channel_id: u32) {
-    MAIN_THREAD.get().map(|t| t.remove_callback(channel_id));
+pub extern "C" fn remove_callback(code: u8, channel_id: u32) {
+    let code = code.into();
+
+    MAIN_THREAD
+        .get_or_init(|| MainThread::create(None))
+        .remove_callback(code, channel_id);
 }
