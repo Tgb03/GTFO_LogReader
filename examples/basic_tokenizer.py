@@ -4,6 +4,9 @@ import os
 from pathlib import Path
 from ctypes import c_char_p, c_void_p, c_uint8, c_uint32, CFUNCTYPE
 
+dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
+
 #
 # THIS IS ALL SETUP FOR THE DLL
 # You could throw all this in a python class
@@ -12,7 +15,7 @@ from ctypes import c_char_p, c_void_p, c_uint8, c_uint32, CFUNCTYPE
 
 # Get absolute path to the DLL relative to this script
 script_dir = Path(__file__).resolve().parent
-dll_path = os.path.join(script_dir, "../target/release/gtfo_log_reader_core.dll")
+dll_path = os.path.join(script_dir, dll_relative_path)
   # Replace with actual DLL name
 lib = ctypes.CDLL(dll_path)
 
@@ -48,12 +51,8 @@ def my_event_callback(message):
     else:
         print("Callback called with NULL message")
 
-userprofile = os.getenv('USERPROFILE')
-local_low = os.path.join(userprofile, 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO')
-local_low = str(local_low)
-
 # Start the listener thread
-lib.start_listener(local_low.encode('utf-8'))
+lib.start_listener(log_folder_path.encode('utf-8'))
 
 # Add a callback with dummy values
 code = 4          # e.g., SubscribeCode::Tokenizer

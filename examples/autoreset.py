@@ -10,6 +10,10 @@ from tkinter import ttk
 from ahk import AHK
 import time
 
+dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+ahk_executable_path = 'C:\Program Files\AutoHotkey\\v2\\AutoHotkey64.exe'
+log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
+
 #
 # THIS IS ALL SETUP FOR THE DLL
 # You could throw all this in a python class
@@ -18,7 +22,7 @@ import time
 
 # Get absolute path to the DLL relative to this script
 script_dir = Path(__file__).resolve().parent
-dll_path = os.path.join(script_dir, "../target/release/gtfo_log_reader_core.dll")
+dll_path = os.path.join(script_dir, dll_relative_path)
   # Replace with actual DLL name
 lib = ctypes.CDLL(dll_path)
 
@@ -63,7 +67,7 @@ hsu_id = 0
 
 is_valid = False
 
-ahk = AHK(version='v2', executable_path='C:\Program Files\AutoHotkey\\v2\\AutoHotkey64.exe')
+ahk = AHK(version='v2', executable_path=ahk_executable_path)
 
 # 4. Implement a Python callback function
 # The callback returns a message that is based on the values
@@ -154,12 +158,8 @@ def check_stop():
 ahk.add_hotkey('#n', callback=start_cycling)
 ahk.start_hotkeys()
 
-userprofile = os.getenv('USERPROFILE')
-local_low = os.path.join(userprofile, 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO')
-local_low = str(local_low)
-
 # Start the listener thread
-lib.start_listener(local_low.encode('utf-8'))
+lib.start_listener(log_folder_path.encode('utf-8'))
 
 # Add a callback with dummy values
 code = 4          # e.g., SubscribeCode::Tokenizer
