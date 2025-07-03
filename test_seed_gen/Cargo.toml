@@ -1,0 +1,8 @@
+[package]
+name = "test_seed_gen"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[dependencies]
+gtfo_log_reader_core = { path = "../gtfo_log_reader_core" }

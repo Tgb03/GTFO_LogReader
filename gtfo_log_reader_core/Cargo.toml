@@ -1,0 +1,25 @@
+[package]
+name = "gtfo_log_reader_core"
+version.workspace = true
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+bincode = "1.3"
+enum_dispatch = "0.3.13"
+might_sleep = "0.2.0"
+num_enum = "0.7.4"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.140"
+strum = { version = "0.26.3", features = ["derive"] }
+strum_macros = "0.26.4"
+winapi = "0.3.9"
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = "thin"
+strip = "debuginfo"
+overflow-checks = false
