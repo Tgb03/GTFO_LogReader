@@ -30,7 +30,7 @@ lib.add_callback.argtypes = [c_uint8, c_uint8, c_uint32, c_void_p]
 lib.add_callback.restype = None
 
 # void remove_callback(uint32_t channel_id)
-lib.remove_callback.argtypes = [c_uint32]
+lib.remove_callback.argtypes = [c_uint8, c_uint32]
 lib.remove_callback.restype = None
 
 #
@@ -72,4 +72,4 @@ while True:
     time.sleep(1)
 
 # Optional: remove callback
-lib.remove_callback(channel_id)
+lib.remove_callback(code, channel_id)
