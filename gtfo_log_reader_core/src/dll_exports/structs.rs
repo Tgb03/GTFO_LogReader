@@ -12,7 +12,7 @@ use crate::{
         callback_handler::HasCallbackHandler,
         enums::{SubscribeCode, SubscriptionType},
         functions::EventCallback,
-        token_parsers::{token_parser_base::TokenParserBase, token_parser_seeds::TokenParserSeed},
+        token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_seeds::TokenParserSeed},
     }, readers::{file_reader::FileReader, folder_watcher::FolderWatcher}
 };
 
@@ -109,6 +109,7 @@ impl MainThread {
 
         let mut parser_base = TokenParserBase::default();
         let mut parser_seeds = TokenParserSeed::default();
+        let mut parser_mapper = TokenParserLocations::default();
 
         loop {
             if let Ok(()) = shutdown.try_recv() {
@@ -119,7 +120,7 @@ impl MainThread {
                 match callback.code {
                     SubscribeCode::Tokenizer => parser_base.add_callback(callback),
                     SubscribeCode::RunInfo => panic!("SubscribeCode::RunInfo not implemented"),
-                    SubscribeCode::Mapper => panic!("SubscribeCode::Mapper not implemented"),
+                    SubscribeCode::Mapper => parser_mapper.add_callback(callback),
                     SubscribeCode::SeedIndexer => parser_seeds.add_callback(callback),
                 }
             }
@@ -128,6 +129,7 @@ impl MainThread {
                 let tokens = tokenizer.tokenize(&new_lines);
 
                 parser_base.parse_tokens(tokens.iter().cloned());
+                parser_mapper.parse_tokens(tokens.iter().cloned());
                 parser_seeds.parse_tokens(tokens.iter().cloned());
             }
 

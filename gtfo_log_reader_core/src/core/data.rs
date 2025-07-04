@@ -3,7 +3,7 @@ use std::fmt::Display;
 use num_enum::{FromPrimitive, IntoPrimitive};
 use serde::{Deserialize, Serialize};
 
-use super::location::Location;
+use crate::core::location::Location;
 
 #[derive(
     Default,
