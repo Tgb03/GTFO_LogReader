@@ -3,6 +3,7 @@ pub mod readers;
 
 pub mod seed_gen;
 pub mod mapper;
+pub mod run_gen;
 
 pub mod dll_exports;
 pub mod output_trait;

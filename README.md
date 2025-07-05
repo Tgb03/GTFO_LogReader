@@ -26,7 +26,7 @@ This function takes 4 parameters:
 
 1. `code: uint8_t` this represents what type of request this callback will listen to.
     - `1`: Tokenizer, this returns ALL tokens parsed, I recommend using this to see which tokens are being parsed.
-    - `2`: ${\textsf{\color{red}NOT YET IMPLEMENTED}}$ RunInfo, this returns ALL the info about runs. Level info, data, door opens, times for each event.
+    - `2`: RunInfo, this returns ALL the info about runs. Level info, data, door opens, times for each event.
     - `3`: Mapper, this returns ALL the info about the level generation when dropping into a level.
     - `4`: SeedIndexer, this returns ALL the info obtained from the seed indexer. Be aware not all levels are supported and the info may be limited.
 

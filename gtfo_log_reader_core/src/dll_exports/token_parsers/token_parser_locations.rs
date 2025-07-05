@@ -25,6 +25,10 @@ impl HasCallbackHandler for TokenParserLocations {
 
 impl TokenParser for TokenParserLocations {
     fn parse_token(&mut self, _: Time, token: Token) {
+        if self.callback_handler.is_empty() {
+            return;
+        }
+        
         if let Some(key) = self.key_gen.accept_token(&token) {
             self.output(key);
         }
