@@ -88,6 +88,13 @@ def my_event_callback(message):
             label.pack()
             labels.append(label)
 
+        if "ConsumableFound" in data:
+            c_id, found = data["ConsumableFound"]
+            text = f"Container {c_id}: {found}"
+            label = Label(frame, text=text)
+            label.pack()
+            labels.append(label)
+
 
 
 # Add a callback with dummy values

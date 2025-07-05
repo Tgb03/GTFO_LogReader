@@ -22,6 +22,7 @@ pub enum OutputSeedIndexer {
     Seed(f32),
     Key(String, i32, i32),           // zone, id
     ResourcePack(ResourceType, i32), // count
+    ConsumableFound(i32, bool),      // id of box, found or not
     GenerationEnd,
     GenerationStart,
 }
