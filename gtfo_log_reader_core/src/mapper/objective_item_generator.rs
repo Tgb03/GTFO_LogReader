@@ -14,8 +14,7 @@ pub struct ObjectiveItemGenerator {
 impl Default for ObjectiveItemGenerator {
     fn default() -> Self {
         Self { 
-            collectable_mapper: CollectableMapper::load_from_web()
-                .or_else(|| CollectableMapper::load_from_file()), 
+            collectable_mapper: CollectableMapper::load_from_file(), 
             dimension: Default::default(), 
             buffer_names: Default::default(), 
             buffer_zones: Default::default(), 
