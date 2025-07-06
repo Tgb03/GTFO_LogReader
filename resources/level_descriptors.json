@@ -547,7 +547,9 @@
             }
         },
         {
-            "OutputSeed": null
+            "Ignore": {
+                "count": 1
+            }
         },
         {
             "KeyConsumer": {
@@ -565,37 +567,9 @@
             }
         },
         {
-            "KeyConsumer": {
-                "key_type": "ColoredKey",
-                "zones": [
-                    {
-                        "name": "ColoredKey",
-                        "zone": 538,
-                        "start_weight": 0,
-                        "middle_weight": 0,
-                        "end_weight": 10000,
-                        "spawns_per_room": [10000]
-                    }
-                ]
+            "Ignore": {
+                "count": 9
             }
-        },
-        {
-            "KeyConsumer": {
-                "key_type": "ColoredKey",
-                "zones": [
-                    {
-                        "name": "ColoredKey",
-                        "zone": 541,
-                        "start_weight": 0,
-                        "middle_weight": 0,
-                        "end_weight": 10000,
-                        "spawns_per_room": [10000]
-                    }
-                ]
-            }
-        },
-        {
-            "OutputSeed": null
         },
         {
             "ZoneConsumer": {
