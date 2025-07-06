@@ -2,7 +2,17 @@ use std::collections::VecDeque;
 
 use serde::{Deserialize, Serialize};
 
-use crate::{dll_exports::callback_handler::HasCallbackHandler, seed_gen::consumers::{base_consumer::Consumer, ignore_consumer::IgnoreConsumer, resource_generation::{ResourceGeneration, ResourceType}, ConsumerEnum}};
+use crate::{
+    dll_exports::callback_handler::HasCallbackHandler, output_trait::{OutputSeedIndexer, OutputTrait}, seed_gen::consumers::{
+        base_consumer::Consumer, 
+        ignore_consumer::IgnoreConsumer, 
+        resource_generation::{
+            ResourceGeneration, 
+            ResourceType
+        }, 
+        ConsumerEnum
+    }
+};
 
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -68,6 +78,11 @@ where
     fn take(&mut self, seed: f32, output: &mut O) -> bool {
         self.setup();
 
-        self.consumers.take(seed, output)
+        let result = self.consumers.take(seed, output);
+        if result {
+            output.output(OutputSeedIndexer::ZoneGenEnded(self.shown_number));
+        }
+
+        result
     }
 }

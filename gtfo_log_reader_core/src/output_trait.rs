@@ -25,4 +25,5 @@ pub enum OutputSeedIndexer {
     ConsumableFound(i32, bool),      // id of box, found or not
     GenerationEnd,
     GenerationStart,
+    ZoneGenEnded(u32),
 }
