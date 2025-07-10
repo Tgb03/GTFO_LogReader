@@ -73,7 +73,35 @@ If the folder path does not exist the thread will do nothing.
 ${\textsf{\color{red}NOT YET IMPLEMENTED}}$
 
 This will contain a function that allows you to pass the path to the file which will then be read.
-The exact behaviour will be documented later based on requirements I make for this section of the program.
+This function is given files to be parsed and a callback handler that will be called every time. 
+
+`pub extern "C" fn process_paths(paths: *const *const c_char, len: uint_32, code: uint_8, message_type: uint_8, event_callback_ptr: *const c_void)`
+
+This function takes 5 parameters, the first 2 are new, while the last 3 are familiar from the `add_callback` function:
+
+1. `paths: *const *const c_char` this represents the vector of paths of files that need to be parsed.
+
+2. `len: uint_32` this represents the size of the paths array. Make sure this is correct as the app will just have undefined behaviour otherwise.
+
+3. `code: uint8_t` this represents what type of request this callback will listen to.
+    - `1`: Tokenizer, this returns ALL tokens parsed, I recommend using this to see which tokens are being parsed.
+    - `2`: RunInfo, this returns ALL the info about runs. Level info, data, door opens, times for each event.
+    - `3`: Mapper, this returns ALL the info about the level generation when dropping into a level.
+    - `4`: SeedIndexer, this returns ALL the info obtained from the seed indexer. Be aware not all levels are supported and the info may be limited.
+
+4. `message_type: uint8_t` this represents the format of the response you will get from the DLL.
+     - `1`: JSON, this returns all the data in Json format.
+     - `2`: ${\textsf{\color{red}NOT YET IMPLEMENTED}}$ BITDATA, this returns all the data directly in bitdata format. I recommend this only if you really care about
+  performance. Tho, I do think it is overkill in almost every situation.
+     - `3`: ${\textsf{\color{red}NOT YET IMPLEMENTED}}$ CSV, this format is a bit special as not all data can be serialized as CSV so it may remove certain information
+     - `4`: ${\textsf{\color{red}NOT YET IMPLEMENTED}}$ XML, similar to json if you enjoy dealing with this format more.
+
+5. `event_callback_ptr: *const c_void` this is the function that will be called by the DLL and given the data.
+This functions needs to be of type:
+
+`pub type EventCallback = extern "C" fn(message: *const c_char)`. As you can see, all data is given through the c_char pointer which can then be parsed. This pointer 
+represents essentially an array of 8 bit integers. Make sure you are actually reading the data properly from it..
+
 
 # Examples
 
@@ -82,6 +110,3 @@ made that greatly as it is intended to only work as example rather than actual a
 
 # Be aware 
 - Certain mods may modify where the logs are being generated or if they are generated. This needs to be accounted for.
-
-
-

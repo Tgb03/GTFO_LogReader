@@ -6,17 +6,16 @@ use might_sleep::prelude::CpuLimiter;
 
 use crate::{
     core::{
-        token_parser::IterTokenParser,
-        tokenizer::{GenericTokenizer, Tokenizer},
+        token_parser::IterTokenParser, tokenizer::{GenericTokenizer, TokenizeIter, Tokenizer}
     }, dll_exports::{
         callback_handler::HasCallbackHandler,
         enums::{SubscribeCode, SubscriptionType},
         functions::EventCallback,
-        token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed},
+        token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed, CallbackTokenParser},
     }, readers::{file_reader::FileReader, folder_watcher::FolderWatcher}
 };
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct CallbackInfo {
     code: SubscribeCode,
     message_type: SubscriptionType,
@@ -97,6 +96,36 @@ impl MainThread {
 
     pub fn change_logs_folder(&self, new_path: PathBuf) {
         self.folder_watcher.update_path(new_path);
+    }
+
+    pub fn static_run(
+        mut paths: Vec<PathBuf>,
+        callback: CallbackInfo,
+    ) {
+        let tokenizer = GenericTokenizer::all_tokenizers();
+
+        while let Some(path) = paths.pop() {
+            let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
+                SubscribeCode::Tokenizer => Box::new(TokenParserBase::default()),
+                SubscribeCode::RunInfo => Box::new(TokenParserSeed::default()),
+                SubscribeCode::Mapper => Box::new(TokenParserLocations::default()),
+                SubscribeCode::SeedIndexer => Box::new(TokenParserSeed::default()),
+            };
+
+            parser.add_callback(callback.clone());
+
+            let Some(text) = FileReader::static_read(path) else {
+                continue;
+            };
+
+            let tok_iter = TokenizeIter::new(
+                text.split("\n"), 
+                &tokenizer
+            );
+    
+            parser.parse_tokens(tok_iter);
+                
+        }
     }
 
     fn thread_run(

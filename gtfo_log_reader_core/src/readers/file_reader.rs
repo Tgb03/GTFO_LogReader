@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader, Seek},
+    io::{BufRead, BufReader, Read, Seek},
     path::PathBuf,
     sync::mpsc::Receiver,
 };
@@ -48,6 +48,15 @@ impl FileReader {
         }
 
         self.last_position = reader.stream_position().unwrap_or(self.last_position);
+
+        Some(buffer)
+    }
+
+    pub fn static_read(path: PathBuf) -> Option<String> {
+        let mut reader = File::open(path).map(|f| BufReader::new(f)).ok()?;
+        let mut buffer = String::new();
+
+        let _ = reader.read_to_string(&mut buffer).ok()?;
 
         Some(buffer)
     }

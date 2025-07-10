@@ -12,7 +12,7 @@ pub trait IterTokenParser: TokenParser {
     }
 }
 
-impl<T: TokenParser> IterTokenParser for T {}
+impl<T: TokenParser + ?Sized> IterTokenParser for T {}
 
 impl<F> TokenParser for F
 where

@@ -69,3 +69,45 @@ pub extern "C" fn remove_callback(code: u8, channel_id: u32) {
         .get_or_init(|| MainThread::create(None))
         .remove_callback(code, channel_id);
 }
+
+#[unsafe(no_mangle)]
+pub extern "C" fn process_paths(
+    paths: *const *const c_char, 
+    len: u32,
+    code: u8,
+    message_type: u8,
+    event_callback_ptr: *const c_void,
+) {
+    if paths.is_null() {
+        return;
+    }
+
+    let slice = unsafe { std::slice::from_raw_parts(paths, len as usize) };
+
+    let pathbufs: Vec<PathBuf> = slice
+        .iter()
+        .filter_map(|&ptr| {
+            if ptr.is_null() {
+                None
+            } else {
+                let c_str = unsafe { CStr::from_ptr(ptr) };
+                Some(PathBuf::from(c_str.to_string_lossy().into_owned()))
+            }
+        })
+        .collect();
+    
+    let code = code.into();
+    let message_type = message_type.into();
+    let event_callback = if event_callback_ptr.is_null() {
+        None
+    } else {
+        Some(unsafe {
+            // Cast the void pointer into a function pointer
+            std::mem::transmute::<*const c_void, EventCallback>(event_callback_ptr)
+        })
+    };
+
+    let callback_info = CallbackInfo::new(code, message_type, 0, event_callback);
+
+    MainThread::static_run(pathbufs, callback_info);
+}
