@@ -1,4 +1,7 @@
-use std::{collections::{HashMap, VecDeque}, fs::File, io::Read};
+use std::{collections::{HashMap, VecDeque}};
+
+#[cfg(debug_assertions)]
+use std::{fs::File, io::Read};
 
 use crate::seed_gen::consumers::ConsumerEnum;
 
@@ -7,7 +10,7 @@ pub struct LoadSeedConsumers;
 
 impl LoadSeedConsumers {
 
-    /*
+    #[cfg(not(debug_assertions))]
     pub fn load_all() -> Option<HashMap<String, VecDeque<ConsumerEnum>>> {
         let file_text = include_str!("..\\..\\resources\\level_descriptors.json");
 
@@ -16,8 +19,8 @@ impl LoadSeedConsumers {
             Err(e) => { println!("{:?}", e); return None; },
         }
     }
-    */
-
+    
+    #[cfg(debug_assertions)]
     pub fn load_all() -> Option<HashMap<String, VecDeque<ConsumerEnum>>> {
         let current_dir = std::env::current_dir().ok()?
             .join("resources")

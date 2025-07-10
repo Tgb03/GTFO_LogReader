@@ -124,7 +124,7 @@ def cycle_reset():
             { x: -2000, y: -2000, pre: 300, click: 1, delay: 10 },
             { x: 300,   y: 43,    pre: 300, click: 100, delay: 10 },
             { x: 573,   y: 248,   pre: 300, click: 100, delay: 10 },
-            { x: -25,   y: 400,   pre: 300, click: 900, delay: 10 }
+            { x: -85,   y: 400,   pre: 300, click: 900, delay: 10 }
         ]
 
         for index, pos in positions {
@@ -146,8 +146,8 @@ def check_stop():
     if key_id in [0, 1, 2, 3]:
         return True
     
-    stop_keys = [4, 5, 6, 7, 14, 16, 18]
-    stop_hsus = [1, 2, 3]
+    stop_keys = [14, 16, 18]
+    stop_hsus = [1]
 
     if key_id in stop_keys and hsu_id in stop_hsus:
         return True
@@ -160,6 +160,8 @@ ahk.start_hotkeys()
 
 # Start the listener thread
 lib.start_listener(log_folder_path.encode('utf-8'))
+
+time.sleep(2)
 
 # Add a callback with dummy values
 code = 4          # e.g., SubscribeCode::Tokenizer
