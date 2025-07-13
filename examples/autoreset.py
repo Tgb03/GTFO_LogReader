@@ -26,8 +26,8 @@ dll_path = os.path.join(script_dir, dll_relative_path)
   # Replace with actual DLL name
 lib = ctypes.CDLL(dll_path)
 
-# 2. Define callback type: extern "C" fn(message: *const c_char)
-CALLBACK_TYPE = CFUNCTYPE(None, ctypes.c_char_p)
+# 2. Define callback type: extern "C" fn(context: *const c_void, message: *const c_char)
+CALLBACK_TYPE = CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_char_p)
 
 # 3. Define Rust function signatures
 
@@ -35,8 +35,8 @@ CALLBACK_TYPE = CFUNCTYPE(None, ctypes.c_char_p)
 lib.start_listener.argtypes = [c_char_p]
 lib.start_listener.restype = None
 
-# void add_callback(uint8_t code, uint8_t message_type, uint32_t channel_id, void* callback)
-lib.add_callback.argtypes = [c_uint8, c_uint8, c_uint32, c_void_p]
+# void add_callback(uint8_t code, uint8_t message_type, uint32_t channel_id, void* context, void* callback)
+lib.add_callback.argtypes = [c_uint8, c_uint8, c_uint32, c_void_p, c_void_p]
 lib.add_callback.restype = None
 
 # void remove_callback(uint32_t channel_id)
@@ -73,7 +73,7 @@ ahk = AHK(version='v2', executable_path=ahk_executable_path)
 # The callback returns a message that is based on the values
 # u set when the callback is created by add_callback(...)
 @CALLBACK_TYPE
-def my_event_callback(message):
+def my_event_callback(context, message):
     global reset_counter
     global reset_counter_label
     global key_id, hsu_id, is_valid
@@ -169,6 +169,6 @@ msg_type = 1      # e.g., SubscriptionType::JSON
 channel_id = 1    # your app-defined channel ID
 callback_fn_ptr = ctypes.cast(my_event_callback, c_void_p)
 
-lib.add_callback(code, msg_type, channel_id, callback_fn_ptr)
+lib.add_callback(code, msg_type, channel_id, 0, callback_fn_ptr)
 
 root.mainloop()

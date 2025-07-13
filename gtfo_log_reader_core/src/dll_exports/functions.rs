@@ -7,7 +7,7 @@ use std::{
 
 use crate::dll_exports::structs::{CallbackInfo, MainThread};
 
-pub type EventCallback = extern "C" fn(message: *const c_char);
+pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char);
 static MAIN_THREAD: OnceLock<MainThread> = OnceLock::new();
 
 /// starts a folder listener in that file_path. This file_path must
@@ -41,6 +41,7 @@ pub extern "C" fn add_callback(
     code: u8,
     message_type: u8,
     channel_id: u32,
+    context: *const c_void,
     event_callback_ptr: *const c_void,
 ) {
     let code = code.into();
@@ -54,7 +55,7 @@ pub extern "C" fn add_callback(
         })
     };
 
-    let callback_info = CallbackInfo::new(code, message_type, channel_id, event_callback);
+    let callback_info = CallbackInfo::new(code, message_type, channel_id, context.into(), event_callback);
     MAIN_THREAD
         .get_or_init(|| MainThread::create(None))
         .register_callback(callback_info);
@@ -76,6 +77,7 @@ pub extern "C" fn process_paths(
     len: u32,
     code: u8,
     message_type: u8,
+    context: *const c_void,
     event_callback_ptr: *const c_void,
 ) {
     if paths.is_null() {
@@ -107,7 +109,7 @@ pub extern "C" fn process_paths(
         })
     };
 
-    let callback_info = CallbackInfo::new(code, message_type, 0, event_callback);
+    let callback_info = CallbackInfo::new(code, message_type, 0, context.into(), event_callback);
 
     MainThread::static_run(pathbufs, callback_info);
 }

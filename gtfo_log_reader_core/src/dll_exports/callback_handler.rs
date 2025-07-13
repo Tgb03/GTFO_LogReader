@@ -27,8 +27,9 @@ where
         for callback in self.get_callback_handler().values() {
             if let Some(event) = callback.get_event_callback() {
                 let converter = callback.get_message_type();
+                let context = callback.get_context();
                 if let Some(result_string) = converter.convert(&data) {
-                    event(result_string.as_ptr())
+                    event(context.get_ptr(), result_string.as_ptr())
                 }
             }
         }

@@ -1,5 +1,5 @@
 use std::{
-    path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
+    os::raw::c_void, path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
 };
 
 use might_sleep::prelude::CpuLimiter;
@@ -15,12 +15,35 @@ use crate::{
     }, readers::{file_reader::FileReader, folder_watcher::FolderWatcher}
 };
 
-#[derive(Default, Clone)]
+#[derive(Debug, Clone, Copy)]
+pub struct ThreadSafePtr{
+    p: *const c_void
+}
+
+impl From<*const c_void> for ThreadSafePtr {
+    fn from(value: *const c_void) -> Self {
+        Self {
+            p: value
+        }
+    }
+}
+
+impl ThreadSafePtr {
+    pub fn get_ptr(&self) -> *const c_void {
+        self.p
+    }
+}
+
+unsafe impl Send for ThreadSafePtr {}
+unsafe impl Sync for ThreadSafePtr {}
+
+#[derive(Clone)]
 pub struct CallbackInfo {
     code: SubscribeCode,
     message_type: SubscriptionType,
     channel_id: u32,
 
+    context: ThreadSafePtr,
     event_callback: Option<EventCallback>,
 }
 
@@ -29,12 +52,14 @@ impl CallbackInfo {
         code: SubscribeCode,
         message_type: SubscriptionType,
         channel_id: u32,
+        context: ThreadSafePtr,
         event_callback: Option<EventCallback>,
     ) -> CallbackInfo {
         CallbackInfo {
             code,
             message_type,
             channel_id,
+            context: context.into(),
             event_callback,
         }
     }
@@ -53,6 +78,10 @@ impl CallbackInfo {
 
     pub fn get_event_callback(&self) -> &Option<EventCallback> {
         &self.event_callback
+    }
+
+    pub fn get_context(&self) -> &ThreadSafePtr {
+        &self.context
     }
 }
 
@@ -90,7 +119,9 @@ impl MainThread {
         let _ = self.send_callbacks.send(CallbackInfo {
             channel_id: id,
             code,
-            ..Default::default()
+            context: ThreadSafePtr{ p: 0 as *mut c_void },
+            event_callback: None,
+            message_type: 0.into(),
         });
     }
 

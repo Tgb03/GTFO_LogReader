@@ -46,7 +46,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "gtfo_log_reader_core"
-version = "0.1.0-beta.1"
+version = "0.1.0-beta.2"
 dependencies = [
  "bincode",
  "enum_dispatch",
@@ -247,7 +247,7 @@ dependencies = [
 
 [[package]]
 name = "test_seed_gen"
-version = "0.1.0-beta.1"
+version = "0.1.0-beta.2"
 dependencies = [
  "gtfo_log_reader_core",
 ]

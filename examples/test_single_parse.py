@@ -24,13 +24,13 @@ dll_path = os.path.join(script_dir, dll_relative_path)
   # Replace with actual DLL name
 lib = ctypes.CDLL(dll_path)
 
-# 2. Define callback type: extern "C" fn(message: *const c_char)
-CALLBACK_TYPE = CFUNCTYPE(None, ctypes.c_char_p)
+# 2. Define callback type: extern "C" fn(context: *const c_void, message: *const c_char)
+CALLBACK_TYPE = CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_char_p)
 
 # 3. Define Rust function signatures
 
-# void process_paths(paths: *const *const c_char, len: uint_32, code: uint_8, message_type: uint_8, event_callback_ptr: *const c_void)
-lib.process_paths.argtypes = [POINTER(c_char_p), c_uint32, c_uint8, c_uint8, c_void_p]
+# void process_paths(paths: *const *const c_char, len: uint_32, code: uint_8, message_type: uint_8, context: *const c_void, event_callback_ptr: *const c_void)
+lib.process_paths.argtypes = [POINTER(c_char_p), c_uint32, c_uint8, c_uint8, c_void_p, c_void_p]
 lib.process_paths.restype = None
 
 #
@@ -42,7 +42,7 @@ lib.process_paths.restype = None
 # The callback returns a message that is based on the values
 # u set when the callback is created by add_callback(...)
 @CALLBACK_TYPE
-def my_event_callback(message):
+def my_event_callback(context, message):
     print(message.decode())
 
 file_paths = filedialog.askopenfilenames(title="Select files to process")
@@ -55,6 +55,6 @@ length = c_uint32(len(encoded_paths))
 code = 1          # e.g., SubscribeCode::Tokenizer
 msg_type = 1      # e.g., SubscriptionType::JSON
 
-lib.process_paths(c_paths, length, code, msg_type, callback_fn_ptr)
+lib.process_paths(c_paths, length, code, msg_type, 0, callback_fn_ptr)
 
 print("Done")

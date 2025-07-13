@@ -40,11 +40,12 @@ This function takes 4 parameters:
 3. `channel_id: uint32_t` this is the channel id being used. Use this for shutting down a certain callback function. Be aware that each `code` has unique `channel_id`s
 so if you create a channel with id `3` and code `1`, in order to shut it down you need to give the correct `code` as well, not just the `channel_id`.
 
-4. `event_callback_ptr: *const c_void` this is the function that will be called by the DLL and given the data.
+4. `callback_context: *const c_void` this is the context for the function that will be called. It is given back as is to the EventCallBack function.
+
+5. `event_callback_ptr: *const c_void` this is the function that will be called by the DLL and given the data.
 This functions needs to be of type:
 
-`pub type EventCallback = extern "C" fn(message: *const c_char)`. As you can see, all data is given through the c_char pointer which can then be parsed. This pointer 
-represents essentially an array of 8 bit integers. Make sure you are actually reading the data properly from it..
+`pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char)`. The first variable is the context for the function call (Can be used for objects or to give special additional information. This is given as is from the moment you created the callback). All the rest of the data is given through the c_char pointer which can then be parsed. This pointer represents essentially an array of 8 bit integers. Make sure you are actually reading the data properly from it.
 
 - `pub extern "C" fn remove_callback(code: uint8_t, channel_id: uint32_t)`
 
@@ -70,12 +71,11 @@ this file, even if the file itself may be super old.
 If the folder path does not exist the thread will do nothing. 
 
 ## Reading specific files
-${\textsf{\color{red}NOT YET IMPLEMENTED}}$
 
 This will contain a function that allows you to pass the path to the file which will then be read.
 This function is given files to be parsed and a callback handler that will be called every time. 
 
-`pub extern "C" fn process_paths(paths: *const *const c_char, len: uint_32, code: uint_8, message_type: uint_8, event_callback_ptr: *const c_void)`
+`pub extern "C" fn process_paths(paths: *const *const c_char, len: uint_32, code: uint_8, message_type: uint_8, callback_context: *const c_void, event_callback_ptr: *const c_void)`
 
 This function takes 5 parameters, the first 2 are new, while the last 3 are familiar from the `add_callback` function:
 
@@ -96,11 +96,12 @@ This function takes 5 parameters, the first 2 are new, while the last 3 are fami
      - `3`: ${\textsf{\color{red}NOT YET IMPLEMENTED}}$ CSV, this format is a bit special as not all data can be serialized as CSV so it may remove certain information
      - `4`: ${\textsf{\color{red}NOT YET IMPLEMENTED}}$ XML, similar to json if you enjoy dealing with this format more.
 
-5. `event_callback_ptr: *const c_void` this is the function that will be called by the DLL and given the data.
+5. `callback_context: *const c_void` this is the context for the function that will be called. It is given back as is to the EventCallBack function.
+
+6. `event_callback_ptr: *const c_void` this is the function that will be called by the DLL and given the data.
 This functions needs to be of type:
 
-`pub type EventCallback = extern "C" fn(message: *const c_char)`. As you can see, all data is given through the c_char pointer which can then be parsed. This pointer 
-represents essentially an array of 8 bit integers. Make sure you are actually reading the data properly from it..
+`pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char)`. The first variable is the context for the function call (Can be used for objects or to give special additional information. This is given as is from the moment you created the process request). All the rest of the data is given through the c_char pointer which can then be parsed. This pointer represents essentially an array of 8 bit integers. Make sure you are actually reading the data properly from it.
 
 
 # Examples
