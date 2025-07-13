@@ -7,6 +7,7 @@ where
 
     current_run: Option<TimedRun<S>>,
     last_split_time: Time,
+    last_level_name: String,
 
     door_count: u32,
     bulk_count: u32,
@@ -22,7 +23,8 @@ impl<S: Split> Default for RunGenerator<S> {
     fn default() -> Self {
         Self { 
             current_run: Default::default(), 
-            last_split_time: Default::default(), 
+            last_split_time: Default::default(),
+            last_level_name: Default::default(), 
             door_count: Default::default(), 
             bulk_count: Default::default(),
             player_count: Default::default(),
@@ -52,18 +54,18 @@ impl RunGenerator<NamedSplit> {
             Token::SelectExpedition(level_id, _) => {
                 if let Some(run) = self.current_run.take() {
                     self.reset();
+                    self.last_level_name = format!("{level_id}");
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
-
-                self.current_run = Some(
-                    TimedRun::new(level_id.to_string(), self.player_count)
-                )
             },
             Token::PlayerJoinedLobby => { self.player_count += 1; },
             Token::PlayerLeftLobby => { self.player_count = self.player_count.saturating_sub(1); },
             Token::UserExitLobby => { self.player_count = 0; },
             Token::GameStarted => { 
-                self.last_split_time = time; 
+                self.last_split_time = time;
+                self.current_run = Some(
+                    TimedRun::new(self.last_level_name.to_string(), self.player_count)
+                );
                 
                 return Some(RunGeneratorResult::GameStarted);
             },
@@ -135,9 +137,26 @@ impl RunGenerator<NamedSplit> {
             },
             Token::GameEndLost => {
                 self.in_death_screen = true;
+                let split = NamedSplit::new(
+                    time - self.last_split_time, 
+                    "LOSS".to_owned(),
+                );
+
+                self.current_run.as_mut()
+                    .map(|r| r.add_split(
+                        split
+                    )
+                );
             }
             Token::GameEndAbort => {
-                if let Some(run) = self.current_run.take() {
+                if let Some(mut run) = self.current_run.take() {
+                    let split = NamedSplit::new(
+                        time - self.last_split_time, 
+                        "STOP".to_owned(),
+                    );
+
+                    run.add_split(split);
+
                     self.reset();
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
