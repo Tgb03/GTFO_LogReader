@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{core::time::Time, run_gen::split::Split};
+use crate::{core::{data::LevelDescriptor, time::Time}, run_gen::split::Split};
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -8,7 +8,7 @@ pub struct TimedRun<S>
 where 
     S: Split {
 
-    name: String,
+    name: LevelDescriptor,
     total_time: Time,
     player_count: u8,
 
@@ -20,19 +20,6 @@ where
 
     splits: Vec<S>,
 
-}
-
-impl<S> Split for TimedRun<S>
-where
-    S: Split {
-    
-    fn get_name(&self) -> &str {
-        &self.name
-    }
-    
-    fn get_time(&self) -> Time {
-        self.total_time
-    }
 }
 
 impl<S: Split> Default for TimedRun<S> {
@@ -54,7 +41,7 @@ impl<S> TimedRun<S>
 where 
     S: Split {
 
-    pub fn new(name: String, player_count: u8) -> Self {
+    pub fn new(name: LevelDescriptor, player_count: u8) -> Self {
         Self {
             name,
             player_count,

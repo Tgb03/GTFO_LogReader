@@ -15,6 +15,5 @@ pub enum RunGeneratorResult {
     CheckpointUsed,
 
     LevelRun(TimedRun<NamedSplit>),
-    GameRun(TimedRun<TimedRun<NamedSplit>>),
 
 }

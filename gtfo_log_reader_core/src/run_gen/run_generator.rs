@@ -1,4 +1,4 @@
-use crate::{core::{time::Time, token::Token}, run_gen::{run::TimedRun, run_gen_result::RunGeneratorResult, split::{NamedSplit, Split}}};
+use crate::{core::{data::LevelDescriptor, time::Time, token::Token}, run_gen::{run::TimedRun, run_gen_result::RunGeneratorResult, split::{NamedSplit, Split}}};
 
 
 pub struct RunGenerator<S>
@@ -7,7 +7,7 @@ where
 
     current_run: Option<TimedRun<S>>,
     last_split_time: Time,
-    last_level_name: String,
+    last_level_name: LevelDescriptor,
 
     door_count: u32,
     bulk_count: u32,
@@ -54,7 +54,7 @@ impl RunGenerator<NamedSplit> {
             Token::SelectExpedition(level_id, _) => {
                 if let Some(run) = self.current_run.take() {
                     self.reset();
-                    self.last_level_name = format!("{level_id}");
+                    self.last_level_name = level_id.clone();
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
@@ -64,7 +64,7 @@ impl RunGenerator<NamedSplit> {
             Token::GameStarted => { 
                 self.last_split_time = time;
                 self.current_run = Some(
-                    TimedRun::new(self.last_level_name.to_string(), self.player_count)
+                    TimedRun::new(self.last_level_name.clone(), self.player_count)
                 );
                 
                 return Some(RunGeneratorResult::GameStarted);
