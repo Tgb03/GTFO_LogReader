@@ -22,7 +22,7 @@ So far 3 functions are exposed. Using these you can read data from the logs in r
 
 - `pub extern "C" fn add_callback(code: uint8_t, message_type: uint8_t, channel_id: uint32_t, event_callback_ptr: *const c_void)`
 
-This function takes 4 parameters:
+This function takes 5 parameters:
 
 1. `code: uint8_t` this represents what type of request this callback will listen to.
     - `1`: Tokenizer, this returns ALL tokens parsed, I recommend using this to see which tokens are being parsed.
@@ -77,7 +77,7 @@ This function is given files to be parsed and a callback handler that will be ca
 
 `pub extern "C" fn process_paths(paths: *const *const c_char, len: uint_32, code: uint_8, message_type: uint_8, callback_context: *const c_void, event_callback_ptr: *const c_void)`
 
-This function takes 5 parameters, the first 2 are new, while the last 3 are familiar from the `add_callback` function:
+This function takes 6 parameters, the first 2 are new, while the last 3 are familiar from the `add_callback` function:
 
 1. `paths: *const *const c_char` this represents the vector of paths of files that need to be parsed.
 
