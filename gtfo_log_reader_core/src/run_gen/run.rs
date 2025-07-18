@@ -70,4 +70,8 @@ where
     pub fn did_overload(&mut self) {
         self.did_overload = true;
     }
+
+    pub fn get_last_split(&self) -> Option<&S> {
+        self.splits.last()
+    }
 }

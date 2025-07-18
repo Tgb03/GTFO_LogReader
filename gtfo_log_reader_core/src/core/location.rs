@@ -26,7 +26,7 @@ pub enum ItemIdentifier {
     Unknown(u8),
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub enum Location {
     // name, zone, id
     ColoredKey(String, u64, u64),
@@ -40,6 +40,9 @@ pub enum Location {
 
     // big collectables (cryo, cargos etc.): only identifier and zone
     BigCollectable(ItemIdentifier, u64),
+
+    // generation started
+    GenerationStarted,
 }
 
 impl Location {
@@ -50,6 +53,7 @@ impl Location {
             | Location::Gatherable(_, zone, _)
             | Location::BigObjective(_, zone, _)
             | Location::BigCollectable(_, zone) => *zone,
+            Location::GenerationStarted => 9999,
         }
     }
 }
@@ -66,6 +70,7 @@ impl Display for Location {
                 write!(f, "{}: ZONE {} at {}", identifier, zone, id)
             }
             Location::BigCollectable(name, zone) => write!(f, "{}: ZONE {}", name, zone),
+            Location::GenerationStarted => write!(f, "-1"),
         }
     }
 }

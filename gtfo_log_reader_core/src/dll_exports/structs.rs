@@ -6,7 +6,7 @@ use might_sleep::prelude::CpuLimiter;
 
 use crate::{
     core::{
-        token_parser::IterTokenParser, tokenizer::{GenericTokenizer, TokenizeIter, Tokenizer}
+        time::Time, token::Token, token_parser::IterTokenParser, tokenizer::{GenericTokenizer, TokenizeIter, Tokenizer}
     }, dll_exports::{
         callback_handler::HasCallbackHandler,
         enums::{SubscribeCode, SubscriptionType},
@@ -138,14 +138,15 @@ impl MainThread {
         while let Some(path) = paths.pop() {
             let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
                 SubscribeCode::Tokenizer => Box::new(TokenParserBase::default()),
-                SubscribeCode::RunInfo => Box::new(TokenParserSeed::default()),
+                SubscribeCode::RunInfo => Box::new(TokenParserRuns::default()),
                 SubscribeCode::Mapper => Box::new(TokenParserLocations::default()),
                 SubscribeCode::SeedIndexer => Box::new(TokenParserSeed::default()),
             };
 
             parser.add_callback(callback.clone());
 
-            let Some(text) = FileReader::static_read(path) else {
+            let Some(text) = FileReader::static_read(path.clone()) else {
+                println!("Could not read path: {:?}", path);
                 continue;
             };
 
@@ -155,7 +156,13 @@ impl MainThread {
             );
     
             parser.parse_tokens(tok_iter);
+            if let Some(last_line) = text.split("\n")
+                .last()
+                .map(|v| Time::from(v))
+                .flatten() {
                 
+                parser.parse_token(last_line, Token::LogFileEnd);
+            }
         }
     }
 

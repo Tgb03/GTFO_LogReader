@@ -100,7 +100,7 @@ impl LocationGenerator for ObjectiveItemGenerator {
                 self.buffer_zones.clear();
                 self.dimension = 0;
                 
-                None
+                Some(Location::GenerationStarted)
             }
             _ => None,
         }

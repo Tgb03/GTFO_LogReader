@@ -28,6 +28,7 @@ impl FileReader {
 
     pub fn get_new_lines(&mut self) -> Option<String> {
         if let Ok(new_path) = self.receiver.try_recv() {
+            println!("Reading live {:?}", new_path);
             self.new_file(new_path);
         }
 

@@ -52,9 +52,9 @@ impl RunGenerator<NamedSplit> {
     pub fn accept_token(&mut self, time: Time, token: &Token) -> Option<RunGeneratorResult> {
         match token {
             Token::SelectExpedition(level_id, _) => {
+                self.last_level_name = level_id.clone();
                 if let Some(run) = self.current_run.take() {
                     self.reset();
-                    self.last_level_name = level_id.clone();
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
@@ -129,10 +129,15 @@ impl RunGenerator<NamedSplit> {
             },
             Token::GameEndWin => {
                 self.current_run.as_mut().map(|v| v.add_win());
+                let split = NamedSplit::new(
+                    time - self.last_split_time, 
+                    "WIN".to_owned(),
+                );
 
-                if let Some(run) = self.current_run.take() {
+                if let Some(mut run) = self.current_run.take() {
+                    run.add_split(split.clone());
                     self.reset();
-                    return Some(RunGeneratorResult::LevelRun(run));
+                return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
             Token::GameEndLost => {
@@ -148,14 +153,16 @@ impl RunGenerator<NamedSplit> {
                     )
                 );
             }
-            Token::GameEndAbort => {
+            Token::GameEndAbort | Token::LogFileEnd => {
                 if let Some(mut run) = self.current_run.take() {
                     let split = NamedSplit::new(
                         time - self.last_split_time, 
                         "STOP".to_owned(),
                     );
 
-                    run.add_split(split);
+                    if run.get_last_split().is_none_or(|v| v.get_name() != "LOSS") {
+                        run.add_split(split);
+                    }
 
                     self.reset();
                     return Some(RunGeneratorResult::LevelRun(run));
