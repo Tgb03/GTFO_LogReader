@@ -3,6 +3,7 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 use strum_macros::{Display, FromRepr};
 
+
 /// taken from https://github.com/Angry-Maid/rusted-mapper
 #[derive(FromRepr, Display, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Serialize, Deserialize)]
 #[repr(u8)]
@@ -42,7 +43,7 @@ pub enum Location {
     BigCollectable(ItemIdentifier, u64),
 
     // generation started
-    GenerationStarted,
+    GenerationStarted(String),
 }
 
 impl Location {
@@ -53,7 +54,7 @@ impl Location {
             | Location::Gatherable(_, zone, _)
             | Location::BigObjective(_, zone, _)
             | Location::BigCollectable(_, zone) => *zone,
-            Location::GenerationStarted => 9999,
+            Location::GenerationStarted(_) => 9999,
         }
     }
 }
@@ -70,7 +71,7 @@ impl Display for Location {
                 write!(f, "{}: ZONE {} at {}", identifier, zone, id)
             }
             Location::BigCollectable(name, zone) => write!(f, "{}: ZONE {}", name, zone),
-            Location::GenerationStarted => write!(f, "-1"),
+            Location::GenerationStarted(_) => write!(f, "-1"),
         }
     }
 }

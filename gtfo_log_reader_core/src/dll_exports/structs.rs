@@ -8,7 +8,7 @@ use crate::{
     core::{
         time::Time, token::Token, token_parser::IterTokenParser, tokenizer::{GenericTokenizer, TokenizeIter, Tokenizer}
     }, dll_exports::{
-        callback_handler::HasCallbackHandler,
+        callback_handler::{CallbackClone, HasCallbackHandler},
         enums::{SubscribeCode, SubscriptionType},
         functions::EventCallback,
         token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed, CallbackTokenParser},
@@ -87,7 +87,6 @@ impl CallbackInfo {
 
 pub struct MainThread {
     folder_watcher: FolderWatcher,
-
     send_callbacks: Sender<CallbackInfo>,
 
     shutdown: Sender<()>,
@@ -171,7 +170,7 @@ impl MainThread {
         callback_recv: Receiver<CallbackInfo>,
         shutdown: Receiver<()>,
     ) {
-        let mut limiter = CpuLimiter::new(Duration::from_millis(500));
+        let mut limiter = CpuLimiter::new(Duration::from_millis(200));
         let tokenizer = GenericTokenizer::all_tokenizers();
 
         let mut parser_base = TokenParserBase::default();
@@ -184,13 +183,20 @@ impl MainThread {
                 break;
             }
 
-            if let Ok(callback) = callback_recv.try_recv() {
+            while let Ok(callback) = callback_recv.try_recv() {
                 match callback.code {
                     SubscribeCode::Tokenizer => parser_base.add_callback(callback),
                     SubscribeCode::RunInfo => parser_runs.add_callback(callback),
                     SubscribeCode::Mapper => parser_mapper.add_callback(callback),
                     SubscribeCode::SeedIndexer => parser_seeds.add_callback(callback),
                 }
+            }
+            
+            if file_reader.get_was_new_file() {
+                parser_base = parser_base.clone_callbacks();
+                parser_seeds = parser_seeds.clone_callbacks();
+                parser_mapper = parser_mapper.clone_callbacks();
+                parser_runs = parser_runs.clone_callbacks();
             }
 
             if let Some(new_lines) = file_reader.get_new_lines() {

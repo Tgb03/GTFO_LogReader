@@ -19,7 +19,6 @@ impl ObjectiveConsumer {
     fn calc_zone(&mut self, seed: f32) {
         if let Some(mut objectives_in_zone) = self.objectives_in_zones.pop_front() {
             let picked = (objectives_in_zone.len() as f32 * seed) as usize;
-            println!("Selected: {picked} from {}", objectives_in_zone.len());
             self.picked_zones.push_back(objectives_in_zone.swap_remove(picked));
         }
     }
@@ -37,7 +36,6 @@ where
         }
 
         if self.picked_zones.len() > 0 {
-            println!("Zone picking {seed}");
             self.picked_zones.pop_front()
                 .map(|mut z| z.take(seed, output));
         }

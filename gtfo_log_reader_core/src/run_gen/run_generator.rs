@@ -58,16 +58,22 @@ impl RunGenerator<NamedSplit> {
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
-            Token::PlayerJoinedLobby => { self.player_count += 1; },
-            Token::PlayerLeftLobby => { self.player_count = self.player_count.saturating_sub(1); },
-            Token::UserExitLobby => { self.player_count = 0; },
+            Token::PlayerJoinedLobby => { 
+                self.player_count = self.player_count.saturating_add(1);
+            },
+            Token::PlayerLeftLobby => { 
+                self.player_count = self.player_count.saturating_sub(1);
+            },
+            Token::UserExitLobby => { 
+                self.player_count = 0;
+            },
             Token::GameStarted => { 
                 self.last_split_time = time;
                 self.current_run = Some(
                     TimedRun::new(self.last_level_name.clone(), self.player_count)
                 );
                 
-                return Some(RunGeneratorResult::GameStarted);
+                return Some(RunGeneratorResult::GameStarted(self.last_level_name.clone(), self.player_count));
             },
             Token::DoorOpen => {
                 if self.in_death_screen { return None }

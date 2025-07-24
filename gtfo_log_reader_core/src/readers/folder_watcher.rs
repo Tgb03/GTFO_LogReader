@@ -57,7 +57,8 @@ impl FolderWatcher {
         shutdown: Receiver<()>,
         update_folder_path: Receiver<PathBuf>,
     ) {
-        let mut limiter = CpuLimiter::new(Duration::from_secs(10));
+        let mut limiter = CpuLimiter::new(Duration::from_secs(1));
+        let mut counter: u8 = 0;
         let mut last_path = None;
 
         loop {
@@ -67,47 +68,58 @@ impl FolderWatcher {
 
             if let Ok(path) = update_folder_path.try_recv() {
                 folder_path = Some(path);
+                last_path = None;
+
+                while let Ok(_) = update_folder_path.try_recv() {}
+
+                counter = 10;
             }
 
-            // not using notify cause of issues with large folders just in case
-            let path = folder_path
-                .as_ref()
-                .map(|f| fs::read_dir(&f).ok())
-                .flatten()
-                .map(|rd| 
-                    rd.flatten()
-                        .filter(|f| {
-                            let metadata = match f.metadata() {
-                                Ok(metadata) => metadata,
-                                Err(_) => {
-                                    return false;
-                                }
-                            };
+            if counter == 10 {
+                // not using notify cause of issues with large folders just in case
+                let path = folder_path
+                    .as_ref()
+                    .map(|f| fs::read_dir(&f).ok())
+                    .flatten()
+                    .map(|rd| 
+                        rd.flatten()
+                            .filter(|f| {
+                                let metadata = match f.metadata() {
+                                    Ok(metadata) => metadata,
+                                    Err(_) => {
+                                        return false;
+                                    }
+                                };
 
-                            metadata.is_file()
-                                && f.file_name()
-                                    .to_str()
-                                    .unwrap_or_default()
-                                    .contains("NICKNAME_NETSTATUS")
-                        })
-                        .max_by_key(|x| match x.metadata() {
-                            Ok(metadata) => metadata.modified().ok(),
-                            Err(_) => Default::default(),
-                        })
-                        .map(|v| v.path())
-                )
-                .flatten();
+                                metadata.is_file()
+                                    && f.file_name()
+                                        .to_str()
+                                        .unwrap_or_default()
+                                        .contains("NICKNAME_NETSTATUS")
+                            })
+                            .max_by_key(|x| match x.metadata() {
+                                Ok(metadata) => metadata.modified().ok(),
+                                Err(_) => Default::default(),
+                            })
+                            .map(|v| v.path())
+                    )
+                    .flatten();
 
-            if path != last_path {
-                if let Some(path) = path {
-                    match sender.send(path.clone()) {
-                        Ok(_) => {}
-                        Err(_) => break,
+                if path != last_path {
+                    if let Some(path) = path {
+                        match sender.send(path.clone()) {
+                            Ok(_) => {}
+                            Err(_) => break,
+                        }
+                        println!("File sent");
+                        last_path = Some(path);
                     }
-                    println!("File sent");
-                    last_path = Some(path);
                 }
+
+                counter = 0;
             }
+
+            counter += 1;
 
             limiter.might_sleep();
         }

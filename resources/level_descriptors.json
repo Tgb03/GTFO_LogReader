@@ -205,6 +205,36 @@
             }
         }
     ],
+    "R3D1": [
+        {
+            "Ignore": {
+                "count": 5
+            }
+        },
+        {
+            "KeyConsumer": {
+                "key_type": "ColoredKey",
+                "zones": [
+                    {
+                        "name": "Key",
+                        "zone": 389,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 1000,
+                        "spawns_per_room": [14, 1, 6]
+                    },
+                    {
+                        "name": "Key",
+                        "zone": 390,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 1000,
+                        "spawns_per_room": [4, 9, 1, 4, 4]
+                    }
+                ]
+            }
+        }
+    ],
     "R4A3": [
         {
             "Ignore": {
@@ -805,6 +835,66 @@
             }
         }
     ],
+    "R6A1": [
+        {
+            "Ignore": {
+                "count": 5
+            }
+        },
+        {
+            "KeyConsumer": {
+                "key_type": "ColoredKey",
+                "zones": [
+                    {
+                        "name": "Key",
+                        "zone": 76,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 1000,
+                        "spawns_per_room": [6, 6, 4, 9, 14]
+                    },
+                    {
+                        "name": "Key",
+                        "zone": 77,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 1000,
+                        "spawns_per_room": [6, 9, 4, 6]
+                    }
+                ]
+            }
+        }
+    ],
+    "R6B1": [
+        {
+            "Ignore": {
+                "count": 6
+            }
+        },
+        {
+            "KeyConsumer": {
+                "key_type": "ColoredKey",
+                "zones": [
+                    {
+                        "name": "Key",
+                        "zone": 35,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 10000,
+                        "spawns_per_room": [9, 6]
+                    },
+                    {
+                        "name": "Key",
+                        "zone": 36,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 10000,
+                        "spawns_per_room": [6, 9]
+                    }
+                ]
+            }
+        }
+    ],
     "R7B2": [
         {
             "Ignore": {
@@ -894,6 +984,28 @@
                 "tracked_containers": [16, 25],
                 "total_container_count": 27,
                 "consumable_count": 14
+            }
+        }
+    ],
+    "R8A1": [
+        {
+            "Ignore": {
+                "count": 5
+            }
+        },
+        {
+            "KeyConsumer": {
+                "key_type": "ColoredKey",
+                "zones": [
+                    {
+                        "name": "Key",
+                        "zone": 72,
+                        "start_weight": 0,
+                        "middle_weight": 0,
+                        "end_weight": 1000,
+                        "spawns_per_room": [9, 9]
+                    }
+                ]
             }
         }
     ],

@@ -54,6 +54,10 @@ This function takes 2 parameters:
 1. `code: uint8_t` this represents the type of request you want to remove
 2. `channel_id: uint8_t` this represents the channel id you want to remove
 
+- `pub extern "C" fn shutdown_all()`
+
+This function works to shutdown everything. Keep in mind that also clears all the callback data which means u can't 
+
 ## Live Reading
 
 For reading logs live (aka while the game is open) the DLL exposes 1 function:
@@ -103,6 +107,109 @@ This functions needs to be of type:
 
 `pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char)`. The first variable is the context for the function call (Can be used for objects or to give special additional information. This is given as is from the moment you created the process request). All the rest of the data is given through the c_char pointer which can then be parsed. This pointer represents essentially an array of 8 bit integers. Make sure you are actually reading the data properly from it.
 
+
+# What each part returns
+
+### 1. Tokenizer
+
+This represents all the tokens that are being recorded by the tool. Generally this data is not really that useful unless you are looking to track some very specific thing like player count.
+
+```rust
+enum Token {
+
+    PlayerJoinedLobby,
+    UserExitLobby,
+    PlayerLeftLobby,
+    SessionSeed(u64),
+
+    GeneratingLevel,
+    GeneratingFinished,
+    ItemAllocated(KeyDescriptor),                     // name
+    ItemSpawn(u64, u32),                              // zone, id
+    CollectableAllocated(u64),                        // zone
+    ObjectiveSpawnedOverride(u64, ObjectiveFunction), // id, name of objective
+    CollectableItemID(u8),                            // item id
+    CollectableItemSeed(u64),                         // item seed
+    DimensionIncrease,
+    DimensionReset,
+    SelectExpedition(LevelDescriptor, i32),           // level info and seed
+    GameStarting,
+    GameStarted,
+    PlayerDroppedInLevel(u32),
+    DoorOpen,
+    CheckpointReset,
+    BulkheadScanDone,
+    SecondaryDone,
+    OverloadDone,
+    GameEndWin,
+    GameEndLost,
+    GameEndAbort,
+    LogFileEnd,
+
+    Invalid,
+}
+```
+
+### 2. RunInfo
+
+This represents all the data that helps out with runs. 
+
+```rust
+enum RunGeneratorResult {
+
+    GameStarted(LevelDescriptor, u8),   // level started, player count
+    SplitAdded(NamedSplit),             // split containing time and name
+
+    SecondaryDone,
+    OverloadDone,
+    CheckpointUsed,
+
+    LevelRun(TimedRun<NamedSplit>),     // full level run obtained
+}
+```
+
+
+### 3. Mapper
+
+This represents all the items (keys, objective items) found from the logs directly. You can see exactly which items are obtained in the comments
+
+```rust
+enum Location {
+    // name, zone, id
+    ColoredKey(String, u64, u64),
+    BulkheadKey(String, u64, u64),
+
+    // gatherable identifier, zone, id
+    Gatherable(ItemIdentifier, u64, u64),
+
+    // hsu/terminal/other: name, zone and XX_area
+    BigObjective(String, u64, u64),
+
+    // big collectables (cryo, cargos etc.): only identifier and zone
+    BigCollectable(ItemIdentifier, u64),
+
+    // generation started
+    GenerationStarted(String),
+}
+```
+
+### 4. SeedIndexer
+
+How we get that information is by checking the seed of the level and then seeing what UnityRandom generates and then interpreting that information based on what we know about the level generation. Because of this, new data may be added later based on what new information we find.
+
+To be noted is that historically the SeedIndexer application developed years ago had the ability to show resource locations. However this application does not yet have this feature. (You can see that the ResourcePack value only contains the type and count, not the actual amount)
+
+```rust
+enum OutputSeedIndexer {
+    Seed(f32),
+    Key(String, i32, i32),           // zone, id
+    ResourcePack(ResourceType, i32), // count
+    ConsumableFound(i32, bool),      // id of box, found or not
+    GenerationEnd,
+    GenerationStart,
+    ZoneGenEnded(u32),
+}
+```
 
 # Examples
 

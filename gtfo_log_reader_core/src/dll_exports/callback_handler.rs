@@ -18,6 +18,27 @@ pub trait HasCallbackHandler {
     }
 }
 
+pub trait CallbackClone: Sized {
+
+    fn clone_callbacks(self) -> Self;
+
+}
+
+impl<T> CallbackClone for T 
+where
+    T: Sized + HasCallbackHandler + Default {
+
+    fn clone_callbacks(self) -> Self {
+        let mut s = Self::default();
+
+        for (_, callback) in self.get_callback_handler() {
+            s.add_callback(callback.clone());
+        }
+
+        s
+    }
+}
+
 impl<O, H> OutputTrait<O> for H
 where
     O: Serialize,

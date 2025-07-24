@@ -22,23 +22,25 @@ impl FileReader {
     }
 
     fn new_file(&mut self, path: PathBuf) {
+        self.file.take();
         self.file = File::open(path).map(|f| BufReader::new(f)).ok();
         self.last_position = 0;
     }
 
-    pub fn get_new_lines(&mut self) -> Option<String> {
+    pub fn get_was_new_file(&mut self) -> bool {
         if let Ok(new_path) = self.receiver.try_recv() {
             println!("Reading live {:?}", new_path);
             self.new_file(new_path);
+
+            return true
         }
 
-        let Some(reader) = &mut self.file else {
-            return None;
-        };
+        false
+    }
 
-        if let Err(_) = reader.seek(std::io::SeekFrom::Start(self.last_position)) {
-            return None;
-        }
+    pub fn get_new_lines(&mut self) -> Option<String> {
+        let reader = self.file.as_mut()?;
+        let _ = reader.seek(std::io::SeekFrom::Start(self.last_position)).ok()?;
 
         let mut buffer = String::new();
         let mut line = String::new();

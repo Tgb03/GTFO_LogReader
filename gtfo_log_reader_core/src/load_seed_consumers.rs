@@ -25,7 +25,6 @@ impl LoadSeedConsumers {
         let current_dir = std::env::current_dir().ok()?
             .join("resources")
             .join("level_descriptors.json");
-        println!("Path: {:?}", current_dir);
         let mut file = File::open(current_dir).ok()?;
         let mut file_text = String::default();
         let _ = file.read_to_string(&mut file_text).ok()?;

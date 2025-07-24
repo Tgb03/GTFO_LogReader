@@ -1,14 +1,14 @@
 use std::{
-    ffi::{CStr, c_char},
+    ffi::{c_char, CStr},
     os::raw::c_void,
     path::PathBuf,
-    sync::OnceLock,
+    sync::{Mutex, OnceLock},
 };
 
 use crate::dll_exports::structs::{CallbackInfo, MainThread};
 
 pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char);
-static MAIN_THREAD: OnceLock<MainThread> = OnceLock::new();
+static MAIN_THREAD: OnceLock<Mutex<Option<MainThread>>> = OnceLock::new();
 
 /// starts a folder listener in that file_path. This file_path must
 /// containg GTFO logs that the program will then read and output
@@ -31,8 +31,16 @@ pub extern "C" fn start_listener(file_path: *const c_char) {
         PathBuf::from(&*string)
     };
 
-    MAIN_THREAD.get_or_init(|| MainThread::create(None))
-        .change_logs_folder(path);
+    let _ = MAIN_THREAD.get_or_init(|| Some(MainThread::create(None)).into())
+        .lock()
+        .map(|mut v| 
+            match v.as_mut() {
+                Some(m_th) => m_th.change_logs_folder(path),
+                None => {
+                    *v = Some(MainThread::create(Some(path)));
+                },
+            }
+        );
 }
 
 ///
@@ -56,9 +64,12 @@ pub extern "C" fn add_callback(
     };
 
     let callback_info = CallbackInfo::new(code, message_type, channel_id, context.into(), event_callback);
-    MAIN_THREAD
-        .get_or_init(|| MainThread::create(None))
-        .register_callback(callback_info);
+    let _ = MAIN_THREAD
+        .get_or_init(|| Some(MainThread::create(None)).into())
+        .lock()
+        .map(|mut v| 
+            v.as_mut().map(|v| v.register_callback(callback_info))
+        );
 }
 
 ///
@@ -66,9 +77,12 @@ pub extern "C" fn add_callback(
 pub extern "C" fn remove_callback(code: u8, channel_id: u32) {
     let code = code.into();
 
-    MAIN_THREAD
-        .get_or_init(|| MainThread::create(None))
-        .remove_callback(code, channel_id);
+    let _ = MAIN_THREAD
+        .get_or_init(|| Some(MainThread::create(None)).into())
+        .lock()
+        .map(|mut v| 
+            v.as_mut().map(|v| v.remove_callback(code, channel_id))
+        );
 }
 
 #[unsafe(no_mangle)]
@@ -112,4 +126,13 @@ pub extern "C" fn process_paths(
     let callback_info = CallbackInfo::new(code, message_type, 0, context.into(), event_callback);
 
     MainThread::static_run(pathbufs, callback_info);
+}
+
+#[unsafe(no_mangle)]
+pub extern "C" fn shutdown_all() {
+    MAIN_THREAD.get()
+        .map(|v| v.lock().ok())
+        .flatten()
+        .as_mut()
+        .map(|v| v.take());      
 }
