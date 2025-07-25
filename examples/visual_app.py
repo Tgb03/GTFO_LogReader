@@ -9,7 +9,7 @@ from tkinter import *
 from tkinter import ttk
 
 
-dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+dll_relative_path = "../target/debug/gtfo_log_reader_core.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #
