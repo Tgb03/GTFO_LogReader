@@ -214,7 +214,7 @@ enum OutputSeedIndexer {
 #### Implemented levels:
 - Rundown 1: R1A1
 - Rundown 2: R2A1
-- Rundown 3: R3A1 R3D1
+- Rundown 3: R3A1 R3A2 R3B2 R3D1
 - Rundown 4: R4A3 R4E1
 - Rundown 5: R5E1
 - Rundown 6: R6A1 R6B1
