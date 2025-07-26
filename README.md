@@ -216,7 +216,7 @@ enum OutputSeedIndexer {
 - Rundown 2: R2A1
 - Rundown 3: R3A1 R3A2 R3B2 R3D1
 - Rundown 4: R4A3 R4E1
-- Rundown 5: R5E1
+- Rundown 5: R5A1 R5E1
 - Rundown 6: R6A1 R6B1
 - Rundown 7: R7B2 R7C3
 - Rundown 8: R8A1 R8B3

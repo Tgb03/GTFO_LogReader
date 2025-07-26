@@ -980,6 +980,49 @@
             }
         }
     ],
+    "R5A1": [
+        {
+            "Ignore": {
+                "count": 8
+            }
+        },
+        {
+            "ZoneConsumer": {
+                "zone_index": 0,
+                "shown_number": 61,
+                "medi": 0.5,
+                "ammo": 0.5,
+                "tool": 0.5,
+                "disi": 0.0,
+                "artifact_count": 4,
+                "consumable_in_container": 5,
+                "consumable_in_worldspawn": 0
+            }
+        },
+        {
+            "ZoneConsumer": {
+                "zone_index": 1,
+                "shown_number": 62,
+                "medi": 0.5,
+                "ammo": 0.5,
+                "tool": 0.2,
+                "disi": 0.0,
+                "artifact_count": 5,
+                "consumable_in_container": 5,
+                "consumable_in_worldspawn": 0
+            }
+        },
+        {
+            "KeyIDConsumer": {
+                "name": "Cell",
+                "zone": 62,
+                "start_weight": 0,
+                "middle_weight": 0,
+                "end_weight": 0,
+                "spawns_per_room": [3, 2, 3, 3, 5]
+            }
+        }
+    ],
     "R5E1": [
         {
             "Ignore": {
