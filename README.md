@@ -7,8 +7,8 @@ dealing with logs far easier and more chill to work with by abstracting away all
 
 # Examples
 
-In this git repo there is a folder `examples` that contains 3 python files that currently work with the DLL to make different things. Keep in mind that each python file is not 
-made that greatly as it is intended to only work as example rather than actual applications you can use, this means you may need to modify them heavily if you wish to use them.
+In this git repo there is a folder `examples` that contains 6 python files that currently work with the DLL to make different things. Keep in mind that each python file is not 
+made that greatly as it is intended to only work as example rather than actual applications you can use, this means you may need to modify them if you wish to use them.
 
 ### How to use examples:
 
@@ -19,9 +19,8 @@ made that greatly as it is intended to only work as example rather than actual a
 5. Open a CMD and run `python <filename>`
 6. Python may say that you are missing a library in which case you need to run `pip install <library name>`. After that rerun the script.
 
-### Small warning
-
-`autoreset.py` uses the AutoHotKey application which can be downloaded here: https://www.autohotkey.com/
+> [!NOTE]
+> `autoreset.py` uses the AutoHotKey application which can be downloaded here: https://www.autohotkey.com/
 
 # How it works
 
@@ -74,7 +73,7 @@ This function takes 2 parameters:
 
 - `pub extern "C" fn shutdown_all()`
 
-This function works to shutdown everything. Keep in mind that also clears all the callback data which means u can't 
+This function works to shutdown everything. Keep in mind that also clears all the callback data which means you need to recreate every single callback.
 
 ## Live Reading
 
@@ -217,6 +216,9 @@ How we get that information is by checking the seed of the level and then seeing
 
 To be noted is that historically the SeedIndexer application developed years ago had the ability to show resource locations. However this application does not yet have this feature. (You can see that the ResourcePack value only contains the type and count, not the actual amount)
 
+> [!IMPORTANT]
+> The `Key(String, i32, i32)` option shows: Colored Keys, Bulkhead Keys, HSUs, Collectable Objective Items (IDs, GLPs, etc...).
+
 ```rust
 enum OutputSeedIndexer {
     Seed(f32),
@@ -238,6 +240,16 @@ enum OutputSeedIndexer {
 - Rundown 6: R6A1 R6B1
 - Rundown 7: R7B2 R7C3
 - Rundown 8: R8A1 R8B3
+
+#### Contributing:
+The way SeedIndexing works is by taking the seed of the level, generating the values the game will then use to build the map (which are 32 bit floating point values) and then checks where items will be spawned based on those values.
+
+In order to add a level to Seed Indexer you need to use the debug version of the `gtfo_log_reader.dll`. This version instead of having the data included in the binary, it loads a file located in `resources/level_descriptors.json`. You also need to download this file and put it in the resources folder that is in the same folder as the DLL and Python Script. (If you messed up the DLL should output the exact error). After you got it to run, you can modify `level_descriptors.json` to produce whichever result you want. 
+
+Generally the way the game works is: It throws out the first 5 values, then it generates all the keys in main and maybe a generator in between keys or after, then the zones along with stuff the zones contain such as cells (tied to zone, not cells tied to door), generators (maybe?, not sure yet) etc. After that the objective of the layer gets generated. Once everything from this layer is done it goes to the secondary, repeats the entire process and then overload. This does mean indeed that finding out keys for a level to reset faster is mostly trivial and should be VERY quick, while mapping objective items can take a whole day. A few things to note is each resource value you see in the ZoneConsumer is the datablock value, `consumable_in_container` means consumables that spawn in boxes/lockers while `consumable_in_worldspawn` is those that spawn on the ground. Make sure these are correct. I strongly recommend using [Kenny's Spreadsheets](https://docs.google.com/spreadsheets/d/1b_dDH7WG8pmAOGPToUE2XSHAkzfie2HzdxVcO3aNK4c) as he noted down a lot of the information being used and made it easier to access.
+
+> [!WARNING]
+> Remember that a lot of the info we have is inferred and we can't really say how exactly the level generation works as a lot of it is unkown so there is a lot of guesswork in figuring out a level.
 
 # Be aware 
 - Certain mods may modify where the logs are being generated or if they are generated. This needs to be accounted for.
