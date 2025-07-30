@@ -5,6 +5,24 @@ This is a DLL (Dynamic Link Library) that specializez in reading logs fast and e
 programs that deal with reading logs both in real time and only one time and grabbing data from them. The aim is to make
 dealing with logs far easier and more chill to work with by abstracting away all their complexity.
 
+# Examples
+
+In this git repo there is a folder `examples` that contains 3 python files that currently work with the DLL to make different things. Keep in mind that each python file is not 
+made that greatly as it is intended to only work as example rather than actual applications you can use, this means you may need to modify them heavily if you wish to use them.
+
+### How to use examples:
+
+1. Download Python.
+2. Download the latest release of the DLL. (On the right in the Github Page)
+3. Download the script you want to use.
+4. Put the script and DLL in the same folder and open the python script to modify the field `dll_relative_path` to match where the DLL is relative to the python script.
+5. Open a CMD and run `python <filename>`
+6. Python may say that you are missing a library in which case you need to run `pip install <library name>`. After that rerun the script.
+
+### Small warning
+
+`autoreset.py` uses the AutoHotKey application which can be downloaded here: https://www.autohotkey.com/
+
 # How it works
 
 The way it works is the DLL is essentially a black box that you tell where to look for logs and which functions (from your
@@ -220,11 +238,6 @@ enum OutputSeedIndexer {
 - Rundown 6: R6A1 R6B1
 - Rundown 7: R7B2 R7C3
 - Rundown 8: R8A1 R8B3
-
-# Examples
-
-In this git repo there is a folder `examples` that contains 3 python files that currently work with the DLL to make different things. Keep in mind that each python file is not 
-made that greatly as it is intended to only work as example rather than actual applications you can use, this means you may need to modify them heavily if you wish to use them.
 
 # Be aware 
 - Certain mods may modify where the logs are being generated or if they are generated. This needs to be accounted for.
