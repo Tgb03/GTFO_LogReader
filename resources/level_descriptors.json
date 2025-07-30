@@ -102,9 +102,9 @@
                         "name": "Key",
                         "zone": 50,
                         "start_weight": 0,
-                        "middle_weight": 2500,
-                        "end_weight": 10000,
-                        "spawns_per_room": [4, 4, 14, 9, 6, 6, 9, 6]
+                        "middle_weight": 0,
+                        "end_weight": 50,
+                        "spawns_per_room": [14, 9]
                     }
                 ]
             }
@@ -215,6 +215,9 @@
         },
         {
             "ObjectiveConsumer": {
+                "item_count": 18,
+                "max_per_zone": 3,
+                "skip_per_item": 1,
                 "objectives_in_zones": [
                     [
                         {
@@ -306,6 +309,9 @@
         },
         {
             "ObjectiveConsumer": {
+                "item_count": 2,
+                "max_per_zone": 1,
+                "skip_per_item": 0,
                 "objectives_in_zones": [
                     [
                         {
