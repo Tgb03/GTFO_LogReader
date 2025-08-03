@@ -1,5 +1,5 @@
 pub mod functions;
-mod enums;
+pub mod enums;
 pub mod structs;
 
 pub mod callback_handler;
