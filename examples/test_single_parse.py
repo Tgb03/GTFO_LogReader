@@ -9,7 +9,7 @@ from tkinter import Tk, filedialog
 
 Tk().withdraw()  # Hide the root window
 
-dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+dll_relative_path = "../target/release/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #

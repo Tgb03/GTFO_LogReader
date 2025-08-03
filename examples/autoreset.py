@@ -10,7 +10,7 @@ from tkinter import ttk
 from ahk import AHK
 import time
 
-dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+dll_relative_path = "../target/release/glr_dylib.dll"
 ahk_executable_path = 'C:\Program Files\AutoHotkey\\v2\\AutoHotkey64.exe'
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
@@ -104,6 +104,12 @@ def my_event_callback(context, message):
 
             if name == 'HSU':
                 hsu_id = id
+
+        if "ResourcePack" in data:
+            name, id, size = data["ResourcePack"]
+            label = Label(frame, text=f"{name} of size {size} at {id}")
+            label.pack()
+            labels.append(label)
 
         if data == "GenerationEnd":
             print("Stop?: ", key_id, hsu_id, check_stop())

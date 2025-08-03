@@ -9,7 +9,7 @@ from tkinter import *
 from tkinter import ttk
 
 
-dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+dll_relative_path = "../target/release/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #
@@ -70,7 +70,7 @@ def my_event_callback(context, message):
 
     if message:
         data = json.loads(message)
-        print(message)
+        # print(message)
 
         if data == "GenerationStart":
             for label in labels:
@@ -95,6 +95,19 @@ def my_event_callback(context, message):
             label = Label(frame, text=text)
             label.pack()
             labels.append(label)
+
+        if "ResourcePack" in data:
+            name, id, size = data["ResourcePack"]
+            label = Label(frame, text=f"{name} of size {size} at {id}")
+            label.pack()
+            labels.append(label)
+
+        # if "ZoneGenEnded" in data:
+        #     zone_id = data["ZoneGenEnded"]
+        #     
+        #     label = Label(frame, text=f"Zone {zone_id} done")
+        #     label.pack()
+        #     labels.append(label)
 
 
 

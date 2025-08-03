@@ -1,16 +1,13 @@
 [workspace]
-members = ["gtfo_log_reader_core"]
+members = [ "glr_core", "glr_dylib", "glr_lib"]
 resolver = "2"
 
 
 [workspace.package]
-version = "0.1.0-beta.6"
+version = "1.0.0"
 edition = "2021"
 authors = ["Tgb03<tgb03.dev@gmail.com>"]
 
-
-[profile.dev]
-panic = "abort"
 
 [profile.release]
 codegen-units = 1

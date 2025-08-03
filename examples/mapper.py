@@ -7,7 +7,7 @@ from pathlib import Path
 from ctypes import c_char_p, c_void_p, c_uint8, c_uint32, CFUNCTYPE
 
 
-dll_relative_path = "../target/release/gtfo_log_reader_core.dll"
+dll_relative_path = "../target/release/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #

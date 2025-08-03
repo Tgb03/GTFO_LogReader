@@ -45,11 +45,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
-name = "gtfo_log_reader_core"
-version = "0.1.0-beta.6"
+name = "glr_core"
+version = "1.0.0"
+dependencies = [
+ "num_enum",
+ "serde",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
+name = "glr_dylib"
+version = "1.0.0"
+dependencies = [
+ "glr_core",
+ "glr_lib",
+]
+
+[[package]]
+name = "glr_lib"
+version = "1.0.0"
 dependencies = [
  "bincode",
  "enum_dispatch",
+ "glr_core",
  "might_sleep",
  "num_enum",
  "ron",
@@ -292,9 +311,9 @@ checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 
 [[package]]
 name = "winnow"
-version = "0.7.11"
+version = "0.7.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74c7b26e3480b707944fc872477815d29a8e429d2f93a1ce000f5fa84a15cbcd"
+checksum = "f3edebf492c8125044983378ecb5766203ad3b4c2f7a922bd7dd207f6d443e95"
 dependencies = [
  "memchr",
 ]

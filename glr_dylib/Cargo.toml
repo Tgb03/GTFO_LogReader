@@ -1,0 +1,14 @@
+[package]
+name = "glr_dylib"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+
+[lib]
+crate-type = ["cdylib"]
+
+
+[dependencies]
+glr_core = { path = "../glr_core" }
+glr_lib = { path = "../glr_lib" }
