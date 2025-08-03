@@ -74,4 +74,32 @@ where
     pub fn get_last_split(&self) -> Option<&S> {
         self.splits.last()
     }
+
+    pub fn get_name(&self) -> &LevelDescriptor {
+        &self.name
+    }
+
+    pub fn get_secondary(&self) -> bool {
+        self.did_secondary
+    }
+
+    pub fn get_overload(&self) -> bool {
+        self.did_overload
+    }
+
+    pub fn get_is_win(&self) -> bool {
+        self.is_win
+    }
+
+    pub fn get_player_count(&self) -> u8 {
+        self.player_count
+    }
+
+    pub fn iter_splits(&self) -> impl Iterator<Item = &S> {
+        self.splits.iter()
+    }
+
+    pub fn iter_splits_mut(&mut self) -> impl Iterator<Item = &mut S> {
+        self.splits.iter_mut()
+    }
 }
