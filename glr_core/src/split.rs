@@ -10,7 +10,20 @@ pub trait Split {
 
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+
+impl<S: Split> Split for Vec<S> {
+    fn get_name(&self) ->  &str {
+        ""
+    }
+
+    fn get_time(&self) -> Time {
+        self.iter()
+            .map(|v| v.get_time())
+            .fold(Time::new(), |a, b| a + b)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct NamedSplit {
 
     time: Time,
