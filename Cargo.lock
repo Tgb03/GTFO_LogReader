@@ -46,7 +46,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
 name = "glr_core"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "num_enum",
  "serde",
@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "glr_dylib"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "glr_core",
  "glr_lib",
@@ -64,7 +64,7 @@ dependencies = [
 
 [[package]]
 name = "glr_lib"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "bincode",
  "enum_dispatch",
