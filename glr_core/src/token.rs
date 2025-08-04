@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Serialize, Deserialize};
 
 use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
 
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Token {
     GeneratingLevel,
 

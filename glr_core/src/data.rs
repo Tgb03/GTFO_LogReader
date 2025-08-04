@@ -80,7 +80,7 @@ impl Display for LevelDescriptor {
     }
 }
 
-#[derive(Default, Debug, PartialEq, Eq, strum::IntoStaticStr, Serialize, Clone)]
+#[derive(Default, Debug, PartialEq, Eq, strum::IntoStaticStr, Serialize, Deserialize, Clone)]
 enum KeyColor {
     PURPLE,
     GREY,
@@ -96,7 +96,7 @@ enum KeyColor {
     COLORED,
 }
 
-#[derive(Default, Debug, PartialEq, Eq, Clone, Serialize)]
+#[derive(Default, Debug, PartialEq, Eq, Clone, Serialize, Deserialize)]
 pub struct KeyDescriptor {
     color: Option<KeyColor>,
     key_number: u16,
@@ -148,7 +148,7 @@ impl Display for KeyDescriptor {
 }
 
 #[allow(non_camel_case_types)]
-#[derive(PartialEq, Eq, Debug, Clone, strum::IntoStaticStr, Serialize)]
+#[derive(PartialEq, Eq, Debug, Clone, strum::IntoStaticStr, Serialize, Deserialize)]
 pub enum ObjectiveFunction {
     #[strum(to_string = "HSU")]
     HSU_FindTakeSample,
