@@ -338,7 +338,7 @@
                             "start_weight": 0,
                             "middle_weight": 0,
                             "end_weight": 0,
-                            "spawns_per_room": [4]
+                            "spawns_per_room": [3]
                         }
                     ]
                 ]
