@@ -311,7 +311,6 @@
             "ObjectiveConsumer": {
                 "item_count": 2,
                 "max_per_zone": 1,
-                "skip_per_item": 0,
                 "objectives_in_zones": [
                     [
                         {

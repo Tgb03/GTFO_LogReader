@@ -1,3 +1,4 @@
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -21,9 +22,7 @@ impl<O> Consumer<O> for IgnoreConsumer
 where
     O: HasCallbackHandler,
 {
-    fn take(&mut self, _: f32, _: &mut O) -> bool {
-        self.count -= 1;
-
-        self.count == 0
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, _: &mut O) {
+        let _ = seed_iter.nth(self.count);
     }
 }

@@ -1,3 +1,4 @@
+
 use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
@@ -25,17 +26,14 @@ impl<O> Consumer<O> for KeyIDConsumer
 where
     O: HasCallbackHandler,
 {
-    fn take(&mut self, seed: f32, output: &mut O) -> bool {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         let out = OutputSeedIndexer::Key(
             self.name.clone(),
             self.zone,
-            self.get_id(seed) as i32,
+            self.get_id(seed_iter.next().unwrap()) as i32,
         );
 
         output.output(out);
-        println!("seed: {seed}");
-
-        return true;
     }
 }
 

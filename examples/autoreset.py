@@ -149,8 +149,8 @@ def cycle_reset():
 
 
 def check_stop():
-    if key_id in [0, 1, 2, 3]:
-        return True
+    # if key_id in [0, 1, 2, 3]:
+    #     return True
     
     stop_keys = [14, 16, 18]
     stop_hsus = [1]

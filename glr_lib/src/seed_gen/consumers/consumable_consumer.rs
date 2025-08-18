@@ -14,35 +14,25 @@ pub struct ConsumableConsumer {
     total_container_count: i32,
     consumable_count: i32,
 
-    #[serde(skip_serializing, default)]
-    counter: u32,
-    #[serde(skip_serializing, default)]
-    found_counters: HashSet<i32>,
-
 }
 
 impl<O> Consumer<O> for ConsumableConsumer
 where 
     O: HasCallbackHandler {
         
-    fn take(&mut self, seed: f32, output: &mut O) -> bool {
-        if self.counter % 2 == 0 {
-            self.consumable_count -= 1;
-            let id = (seed * self.total_container_count as f32) as i32;
-            
-            self.found_counters.insert(id);
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+        let mut found_counters = HashSet::<i32>::new();
+
+        for _ in 0..self.consumable_count {
+            let id = (seed_iter.next().unwrap() * self.total_container_count as f32) as i32;
+            let _ = seed_iter.next();
+
+            found_counters.insert(id);
         }
 
-        if self.consumable_count == 0 {
-            for id in &self.tracked_containers {
-                output.output(OutputSeedIndexer::ConsumableFound(*id, self.found_counters.contains(id)));
-            }
-
-            return true
+        for id in &self.tracked_containers {
+            output.output(OutputSeedIndexer::ConsumableFound(*id, found_counters.contains(id)));
         }
-        
-        self.counter += 1;
-        false
     }
 
 }

@@ -22,4 +22,6 @@ pub enum OutputSeedIndexer {
     GenerationEnd,
     GenerationStart,
     ZoneGenEnded(u32),
+    
+    ProcessFailed,
 }
