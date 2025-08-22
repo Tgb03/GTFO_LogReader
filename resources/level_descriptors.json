@@ -1,282 +1,383 @@
 {
     "R1A1": [
         {
-            "Ignore": {
-                "count": 5
-            }
-        },
-        {
-            "KeyConsumer": {
-                "key_type": "ColoredKey",
+            "LevelData": {
                 "zones": [
                     {
-                        "name": "Key",
-                        "zone": 50,
-                        "start_weight": 0,
-                        "middle_weight": 2500,
-                        "end_weight": 10000,
-                        "spawns_per_room": [4, 4, 14, 9, 6, 6, 9, 6]
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 49,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Small", "Huge", "Small", "Large", "Medium"],
+                        
+                        "medi": 0.33,
+                        "ammo": 0.33,
+                        "tool": 0.33,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 50,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Small", "Small", "Huge", "Large", "Medium", "Medium", "Large", "Medium"],
+                        
+                        "medi": 1.0,
+                        "ammo": 1.0,
+                        "tool": 1.0,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Worldspawn", "Container", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 51,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Large"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": ["Worldspawn", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Container", "Container", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 52,
+                        "unlocked_by": {
+                            "unlock_type": "ColoredKey",
+                            "zones": [
+                                {
+                                    "layer_id": 0,
+                                    "dimension_id": 0,
+                                    "zone_id": 50,
+
+                                    "start_weight": 0,
+                                    "middle_weight": 2500,
+                                    "end_weight": 10000
+                                }
+                            ]
+                        },
+                        "rooms": ["Large", "Large", "Large", "Large", "Huge"],
+                        
+                        "medi": 1.0,
+                        "ammo": 1.0,
+                        "tool": 1.0,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    }
+                ],
+                "staged_objectives": [
+                    {
+                        "Consumer": {
+                            "KeyConsumer": {
+                                "key_type": "Other",
+                                "zones": [
+                                    {
+                                        "name": "HSU",
+                                        "zone": 52,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 50,
+                                        "spawns_per_room": [0, 2, 2, 2, 4]
+                                    }
+                                ]
+                            }
+                        }
                     }
                 ]
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 0,
-                "shown_number": 49,
-                "medi": 0.33,
-                "disi": 0.0,
-                "ammo": 0.33,
-                "tool": 0.33,
-                "artifact_count": 3,
-                "consumable_in_container": 5,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 1,
-                "shown_number": 50,
-                "medi": 1.0,
-                "disi": 0.0,
-                "ammo": 1.0,
-                "tool": 1.0,
-                "artifact_count": 6,
-                "consumable_in_container": 5,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 2,
-                "shown_number": 51,
-                "medi": 0.5,
-                "disi": 0.0,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "artifact_count": 3,
-                "consumable_in_container": 4,
-                "consumable_in_worldspawn": 1
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 1,
-                "shown_number": 50,
-                "medi": 1.0,
-                "disi": 0.0,
-                "ammo": 1.0,
-                "tool": 1.0,
-                "artifact_count": 3,
-                "consumable_in_container": 5,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "Ignore": {
-                "count": 1
-            }
-        },
-        {
-            "KeyIDConsumer": {
-                "name": "HSU",
-                "zone": 52,
-                "start_weight": 0,
-                "middle_weight": 0,
-                "end_weight": 50,
-                "spawns_per_room": [0, 2, 2, 2, 4]
             }
         }
     ],
     "R1B1": [
         {
-            "Ignore": {
-                "count": 5
-            }
-        },
-        {
-            "KeyConsumer": {
-                "key_type": "ColoredKey",
+            "LevelData": {
                 "zones": [
                     {
-                        "name": "Key",
-                        "zone": 50,
-                        "start_weight": 0,
-                        "middle_weight": 0,
-                        "end_weight": 50,
-                        "spawns_per_room": [14, 9]
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 38,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Small", "Huge"],
+                        
+                        "medi": 0.2,
+                        "medi_weights": [0, 1, 2],
+                        "ammo": 0.2,
+                        "ammo_weights": [0, 1, 2],
+                        "tool": 0.2,
+                        "tool_weights": [0, 1, 2],
+                        "disi": 0.0,
+
+                        "consumables": [],
+                        "artifacts": ["Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 39,
+                        "unlocked_by": {
+                            "unlock_type": "ColoredKey",
+                            "zones": [
+                                {
+                                    "layer_id": 0,
+                                    "dimension_id": 0,
+                                    "zone_id": 43,
+
+                                    "start_weight": 0,
+                                    "middle_weight": 0,
+                                    "end_weight": 50
+                                }
+                            ]
+                        },
+                        "rooms": ["Huge", "Large"],
+                        
+                        "medi": 0.5,
+                        "medi_weights": [0, 5, 5],
+                        "ammo": 0.5,
+                        "ammo_weights": [0, 5, 5],
+                        "tool": 0.5,
+                        "tool_weights": [0, 5, 5],
+                        "disi": 0.0,
+
+                        "consumables": [],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 40,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Large", "Large", "Huge"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": [],
+                        "artifacts": ["Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 41,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Huge", "Small", "Small", "Medium", "Large"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": [],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 42,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Large", "Large"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": [],
+                        "artifacts": ["Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 43,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Huge", "Large"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": [],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 44,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Large", "Huge"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 45,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Medium", "Medium", "Medium", "Large", "Huge"],
+                        
+                        "medi": 0.5,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
                     }
-                ]
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 0,
-                "shown_number": 38,
-                "medi": 0.2,
-                "ammo": 0.2,
-                "tool": 0.2,
-                "disi": 0.0,
-                "artifact_count": 2,
-                "consumable_in_container": 0,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 1,
-                "shown_number": 39,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 3,
-                "consumable_in_container": 0,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 2,
-                "shown_number": 40,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 2,
-                "consumable_in_container": 0,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 3,
-                "shown_number": 41,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 3,
-                "consumable_in_container": 0,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 4,
-                "shown_number": 42,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 1,
-                "consumable_in_container": 0,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 5,
-                "shown_number": 43,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 3,
-                "consumable_in_container": 0,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 6,
-                "shown_number": 44,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 2,
-                "consumable_in_container": 5,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ZoneConsumer": {
-                "zone_index": 7,
-                "shown_number": 45,
-                "medi": 0.5,
-                "ammo": 0.5,
-                "tool": 0.5,
-                "disi": 0.0,
-                "artifact_count": 2,
-                "consumable_in_container": 5,
-                "consumable_in_worldspawn": 0
-            }
-        },
-        {
-            "ObjectiveConsumer": {
-                "item_count": 18,
-                "max_per_zone": 3,
-                "skip_per_item": 1,
-                "objectives_in_zones": [
-                    [
-                        {
+                ],
+                "staged_objectives": [
+                    {
+                        "GatherObjective": {
                             "name": "ID",
-                            "zone": 39,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [14, 9]
-                        },
-                        {
-                            "name": "ID",
-                            "zone": 40,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [9, 9, 14]
-                        },
-                        {
-                            "name": "ID",
-                            "zone": 41,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [14, 4, 4, 6, 9]
-                        },
-                        {
-                            "name": "ID",
-                            "zone": 42,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [9, 9]
-                        },
-                        {
-                            "name": "ID",
-                            "zone": 43,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [14, 9]
-                        },
-                        {
-                            "name": "ID",
-                            "zone": 44,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [9, 14]
-                        },
-                        {
-                            "name": "ID",
-                            "zone": 45,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 10000,
-                            "spawns_per_room": [6, 6, 6, 9, 14]
+                            "item_count": 18,
+                            "max_per_zone": 3,
+                            "skip_per_item": 1,
+                            "objectives_in_zone": [
+                                [
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 39,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    },
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 40,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    },
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 41,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    },
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 42,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    },
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 43,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    },
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 44,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    },
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 0,
+                                        "zone_id": 45,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 10000
+                                    }
+                                ]
+                            ]
                         }
-                    ]
+                    }
                 ]
             }
         }
@@ -311,7 +412,6 @@
             "ObjectiveConsumer": {
                 "item_count": 2,
                 "max_per_zone": 1,
-                "skip_per_item": 0,
                 "objectives_in_zones": [
                     [
                         {
@@ -1658,6 +1758,141 @@
                 "middle_weight": 0,
                 "end_weight": 0,
                 "spawns_per_room": [3, 2, 3, 3, 5]
+            }
+        }
+    ],
+    "R5C3": [
+        {
+            "LevelData": {
+                "zones": [
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 371,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Small", "Large", "Small", "Medium", "Small", "Medium", "Medium"],
+                        
+                        "medi": 0.4,
+                        "ammo": 0.0,
+                        "tool": 1.4,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 372,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Medium", "Medium", "Medium", "Huge", "Large", "Medium", "Small", "Large"],
+                        
+                        "medi": 0.4,
+                        "ammo": 0.4,
+                        "tool": 1.4,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 373,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Medium", "Huge", "Medium"],
+                        
+                        "medi": 0.8,
+                        "ammo": 1.0,
+                        "tool": 1.0,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Container", "Container"],
+                        "artifacts": ["Container", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 374,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Small", "Large", "Small", "Medium", "Huge", "Medium"],
+                        
+                        "medi": 0.4,
+                        "ammo": 0.4,
+                        "tool": 1.6,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 375,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Medium", "Medium", "Medium", "Medium", "Small", "Medium", "Large"],
+                        
+                        "medi": 0.4,
+                        "ammo": 0.0,
+                        "tool": 1.5,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+                        "artifacts": ["Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 376,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "zones": []
+                        },
+                        "rooms": ["Small", "Large", "Small", "Large", "Small", "Small", "Large"],
+                        
+                        "medi": 0.4,
+                        "ammo": 0.0,
+                        "tool": 1.4,
+                        "disi": 0.0,
+
+                        "consumables": ["Container", "Container", "Container", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn", "Worldspawn"],
+                        "artifacts": ["Container", "Worldspawn", "Worldspawn", "Worldspawn"],
+
+                        "small_pickups": [],
+                        "big_pickups": []
+                    }
+                ],
+                "staged_objectives": []
             }
         }
     ],

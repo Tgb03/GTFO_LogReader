@@ -34,8 +34,7 @@ impl TokenParser for TokenParserSeed {
             let mut unity_random = UnityRandom::from(seed);
             self.level_descriptors
                 .get_level(&level)
-                .clone()
-                .map(|mut v| v.take_multiple(&mut unity_random, self));
+                .map(|v| v.take(&mut unity_random, &mut self.callback_handler));
             
             self.output(OutputSeedIndexer::GenerationEnd);
         }

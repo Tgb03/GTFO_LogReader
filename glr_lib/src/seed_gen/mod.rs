@@ -4,3 +4,4 @@ pub mod levels;
 mod seed_generator;
 
 pub mod consumers;
+pub mod zone_info;

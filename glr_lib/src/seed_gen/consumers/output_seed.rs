@@ -1,3 +1,4 @@
+
 use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
@@ -14,9 +15,7 @@ impl<O> Consumer<O> for OutputSeed
 where
     O: HasCallbackHandler,
 {
-    fn take(&mut self, seed: f32, output: &mut O) -> bool {
-        output.output(OutputSeedIndexer::Seed(seed));
-
-        true
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+        output.output(OutputSeedIndexer::Seed(seed_iter.next().unwrap()));
     }
 }

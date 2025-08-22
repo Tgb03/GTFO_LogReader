@@ -22,7 +22,7 @@ impl Default for LevelDescriptors {
 }
 
 impl LevelDescriptors {
-    pub fn get_level(&self, level: &LevelDescriptor) -> Option<VecDeque<ConsumerEnum>> {
-        self.levels.get(&level.to_string()).cloned()
+    pub fn get_level(&self, level: &LevelDescriptor) -> Option<&VecDeque<ConsumerEnum>> {
+        self.levels.get(&level.to_string())
     }
 }

@@ -1,4 +1,5 @@
 
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -18,11 +19,6 @@ pub enum KeyType {
 pub struct KeyConsumer {
     key_type: KeyType,
     zones: Vec<KeyIDConsumer>,
-
-    #[serde(skip_serializing, default)]
-    seed_index: usize,
-    #[serde(skip_serializing, default)]
-    zone: usize,
 }
 
 impl KeyConsumer {
@@ -33,31 +29,14 @@ impl KeyConsumer {
             KeyType::Other => 1,
         }
     }
-
-    pub fn get_second_id(&self) -> usize {
-        self.get_first_id() + 1
-    }
 }
 
 impl<O> Consumer<O> for KeyConsumer
 where
     O: HasCallbackHandler,
 {
-    fn take(&mut self, seed: f32, output: &mut O) -> bool {
-        self.seed_index += 1;
-
-        if self.seed_index == self.get_first_id() - 1 {
-            println!("GOT KEY NUMBER: {seed}");
-        }
-
-        if self.seed_index == self.get_first_id() {
-            self.zone = (seed * self.zones.len() as f32) as usize;
-        }
-
-        if self.seed_index == self.get_second_id() {
-            return self.zones[self.zone].take(seed, output);
-        }
-
-        false
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+        let zone = (seed_iter.nth(self.get_first_id()).unwrap() * self.zones.len() as f32) as usize;
+        self.zones[zone].take(seed_iter, output);
     }
 }
