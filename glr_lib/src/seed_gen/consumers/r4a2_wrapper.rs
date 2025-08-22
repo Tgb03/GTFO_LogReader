@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{dll_exports::callback_handler::HasCallbackHandler, seed_gen::consumers::{base_consumer::Consumer, key_id_consumer::KeyIDConsumer, ConsumerEnum}};
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct R4A2Wrapper {
 
     choices: VecDeque<Vec<KeyIDConsumer>>,

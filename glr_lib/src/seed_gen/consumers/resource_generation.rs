@@ -12,6 +12,7 @@ use crate::{
 pub struct ResourceGeneration {
     left: f32,
     res_type: ResourceType,
+    #[serde(default)] zone: i32,
 
     #[serde(default)]
     track_spawn: Option<KeyIDConsumer>,
@@ -58,10 +59,16 @@ where
             let take_seed = seed_iter.next().unwrap();
             let id_seed = seed_iter.next().unwrap();
 
-            let (l, pack_size) = Self::try_remove(left, take_seed);
+            let (l, pack_size) = if take_seed < 0.333333f32 {
+                Self::try_remove(left, 0.6f32)
+            } else if take_seed < 0.6666666f32 {
+                Self::try_remove(left, 1.0f32)
+            } else {
+                Self::try_remove(left, 0.4f32)
+            };
 
             if let Some(t_s) = &self.track_spawn {
-                output.output(OutputSeedIndexer::ResourcePack(self.res_type, t_s.get_id(id_seed) as i32, pack_size));
+                output.output(OutputSeedIndexer::ResourcePack(self.res_type, self.zone, t_s.get_id(id_seed) as i32, pack_size));
             }
 
             left = l;

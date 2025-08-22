@@ -8,10 +8,11 @@ from ctypes import c_char_p, c_void_p, c_uint8, c_uint32, CFUNCTYPE
 from tkinter import *
 from tkinter import ttk
 from collections import Counter
+from collections import defaultdict
 
 
-# dll_relative_path = "../target/release/glr_dylib.dll"
-dll_relative_path = "gtfo_log_reader_core_64bit.dll"
+dll_relative_path = "../target/release/glr_dylib.dll"
+# dll_relative_path = "gtfo_log_reader_core_64bit.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #
@@ -49,6 +50,7 @@ lib.remove_callback.restype = None
 #
 
 labels = []
+groups = defaultdict(list)
 
 root = Tk()
 root.geometry("300x200")
@@ -100,6 +102,7 @@ def my_event_callback(context, message):
             for label in labels:
                 label.destroy()
 
+            groups.clear()
             counter.reset()
 
             reset_counter += 1
@@ -110,8 +113,12 @@ def my_event_callback(context, message):
 
         if "Key" in data:
             name, zone, id = data["Key"]
-            if name == "ID":
-                counter.add(zone)
+            if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
+                groups[(name, zone)].append(id)
+                # counter.add(zone)
+                return
+
+            if name == "ArtifactWorldspawn":
                 return
 
             text = f"{name} in ZONE_{zone} at {id}"
@@ -127,8 +134,8 @@ def my_event_callback(context, message):
             labels.append(label)
 
         if "ResourcePack" in data:
-            name, id, size = data["ResourcePack"]
-            label = Label(frame, text=f"{name} of size {size} at {id}")
+            name, zone, id, size = data["ResourcePack"]
+            label = Label(frame, text=f"{name} in ZONE_{zone} of size {size} at {id}")
             label.pack()
             labels.append(label)
 
@@ -140,13 +147,18 @@ def my_event_callback(context, message):
         #     labels.append(label)
 
         if data == "GenerationEnd":
-            for num, count in counter:
-                if num in [40, 42, 45]:
-                    continue
-                
-                label = Label(frame, text=f"ZONE_{num} has {count} IDs")
+            for (name, zone) in sorted(groups.keys()):
+                ids = groups[(name, zone)]
+                label = Label(frame, text=f"ZONE_{zone} has {name}: {ids}")
                 label.pack()
                 labels.append(label)
+            # for num, count in counter:
+            #     if num in [40, 42, 45]:
+            #         continue
+            #     
+            #     label = Label(frame, text=f"ZONE_{num} has {count} IDs")
+            #     label.pack()
+            #     labels.append(label)
 
             
         

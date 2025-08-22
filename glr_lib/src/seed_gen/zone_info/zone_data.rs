@@ -1,7 +1,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::seed_gen::zone_info::{unlock_method::{UnlockMethod, ZoneLocationSpawn}, zone_identifier::ZoneIdentifier};
+use crate::seed_gen::zone_info::{generated_data::AllocType, unlock_method::{UnlockMethod, ZoneLocationSpawn}, zone_identifier::ZoneIdentifier};
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -21,13 +21,29 @@ pub struct ZoneData {
     pub tool: f32,
     #[serde(default)] pub tool_weights: [i32; 3],
 
-    pub consumables_in_worldspawn: u32,
-    pub consumables_in_containers: u32,
-    pub artifacts_in_worldspawn: u32,
-    pub artifacts_in_containers: u32,
+    pub consumables: Vec<ContainerOrWorldspawn>,
+    pub artifacts: Vec<ContainerOrWorldspawn>,
 
     pub small_pickups: Vec<ZoneLocationSpawn>,
+    pub big_pickups: Vec<ZoneLocationSpawn>,
 
+}
+
+#[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq, Eq)]
+pub enum ContainerOrWorldspawn {
+
+    Container,
+    Worldspawn,
+
+}
+
+impl Into<AllocType> for &ContainerOrWorldspawn {
+    fn into(self) -> AllocType {
+        match self {
+            ContainerOrWorldspawn::Container => AllocType::Container,
+            ContainerOrWorldspawn::Worldspawn => AllocType::SmallPickup,
+        }
+    }
 }
 
 

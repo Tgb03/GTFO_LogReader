@@ -27,7 +27,7 @@ impl TryInto<AllocType> for &UnlockMethodType {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ZoneLocationSpawn {
 
     #[serde(flatten)]
