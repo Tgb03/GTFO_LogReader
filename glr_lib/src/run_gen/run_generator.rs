@@ -113,7 +113,7 @@ impl RunGenerator<NamedSplit> {
                 self.bulk_count += 1;
                 let split = NamedSplit::new(
                     time - self.last_split_time, 
-                    format!("D_{}", self.bulk_count),
+                    format!("B_{}", self.bulk_count),
                 );
                 self.last_split_time = time; 
                 
