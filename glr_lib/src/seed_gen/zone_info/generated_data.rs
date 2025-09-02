@@ -1,7 +1,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::seed_gen::zone_info::{unlock_method::ZoneLocationSpawn, zone_data::ZoneData, zone_identifier::ZoneIdentifier};
+use crate::seed_gen::zone_info::{unlock_method::ZoneLocationSpawn, zone_data::{RoomSize, ZoneData}, zone_identifier::ZoneIdentifier};
 
 
 #[derive(Debug)]
@@ -9,14 +9,14 @@ pub struct GeneratedZone {
 
     zone_id: ZoneIdentifier,
     
-    alloc_containers: Vec<Vec<(u8, u8)>>,
-    alloc_small_pickups: Vec<Vec<(u8, u8)>>,
-    alloc_big_pickups: Vec<Vec<(u8, u8)>>,
+    alloc_containers: Vec<Vec<u8>>,
+    alloc_small_pickups: Vec<Vec<u8>>,
+    alloc_big_pickups: Vec<Vec<u8>>,
 
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum AllocType {
 
@@ -31,67 +31,51 @@ impl From<&ZoneData> for GeneratedZone {
     fn from(value: &ZoneData) -> Self {
         Self {
             zone_id: value.zone_id.clone(),
-            alloc_containers: value.rooms.iter()
-                .map(|v| 
-                    (0..v.into_containers())
-                )
-                .scan(0, |state: &mut u8, v| {
-                    let range_start = *state;
-
-                    *state = range_start + v.end;
-                    Some(range_start..range_start + v.end)
-                })
-                .map(|v| 
-                    v.map(|v| (v, 3u8))
-                )
-                .map(|v| v.collect())
-                .collect(),
-            alloc_small_pickups: value.rooms.iter()
-                .map(|v| 
-                    (0..v.into_small_pickups())
-                )
-                .scan(0, |state: &mut u8, v| {
-                    let range_start = *state;
-
-                    *state = range_start + v.end;
-                    Some(range_start..range_start + v.end)
-                })
-                .map(|v| 
-                    v.map(|v| (v, 1u8))
-                )
-                .map(|v| v.collect())
-                .collect(),
-            alloc_big_pickups: value.rooms.iter()
-                .map(|v| 
-                    (0..v.into_big_pickups())
-                )
-                .scan(0, |state: &mut u8, v| {
-                    let range_start = *state;
-
-                    *state = range_start + v.end;
-                    Some(range_start..range_start + v.end)
-                })
-                .map(|v| 
-                    v.map(|v| (v, 1u8))
-                )
-                .map(|v| v.collect())
-                .collect(),
+            alloc_containers: Self::initial_allocations(AllocType::Container, &value.rooms),
+            alloc_small_pickups: Self::initial_allocations(AllocType::SmallPickup, &value.rooms),
+            alloc_big_pickups: Self::initial_allocations(AllocType::BigPickup, &value.rooms),
         }
     }
 }
 
 impl GeneratedZone {
 
-    /// someone remake this entire thing
-    /// if i continue writing in this i will kill myself
+    fn initial_allocations(
+        alloc_type: AllocType,
+        rooms: &Vec<RoomSize>,
+    ) -> Vec<Vec<u8>> {
+        let mut result = Vec::with_capacity(rooms.len());
+        let mut start = 0;
+
+        for room in rooms {
+            let (room_len, alloc_per_space) = match alloc_type {
+                AllocType::Container => (room.into_containers(), 3),
+                AllocType::SmallPickup => (room.into_small_pickups(), 1),
+                AllocType::BigPickup => (room.into_big_pickups(), 1),
+            };
+
+            let mut append_res = Vec::with_capacity(room_len as usize * alloc_per_space);
+
+            for id in 0..room_len {
+                for _ in 0..alloc_per_space {
+                    append_res.push(id + start);
+                }
+            }
+
+            start += room_len;
+            result.push(append_res);
+        }
+
+        result    
+    }
+
     pub fn spawn_id(
         &mut self, 
         weights: &[i32; 3], 
         alloc_type: &AllocType, 
-        seed: f32, 
-        advanced_checks: bool,
+        seed: f32,
     ) -> usize {
-        let mut spawns_per_room: Vec<usize> = match alloc_type {
+        let spawns_per_room: Vec<usize> = match alloc_type {
             AllocType::Container => &mut self.alloc_containers,
             AllocType::SmallPickup => &mut self.alloc_small_pickups,
             AllocType::BigPickup => &mut self.alloc_big_pickups,
@@ -102,20 +86,6 @@ impl GeneratedZone {
             )
             .collect();
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
-        spawns_per_room = match alloc_type {
-            AllocType::Container => &mut self.alloc_containers,
-            AllocType::SmallPickup => &mut self.alloc_small_pickups,
-            AllocType::BigPickup => &mut self.alloc_big_pickups,
-        }
-            .iter()
-            .map(|v| 
-                match advanced_checks {
-                    true => v.iter()
-                        .fold(0usize, |a, b| a + b.1 as usize),
-                    false => v.len(),
-                }
-            )
-            .collect();
 
         let room = Self::get_room(seed, &values_per_room);
         let spawn_count = spawns_per_room[room];
@@ -127,7 +97,7 @@ impl GeneratedZone {
         let left = seed - previous_room;
 
         let percent = left / size;
-        let mut in_room_id = (percent * spawn_count as f32) as usize;
+        let in_room_id = (percent * spawn_count as f32) as usize;
 
         let vec = match alloc_type {
             AllocType::Container => &mut self.alloc_containers,
@@ -135,35 +105,14 @@ impl GeneratedZone {
             AllocType::BigPickup => &mut self.alloc_big_pickups,
         };
 
-        let id = match advanced_checks {
-            false => vec.get_mut(room)
-                .map(|v| v.get_mut(in_room_id))
-                .flatten()
-                .map(|(id, c)| {
-                    *c -= 1;
-                    
-                    *id as usize
-                }).unwrap(),
-            true => vec.get_mut(room)
-                .map(|v| {
-                    for it in v {
-                        if in_room_id < it.1 as usize {
-                            it.1 -= 1;
-                            return Some(it.0 as usize);
-                        }
+        let id = vec.get_mut(room)
+            .map(|v| v.get_mut(in_room_id))
+            .flatten()
+            .map(|id| *id)
+            .unwrap();
 
-                        in_room_id -= it.1 as usize;
-                    }
-
-                    None
-                })
-                .flatten()
-                .unwrap(),
-        };
-
-        vec.get_mut(room)
-            .unwrap()
-            .retain(|v| v.1 != 0);
+        // vec.get_mut(room)
+        //     .map(|v| v.remove(in_room_id));
 
         id as usize
     }
@@ -246,7 +195,6 @@ pub fn grab_spawn_id(
     spawn: &ZoneLocationSpawn, 
     alloc_type: AllocType, 
     seed: f32,
-    advanced_checks: bool,
 ) -> Option<usize> {
     
     zones.iter_mut()
@@ -256,7 +204,6 @@ pub fn grab_spawn_id(
             &[spawn.start_weight, spawn.middle_weight, spawn.end_weight], 
             &alloc_type, 
             seed,
-            advanced_checks
         ))
 }
 

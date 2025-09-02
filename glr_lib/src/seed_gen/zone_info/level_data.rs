@@ -16,8 +16,13 @@ use crate::{
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LevelData {
 
-    zones: Vec<ZoneData>,
-    staged_objectives: Vec<StagedObjectiveEnum>,
+    pub skip_start: usize,
+
+    pub zones: Vec<ZoneData>,
+    #[serde(default)] pub bulk_keys_main: Vec<Vec<ZoneLocationSpawn>>,
+    #[serde(default)] pub bulk_keys_sec: Vec<Vec<ZoneLocationSpawn>>,
+    #[serde(default)] pub bulk_keys_ovrl: Vec<Vec<ZoneLocationSpawn>>,
+    pub staged_objectives: Vec<StagedObjectiveEnum>,
     
 }
 
@@ -54,7 +59,6 @@ impl LevelData {
                 zone, 
                 (&key.unlock_type).try_into().ok()?, 
                 seed_iter.next()?,
-                false
             )?;
 
             output.output(OutputSeedIndexer::Key(name.to_owned(), zone.zone_id.zone_id, id as i32))
@@ -108,7 +112,6 @@ impl LevelData {
                 }, 
                 AllocType::Container, 
                 seed_iter.next()?,
-                false
             )?;
 
             let (l, pack_size) = if take_seed < 0.333333f32 {
@@ -154,7 +157,6 @@ impl LevelData {
                 }, 
                 val.into(), 
                 seed_iter.next()?,
-                false
             )?;
 
             let name = match val {
@@ -176,7 +178,6 @@ impl LevelData {
                 }, 
                 val.into(), 
                 seed_iter.next()?,
-                false
             )?;
 
             let name = match val {
@@ -188,6 +189,31 @@ impl LevelData {
             };
 
             output.output(OutputSeedIndexer::Key(name.to_owned(), zone.zone_id.zone_id, id as i32));
+        }
+
+        Some(())
+    }
+
+    fn do_big_pickus<O: HasCallbackHandler>(
+        generated_zones: &mut Vec<GeneratedZone>,
+        zone: &ZoneData,
+        seed_iter: &mut dyn Iterator<Item = f32>,
+        output: &mut O,
+    ) -> Option<()> {
+        for pickup in &zone.big_pickups {
+            let id = grab_spawn_id(
+                generated_zones, 
+                &ZoneLocationSpawn { 
+                    zone_id: zone.zone_id, 
+                    start_weight: pickup.start_weight, 
+                    middle_weight: pickup.middle_weight, 
+                    end_weight: pickup.end_weight 
+                }, 
+                AllocType::BigPickup, 
+                seed_iter.next()?
+            )?;
+
+            output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
         }
 
         Some(())
@@ -218,7 +244,6 @@ impl LevelData {
                 zone, 
                 (&cell.unlock_type).try_into().ok()?, 
                 seed_iter.next()?,
-                false
             )?;
             
             output.output(OutputSeedIndexer::Key("Cell".to_owned(), zone.zone_id.zone_id, id as i32))
@@ -245,6 +270,7 @@ impl LevelData {
                 Self::do_res(generated_zones, zone, seed_iter, output, ResourceType::ToolRefillpack)?;
             
                 Self::do_consumables(generated_zones, zone, seed_iter, output)?;
+                Self::do_big_pickus(generated_zones, zone, seed_iter, output)?;
             }
 
             Self::do_layer_cells(&self, generated_zones, layer, seed_iter, output)?;
@@ -264,7 +290,9 @@ where
             .map(|v| v.into())
             .collect();
 
-        let _ = seed_iter.nth(4);
+        if self.skip_start > 0 {
+            let _ = seed_iter.nth(self.skip_start - 1);
+        }
 
         vec![
             self.do_layer(&mut generated_zones, 0, seed_iter, output),

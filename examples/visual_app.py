@@ -139,12 +139,12 @@ def my_event_callback(context, message):
             label.pack()
             labels.append(label)
 
-        # if "ZoneGenEnded" in data:
-        #     zone_id = data["ZoneGenEnded"]
-        #     
-        #     label = Label(frame, text=f"Zone {zone_id} done")
-        #     label.pack()
-        #     labels.append(label)
+        if "ZoneGenEnded" in data:
+            zone_id = data["ZoneGenEnded"]
+            
+            label = Label(frame, text=f"Zone {zone_id} done")
+            label.pack()
+            labels.append(label)
 
         if data == "GenerationEnd":
             for (name, zone) in sorted(groups.keys()):
@@ -152,17 +152,13 @@ def my_event_callback(context, message):
                 label = Label(frame, text=f"ZONE_{zone} has {name}: {ids}")
                 label.pack()
                 labels.append(label)
-            # for num, count in counter:
-            #     if num in [40, 42, 45]:
-            #         continue
-            #     
-            #     label = Label(frame, text=f"ZONE_{num} has {count} IDs")
-            #     label.pack()
-            #     labels.append(label)
-
-            
-        
-
+            for num, count in counter:
+                if num in [40, 42, 45]:
+                    continue
+                
+                label = Label(frame, text=f"ZONE_{num} has {count} IDs")
+                label.pack()
+                labels.append(label)
 
 
 # Add a callback with dummy values

@@ -1,7 +1,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::seed_gen::zone_info::{generated_data::AllocType, unlock_method::{UnlockMethod, ZoneLocationSpawn}, zone_identifier::ZoneIdentifier};
+use crate::seed_gen::zone_info::{generated_data::AllocType, unlock_method::UnlockMethod, zone_identifier::ZoneIdentifier, zone_obj_spawn::ZoneObjectSpawn};
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -24,8 +24,8 @@ pub struct ZoneData {
     pub consumables: Vec<ContainerOrWorldspawn>,
     pub artifacts: Vec<ContainerOrWorldspawn>,
 
-    pub small_pickups: Vec<ZoneLocationSpawn>,
-    pub big_pickups: Vec<ZoneLocationSpawn>,
+    pub small_pickups: Vec<ZoneObjectSpawn>,
+    pub big_pickups: Vec<ZoneObjectSpawn>,
 
 }
 

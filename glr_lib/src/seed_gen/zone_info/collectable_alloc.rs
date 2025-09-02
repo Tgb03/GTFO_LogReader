@@ -52,7 +52,6 @@ impl<O: HasCallbackHandler> StagedObjective<O> for CollectableAlloc {
                     alloc, 
                     AllocType::Container, 
                     seed_iter.next().unwrap(),
-                    false
                 ) {
                     out.output(OutputSeedIndexer::Key(cloned_name.clone(), alloc.zone_id.zone_id, id as i32));
                 }
