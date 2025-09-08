@@ -16,6 +16,8 @@ where
     O: HasCallbackHandler,
 {
     fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
-        output.output(OutputSeedIndexer::Seed(seed_iter.next().unwrap()));
+        let seed = seed_iter.next().unwrap();
+        println!("Seed outputted: {seed}");
+        output.output(OutputSeedIndexer::Seed(seed));
     }
 }

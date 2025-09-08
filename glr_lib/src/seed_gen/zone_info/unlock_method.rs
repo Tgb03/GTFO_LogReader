@@ -4,7 +4,7 @@ use crate::seed_gen::zone_info::{generated_data::AllocType, zone_identifier::Zon
 
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 #[repr(u8)]
 pub enum UnlockMethodType {
 
@@ -40,7 +40,7 @@ pub struct ZoneLocationSpawn {
 }
 
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UnlockMethod {
 
     pub unlock_type: UnlockMethodType,

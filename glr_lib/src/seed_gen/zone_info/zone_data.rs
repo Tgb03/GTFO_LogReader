@@ -12,6 +12,9 @@ pub struct ZoneData {
     pub unlocked_by: UnlockMethod,
     pub rooms: Vec<RoomSize>,
 
+    #[serde(default)] pub terminals: Vec<u8>,
+    #[serde(default)] pub alloc_other: Vec<u8>,
+
     pub medi: f32,
     #[serde(default)] pub medi_weights: [i32; 3],
     pub disi: f32,

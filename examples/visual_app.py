@@ -113,13 +113,17 @@ def my_event_callback(context, message):
 
         if "Key" in data:
             name, zone, id = data["Key"]
-            if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
-                groups[(name, zone)].append(id)
-                # counter.add(zone)
+            if name in ["ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn"]:
                 return
+            
+            # if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
+            #             "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
+            #     groups[(name, zone)].append(id)
+            #     # counter.add(zone)
+            #     return
 
-            if name == "ArtifactWorldspawn":
-                return
+            # if name == "ArtifactWorldspawn":
+            #     return
 
             text = f"{name} in ZONE_{zone} at {id}"
             label = Label(frame, text=text)
@@ -135,6 +139,11 @@ def my_event_callback(context, message):
 
         if "ResourcePack" in data:
             name, zone, id, size = data["ResourcePack"]
+            if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
+                        "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
+                groups[(name, zone)].append(id)
+                # counter.add(zone)
+                return
             label = Label(frame, text=f"{name} in ZONE_{zone} of size {size} at {id}")
             label.pack()
             labels.append(label)
@@ -145,6 +154,9 @@ def my_event_callback(context, message):
             label = Label(frame, text=f"Zone {zone_id} done")
             label.pack()
             labels.append(label)
+
+        if data == "Seed":
+            print(data)
 
         if data == "GenerationEnd":
             for (name, zone) in sorted(groups.keys()):

@@ -49,3 +49,15 @@ where
         }
     }
 }
+
+impl<O, T> Consumer<O> for &Vec<T>
+where
+    O: HasCallbackHandler + OutputTrait<OutputSeedIndexer>,
+    T: Debug + Consumer<O>,
+{
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+        for it in self.iter() {
+            it.take(seed_iter, output);
+        }
+    }
+}

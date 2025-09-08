@@ -24,9 +24,9 @@ pub struct KeyConsumer {
 impl KeyConsumer {
     pub fn get_first_id(&self) -> usize {
         match self.key_type {
-            KeyType::ColoredKey => 3,
-            KeyType::BulkheadKey => 2,
-            KeyType::Other => 1,
+            KeyType::ColoredKey => 2,
+            KeyType::BulkheadKey => 1,
+            KeyType::Other => 0,
         }
     }
 }

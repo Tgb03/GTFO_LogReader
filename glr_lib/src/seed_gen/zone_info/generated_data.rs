@@ -13,6 +13,9 @@ pub struct GeneratedZone {
     alloc_small_pickups: Vec<Vec<u8>>,
     alloc_big_pickups: Vec<Vec<u8>>,
 
+    alloc_terminals: Vec<Vec<u8>>,
+    alloc_other: Vec<Vec<u8>>,
+
 }
 
 
@@ -23,6 +26,9 @@ pub enum AllocType {
     Container = 0,
     SmallPickup = 1,
     BigPickup = 2,
+    
+    Terminal = 3,
+    Other = 4,
 
 }
 
@@ -34,6 +40,12 @@ impl From<&ZoneData> for GeneratedZone {
             alloc_containers: Self::initial_allocations(AllocType::Container, &value.rooms),
             alloc_small_pickups: Self::initial_allocations(AllocType::SmallPickup, &value.rooms),
             alloc_big_pickups: Self::initial_allocations(AllocType::BigPickup, &value.rooms),
+            alloc_terminals: value.terminals.iter()
+                .map(|v| vec![1; *v as usize])
+                .collect(),
+            alloc_other: value.alloc_other.iter()
+                .map(|v| vec![1; *v as usize])
+                .collect(),
         }
     }
 }
@@ -51,7 +63,7 @@ impl GeneratedZone {
             let (room_len, alloc_per_space) = match alloc_type {
                 AllocType::Container => (room.into_containers(), 3),
                 AllocType::SmallPickup => (room.into_small_pickups(), 1),
-                AllocType::BigPickup => (room.into_big_pickups(), 1),
+                _ => (room.into_big_pickups(), 1),
             };
 
             let mut append_res = Vec::with_capacity(room_len as usize * alloc_per_space);
@@ -79,6 +91,8 @@ impl GeneratedZone {
             AllocType::Container => &mut self.alloc_containers,
             AllocType::SmallPickup => &mut self.alloc_small_pickups,
             AllocType::BigPickup => &mut self.alloc_big_pickups,
+            AllocType::Other => &mut self.alloc_other,
+            AllocType::Terminal => &mut self.alloc_terminals,
         }
             .iter()
             .map(|v| 
@@ -103,6 +117,8 @@ impl GeneratedZone {
             AllocType::Container => &mut self.alloc_containers,
             AllocType::SmallPickup => &mut self.alloc_small_pickups,
             AllocType::BigPickup => &mut self.alloc_big_pickups,
+            AllocType::Other => &mut self.alloc_other,
+            AllocType::Terminal => &mut self.alloc_terminals,
         };
 
         let id = vec.get_mut(room)
@@ -111,9 +127,10 @@ impl GeneratedZone {
             .map(|id| *id)
             .unwrap();
 
-        // vec.get_mut(room)
-        //     .map(|v| v.remove(in_room_id));
-
+        if *alloc_type != AllocType::Container {
+            vec.get_mut(room)
+                .map(|v| v.remove(in_room_id));
+        }
         id as usize
     }
 

@@ -23,6 +23,8 @@ where
     O: HasCallbackHandler,
 {
     fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, _: &mut O) {
-        let _ = seed_iter.nth(self.count);
+        if self.count > 0 {
+            let _ = seed_iter.nth(self.count - 1);
+        }
     }
 }
