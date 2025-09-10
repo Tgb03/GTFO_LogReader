@@ -12,7 +12,7 @@ from collections import defaultdict
 
 
 dll_relative_path = "../target/release/glr_dylib.dll"
-# dll_relative_path = "gtfo_log_reader_core_64bit.dll"
+# dll_relative_path = "../target/debug/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #
@@ -113,7 +113,7 @@ def my_event_callback(context, message):
 
         if "Key" in data:
             name, zone, id = data["Key"]
-            if name in ["ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn"]:
+            if name in ["ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
                 return
             
             # if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 

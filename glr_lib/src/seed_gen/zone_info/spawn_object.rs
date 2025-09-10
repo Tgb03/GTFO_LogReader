@@ -28,6 +28,8 @@ impl SpawnObject {
         seed_iter: &mut dyn Iterator<Item = f32>,
         output: &mut O,
     ) -> Option<()> {
+        let is_container = self.alloc_type == AllocType::Container;
+        let seed = seed_iter.next()?;
         let id = grab_spawn_id(
             generated_data, 
             &ZoneLocationSpawn {
@@ -37,8 +39,10 @@ impl SpawnObject {
                 end_weight: self.end_weight,
             }, 
             self.alloc_type, 
-            seed_iter.next()?
+            seed
         )?;
+
+        if is_container { let _ = seed_iter.next(); }
 
         output.output(OutputSeedIndexer::Key(self.name, self.zone_id.zone_id, id as i32));
 

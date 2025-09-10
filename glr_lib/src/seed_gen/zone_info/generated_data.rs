@@ -40,17 +40,38 @@ impl From<&ZoneData> for GeneratedZone {
             alloc_containers: Self::initial_allocations(AllocType::Container, &value.rooms),
             alloc_small_pickups: Self::initial_allocations(AllocType::SmallPickup, &value.rooms),
             alloc_big_pickups: Self::initial_allocations(AllocType::BigPickup, &value.rooms),
-            alloc_terminals: value.terminals.iter()
-                .map(|v| vec![1; *v as usize])
-                .collect(),
-            alloc_other: value.alloc_other.iter()
-                .map(|v| vec![1; *v as usize])
-                .collect(),
+            alloc_terminals: Self::initial_allocations_from_vec(&value.terminals, 1),
+            alloc_other: Self::initial_allocations_from_vec(&value.alloc_other, 1),
         }
     }
 }
 
 impl GeneratedZone {
+
+    fn initial_allocations_from_vec(
+        rooms: &Vec<u8>,
+        per_id: u8,
+    ) -> Vec<Vec<u8>> {
+        let mut result = Vec::with_capacity(rooms.len());
+        let mut start = 0;
+
+        for room in rooms {
+            let (room_len, alloc_per_space) = (*room, per_id as usize);
+
+            let mut append_res = Vec::with_capacity(room_len as usize * alloc_per_space);
+
+            for id in 0..room_len {
+                for _ in 0..alloc_per_space {
+                    append_res.push(id + start);
+                }
+            }
+
+            start += room_len;
+            result.push(append_res);
+        }
+
+        result    
+    }
 
     fn initial_allocations(
         alloc_type: AllocType,
@@ -99,6 +120,8 @@ impl GeneratedZone {
                 v.len()
             )
             .collect();
+        if spawns_per_room.len() == 0 { return 0 }
+        
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
 
         let room = Self::get_room(seed, &values_per_room);

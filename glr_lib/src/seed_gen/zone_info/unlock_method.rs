@@ -40,10 +40,16 @@ pub struct ZoneLocationSpawn {
 }
 
 
+fn generate_1_usize() -> usize {
+    1
+}
+
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UnlockMethod {
 
     pub unlock_type: UnlockMethodType,
+    #[serde(default="generate_1_usize")] pub placement_count: usize,
     pub zones: Vec<ZoneLocationSpawn>,
 
 }

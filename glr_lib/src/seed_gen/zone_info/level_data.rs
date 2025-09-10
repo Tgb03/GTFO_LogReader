@@ -61,41 +61,53 @@ impl StagedObjective {
             let choices = &mut new_vec[id];
 
             let size = choices.len();
-            let (count, selected) = &mut choices[(seed_iter.next().unwrap() * size as f32) as usize];
+            let rolled_id = if self.name.as_str() != "PowerCellDistribution" {
+                (seed_iter.next().unwrap() * size as f32) as usize
+            } else { 0 };
+            let (count, selected) = &mut choices[rolled_id];
             *count -= 1;
 
             let result_obj = match self.spawn_in_layer {
-                    true => {
-                        match self.spawn_type {
-                            Some(alloc_type) => { 
-                                let id = grab_spawn_id(
-                                    generated_zones, 
-                                    selected, 
-                                    alloc_type, 
-                                    seed_iter.next().unwrap()
-                                ).unwrap();
+                true => {
+                    match self.spawn_type {
+                        Some(alloc_type) => { 
+                            let id = grab_spawn_id(
+                                generated_zones, 
+                                selected, 
+                                alloc_type, 
+                                seed_iter.next().unwrap()
+                            ).unwrap();
 
-                                output.output(OutputSeedIndexer::Key(self.name.clone(), selected.zone_id.zone_id, id as i32));
-                            },
-                            None => todo!(),
-                        };
+                            output.output(OutputSeedIndexer::Key(self.name.clone(), selected.zone_id.zone_id, id as i32));
+                        },
+                        None => {},
+                    };
 
-                        None
-                    },
-                    false => Some(SpawnObject {
+                    None
+                },
+                false => match self.spawn_type {
+                    Some(sp_t) => Some(SpawnObject {
                         name: self.name.clone(),
                         start_weight: selected.start_weight,
                         middle_weight: selected.middle_weight,
                         end_weight: selected.end_weight,
-                        alloc_type: *self.spawn_type.as_ref().unwrap(),
+                        alloc_type: sp_t,
                         zone_id: selected.zone_id,
                     }),
-                };
+                    None => None,
+                }
+            };
 
             if let Some(result_obj) = result_obj {
                 result.push(result_obj);
             }
+
+            choices.retain(|v| v.0 > 0);
         }
+
+        // if self.name.as_str() == "GatherSmallItems" {
+        //     result.sort_by_key(|v| v.zone_id.zone_id);
+        // }
 
         result
     }
@@ -111,7 +123,7 @@ impl LevelData {
         seed_iter: &mut dyn Iterator<Item = f32>, 
         output: &mut O,
     ) -> Option<Vec<ZoneLocationSpawn>> {
-        self.zones
+        let result = self.zones
             .iter()
             .filter_map(|v| {
                 if v.unlocked_by.zones.get(0)?.zone_id.layer_id != layer { return None }
@@ -126,11 +138,14 @@ impl LevelData {
                     UnlockMethodType::None => ("Unknown", 0usize),
                     UnlockMethodType::Cell => {
                         println!("got cell");
-                        return Some(key.grab_zone(seed_iter.next()?))
+                        return Some((0..key.placement_count).into_iter()
+                            .map(|_| key.grab_zone(seed_iter.next().unwrap()))
+                            .collect::<Vec<&ZoneLocationSpawn>>())
                     },
                     UnlockMethodType::ColoredKey => ("ColoredKey", 2),
                     UnlockMethodType::BulkheadKey => ("BulkKey", 1),
                 };
+                println!("Got key");
                 let zone = key.grab_zone(seed_iter.nth(useless_seeds)?);
                 let id = grab_spawn_id(
                     generated_zones, 
@@ -143,9 +158,32 @@ impl LevelData {
 
                 None
             })
-            .cloned()
-            .collect::<Vec<ZoneLocationSpawn>>()
-            .into()
+            .fold(Vec::new(), |mut v, a| {
+                v.extend(a.into_iter().cloned());
+                v
+            });
+
+        match layer {
+            0 => &self.bulk_keys_main,
+            1 => &self.bulk_keys_sec,
+            _ => &self.bulk_keys_ovrl,
+        }.iter()
+            .for_each(|v| {
+                let zone = &v[
+                    (seed_iter.nth(1).unwrap() * v.len() as f32) as usize
+                ];
+                let id = grab_spawn_id(
+                    generated_zones, 
+                    zone, 
+                    AllocType::Container, 
+                    seed_iter.next().unwrap(),
+                ).unwrap_or_default();
+
+                println!("Got bulk key");
+                output.output(OutputSeedIndexer::Key("BulkKey".to_owned(), zone.zone_id.zone_id, id as i32));
+            });
+
+        Some(result)
     }
 
     fn try_remove(left: f32, take: f32) -> (f32, u8) {
