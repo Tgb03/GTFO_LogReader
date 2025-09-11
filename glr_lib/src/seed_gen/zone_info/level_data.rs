@@ -341,8 +341,6 @@ impl LevelData {
                 seed,
             )?;
 
-            println!("BigPickup got {seed}");
-
             output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
         }
 

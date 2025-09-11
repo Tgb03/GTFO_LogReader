@@ -15171,7 +15171,7 @@
                         "spawn_type": "Terminal",
                         "name": "SpecialTerminalCommand",
                         "count": 1,
-                        "max_per_zone": 18446744073709551615,
+                        "max_per_zone": 1000,
                         "spawn_in_layer": false
                     },
                     {
@@ -21267,7 +21267,7 @@
                         "name": "SpecialTerminalCommand",
                         "count": 1,
                         "max_per_zone": 1000,
-                        "spawn_in_layer": false
+                        "spawn_in_layer": true
                     }
                 ]
             }
