@@ -14,7 +14,7 @@ pub struct ZoneData {
 
     #[serde(default)] pub terminals: Vec<u8>,
     #[serde(default)] pub alloc_other: Vec<u8>,
-
+    
     pub medi: f32,
     #[serde(default)] pub medi_weights: [i32; 3],
     pub disi: f32,
@@ -23,12 +23,13 @@ pub struct ZoneData {
     #[serde(default)] pub ammo_weights: [i32; 3],
     pub tool: f32,
     #[serde(default)] pub tool_weights: [i32; 3],
-
+    
     pub consumables: Vec<ContainerOrWorldspawn>,
     pub artifacts: Vec<ContainerOrWorldspawn>,
-
+    
     pub small_pickups: Vec<ZoneObjectSpawn>,
     pub big_pickups: Vec<ZoneObjectSpawn>,
+    #[serde(default)] pub other_pickups: Vec<ZoneObjectSpawn>,
 
 }
 

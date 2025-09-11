@@ -78,7 +78,13 @@ impl StagedObjective {
                                 seed_iter.next().unwrap()
                             ).unwrap();
 
-                            output.output(OutputSeedIndexer::Key(self.name.clone(), selected.zone_id.zone_id, id as i32));
+                            output.output(OutputSeedIndexer::Key(
+                                if self.name.as_str() == "CentralGeneratorCluster" {
+                                    "Cell".to_owned()
+                                } else { self.name.clone() }, 
+                                selected.zone_id.zone_id, 
+                                id as i32
+                            ));
                         },
                         None => {},
                     };
@@ -87,7 +93,9 @@ impl StagedObjective {
                 },
                 false => match self.spawn_type {
                     Some(sp_t) => Some(SpawnObject {
-                        name: self.name.clone(),
+                        name: if self.name.as_str() == "CentralGeneratorCluster" {
+                            "Cell".to_owned()
+                        } else { self.name.clone() },
                         start_weight: selected.start_weight,
                         middle_weight: selected.middle_weight,
                         end_weight: selected.end_weight,
@@ -320,6 +328,7 @@ impl LevelData {
         output: &mut O,
     ) -> Option<()> {
         for pickup in &zone.big_pickups {
+            let seed = seed_iter.next()?;
             let id = grab_spawn_id(
                 generated_zones, 
                 &ZoneLocationSpawn { 
@@ -329,7 +338,34 @@ impl LevelData {
                     end_weight: pickup.end_weight 
                 }, 
                 AllocType::BigPickup, 
-                seed_iter.next()?
+                seed,
+            )?;
+
+            println!("BigPickup got {seed}");
+
+            output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
+        }
+
+        Some(())
+    }
+
+    fn do_other_pickups<O: HasCallbackHandler>(
+        generated_zones: &mut Vec<GeneratedZone>,
+        zone: &ZoneData,
+        seed_iter: &mut dyn Iterator<Item = f32>,
+        output: &mut O,
+    ) -> Option<()> {
+        for pickup in &zone.other_pickups {
+            let id = grab_spawn_id(
+                generated_zones, 
+                &ZoneLocationSpawn { 
+                    zone_id: zone.zone_id, 
+                    start_weight: pickup.start_weight, 
+                    middle_weight: pickup.middle_weight, 
+                    end_weight: pickup.end_weight 
+                }, 
+                AllocType::Other, 
+                seed_iter.next()?,
             )?;
 
             output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
@@ -357,6 +393,7 @@ impl LevelData {
         
             Self::do_consumables(generated_zones, zone, seed_iter, output)?;
             Self::do_big_pickus(generated_zones, zone, seed_iter, output)?;
+            Self::do_other_pickups(generated_zones, zone, seed_iter, output)?;
         }
 
         let mut vec: Vec<SpawnObject> = cell_iter.into_iter()
