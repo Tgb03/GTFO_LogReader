@@ -138,10 +138,10 @@ impl LevelData {
 
                 match v.unlocked_by.unlock_type {
                     UnlockMethodType::None => None,
-                    _ => Some(&v.unlocked_by),
+                    _ => Some((&v.unlocked_by, v.zone_id.zone_id)),
                 }
             })
-            .filter_map(|key| {
+            .filter_map(|(key, zone_id)| {
                 let (name, useless_seeds) = match key.unlock_type {
                     UnlockMethodType::None => ("Unknown", 0usize),
                     UnlockMethodType::Cell => {
@@ -150,7 +150,7 @@ impl LevelData {
                             .map(|_| key.grab_zone(seed_iter.next().unwrap()))
                             .collect::<Vec<&ZoneLocationSpawn>>())
                     },
-                    UnlockMethodType::ColoredKey => ("ColoredKey", 2),
+                    UnlockMethodType::ColoredKey => ("Key", 2),
                     UnlockMethodType::BulkheadKey => ("BulkKey", 1),
                 };
                 println!("Got key");
@@ -162,7 +162,7 @@ impl LevelData {
                     seed_iter.next()?,
                 )?;
 
-                output.output(OutputSeedIndexer::Key(name.to_owned(), zone.zone_id.zone_id, id as i32));
+                output.output(OutputSeedIndexer::Key(format!("{name}Z{zone_id}"), zone.zone_id.zone_id, id as i32));
 
                 None
             })
