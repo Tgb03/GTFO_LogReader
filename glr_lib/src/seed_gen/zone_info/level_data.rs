@@ -55,6 +55,7 @@ impl StagedObjective {
             .collect();
 
         let mut result = Vec::with_capacity(self.count);
+        if self.locations.len() == 0 { return vec![] }
         
         for id in 0..self.count {
             let id = id % self.locations.len();
@@ -64,6 +65,7 @@ impl StagedObjective {
             let rolled_id = if self.name.as_str() != "PowerCellDistribution" {
                 (seed_iter.next().unwrap() * size as f32) as usize
             } else { 0 };
+            if rolled_id >= choices.len() { return vec![] }
             let (count, selected) = &mut choices[rolled_id];
             *count -= 1;
 
@@ -75,8 +77,8 @@ impl StagedObjective {
                                 generated_zones, 
                                 selected, 
                                 alloc_type, 
-                                seed_iter.next().unwrap()
-                            ).unwrap();
+                                seed_iter
+                            ).unwrap_or_default();
 
                             output.output(OutputSeedIndexer::Key(
                                 if self.name.as_str() == "CentralGeneratorCluster" {
@@ -128,12 +130,14 @@ impl LevelData {
         &self, 
         generated_zones: &mut Vec<GeneratedZone>, 
         layer: u8, 
+        dim: u8,
         seed_iter: &mut dyn Iterator<Item = f32>, 
         output: &mut O,
     ) -> Option<Vec<ZoneLocationSpawn>> {
         let result = self.zones
             .iter()
             .filter_map(|v| {
+                if v.zone_id.dimension_id != dim { return None }
                 if v.unlocked_by.zones.get(0)?.zone_id.layer_id != layer { return None }
 
                 match v.unlocked_by.unlock_type {
@@ -159,7 +163,7 @@ impl LevelData {
                     generated_zones, 
                     zone, 
                     (&key.unlock_type).try_into().ok()?, 
-                    seed_iter.next()?,
+                    seed_iter,
                 )?;
 
                 output.output(OutputSeedIndexer::Key(format!("{name}Z{zone_id}"), zone.zone_id.zone_id, id as i32));
@@ -176,6 +180,7 @@ impl LevelData {
             1 => &self.bulk_keys_sec,
             _ => &self.bulk_keys_ovrl,
         }.iter()
+            .filter(|v| v.first().is_some_and(|v| v.zone_id.dimension_id == dim))
             .for_each(|v| {
                 let zone = &v[
                     (seed_iter.nth(1).unwrap() * v.len() as f32) as usize
@@ -184,10 +189,10 @@ impl LevelData {
                     generated_zones, 
                     zone, 
                     AllocType::Container, 
-                    seed_iter.next().unwrap(),
+                    seed_iter,
                 ).unwrap_or_default();
 
-                println!("Got bulk key");
+                println!("Got bulk key: layer {} dim {}", layer, dim);
                 output.output(OutputSeedIndexer::Key("BulkKey".to_owned(), zone.zone_id.zone_id, id as i32));
             });
 
@@ -238,7 +243,7 @@ impl LevelData {
                     end_weight: weights[2],
                 }, 
                 AllocType::Container, 
-                seed_iter.next()?,
+                seed_iter,
             )?;
 
             let (l, pack_size) = if take_seed < 0.333333f32 {
@@ -283,7 +288,7 @@ impl LevelData {
                     end_weight: 0 
                 }, 
                 val.into(), 
-                seed_iter.next()?,
+                seed_iter,
             )?;
 
             let name = match val {
@@ -304,7 +309,7 @@ impl LevelData {
                     end_weight: 0 
                 }, 
                 val.into(), 
-                seed_iter.next()?,
+                seed_iter,
             )?;
 
             let name = match val {
@@ -328,7 +333,6 @@ impl LevelData {
         output: &mut O,
     ) -> Option<()> {
         for pickup in &zone.big_pickups {
-            let seed = seed_iter.next()?;
             let id = grab_spawn_id(
                 generated_zones, 
                 &ZoneLocationSpawn { 
@@ -338,7 +342,7 @@ impl LevelData {
                     end_weight: pickup.end_weight 
                 }, 
                 AllocType::BigPickup, 
-                seed,
+                seed_iter,
             )?;
 
             output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
@@ -363,7 +367,7 @@ impl LevelData {
                     end_weight: pickup.end_weight 
                 }, 
                 AllocType::Other, 
-                seed_iter.next()?,
+                seed_iter,
             )?;
 
             output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
@@ -376,13 +380,14 @@ impl LevelData {
         &self, 
         generated_zones: &mut Vec<GeneratedZone>,
         layer: u8, 
+        dim: u8,
         seed_iter: &mut dyn Iterator<Item = f32>, 
         output: &mut O,
     ) -> Option<Vec<SpawnObject>> {
-        let cell_iter = self.do_layer_keys(generated_zones, layer, seed_iter, output)?;
+        let cell_iter = self.do_layer_keys(generated_zones, layer, dim, seed_iter, output)?;
 
         for zone in self.zones.iter()
-            .filter(|v| v.zone_id.layer_id == layer) {
+            .filter(|v| v.zone_id.layer_id == layer && v.zone_id.dimension_id == dim) {
     
             Self::do_res(generated_zones, zone, seed_iter, output, ResourceType::Healthpack)?;
             Self::do_res(generated_zones, zone, seed_iter, output, ResourceType::DisinfectPack)?;
@@ -405,11 +410,13 @@ impl LevelData {
             })
             .collect();
 
-        if let Some(objective) = 
-            self.staged_objectives.get(layer as usize)
-                .map(|v| v.get_task(generated_zones, seed_iter, output)) {
-            
-            vec.extend(objective);
+        if dim == 0 {
+            if let Some(objective) = 
+                self.staged_objectives.get(layer as usize)
+                    .map(|v| v.get_task(generated_zones, seed_iter, output)) {
+                
+                vec.extend(objective);
+            }
         }
 
         Some(vec)
@@ -436,15 +443,22 @@ where
         //     println!("seed: {}", seed_iter.next().unwrap());
         // }
 
-        let r = vec![
-            self.do_layer(&mut generated_zones, 0, seed_iter, output),
-            self.do_layer(&mut generated_zones, 1, seed_iter, output),
-            self.do_layer(&mut generated_zones, 2, seed_iter, output),
+        let mut r = vec![
+            self.do_layer(&mut generated_zones, 0, 0, seed_iter, output),
+            self.do_layer(&mut generated_zones, 1, 0, seed_iter, output),
+            self.do_layer(&mut generated_zones, 2, 0, seed_iter, output),
         ];
 
         // self.do_layer_cells(&mut generated_zones, 0, seed_iter, output);
         // self.do_layer_cells(&mut generated_zones, 1, seed_iter, output);
         // self.do_layer_cells(&mut generated_zones, 2, seed_iter, output);
+
+        for dim in 1..20 {
+            r.extend(
+                self.do_layer(&mut generated_zones, 0, dim, seed_iter, output).into_iter()
+                    .map(|v| Some(v))
+            );
+        }
 
         r.into_iter()
             .filter_map(|v| v)
@@ -455,5 +469,6 @@ where
             })
             .into_iter()
             .for_each(|v| { v.take(&mut generated_zones, seed_iter, output); });
+        
     }
 }

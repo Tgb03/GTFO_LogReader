@@ -237,9 +237,9 @@ enum OutputSeedIndexer {
 - Rundown 3: **FULLY DONE**
 - Rundown 4: **FULLY DONE**
 - Rundown 5: **FULLY DONE**
--  7 / 13 Rundown 6: R6A1 R6B1 R6B2 R6C1 R6C2 R6C3 R6D3
--  6 / 10 Rundown 7: R7A1 R7B1 R7B2 R7B3 R7C3 R7E1
--  3 / 12 Rundown 8: R8A1 R8B3 R8E2
+- Rundown 6: **FULLY DONE**
+-  8 / 10 Rundown 7: R7A1 R7B1 R7B2 R7B3 R7C2 R7C3 R7D1 R7E1
+-  4 / 12 Rundown 8: R8A1 R8B1 R8B3 R8E2
 
 #### Contributing:
 The way SeedIndexing works is by taking the seed of the level, generating the values the game will then use to build the map (which are 32 bit floating point values) and then checks where items will be spawned based on those values.
