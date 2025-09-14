@@ -38,7 +38,8 @@ impl SpawnObject {
                 end_weight: self.end_weight,
             }, 
             self.alloc_type, 
-            seed_iter
+            seed_iter,
+            Some("SpawnObject alloc")
         )?;
 
         if is_container { let _ = seed_iter.next(); }

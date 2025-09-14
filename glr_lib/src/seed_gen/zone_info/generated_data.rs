@@ -107,6 +107,7 @@ impl GeneratedZone {
         weights: &[i32; 3], 
         alloc_type: &AllocType, 
         seed_iter: &mut dyn Iterator<Item = f32>,
+        debug_str: Option<&str>,
     ) -> usize {
         let spawns_per_room: Vec<usize> = match alloc_type {
             AllocType::Container => &mut self.alloc_containers,
@@ -125,6 +126,10 @@ impl GeneratedZone {
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
 
         let seed = seed_iter.next().unwrap();
+        // match debug_str {
+        //     Some(s) => println!("s: {} from {}", seed, s),
+        //     None => println!("s: {}", seed),
+        // }
         let mut room = Self::get_room(seed, &values_per_room);
         if room >= spawns_per_room.len() { room -= 1; }
         let spawn_count = spawns_per_room[room];
@@ -241,6 +246,7 @@ pub fn grab_spawn_id(
     spawn: &ZoneLocationSpawn, 
     alloc_type: AllocType, 
     seed_iter: &mut dyn Iterator<Item = f32>,
+    debug_str: Option<&str>,
 ) -> Option<usize> {
     
     zones.iter_mut()
@@ -250,6 +256,7 @@ pub fn grab_spawn_id(
             &[spawn.start_weight, spawn.middle_weight, spawn.end_weight], 
             &alloc_type, 
             seed_iter,
+            debug_str,
         ))
 }
 
