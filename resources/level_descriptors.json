@@ -8804,7 +8804,7 @@
                         "name": "SpecialTerminalCommand",
                         "count": 1,
                         "max_per_zone": 1000,
-                        "spawn_in_layer": false
+                        "spawn_in_layer": true
                     }
                 ]
             }
@@ -9477,14 +9477,6 @@
                                 }
                             ],
                             [
-                                {
-                                    "layer_id": 0,
-                                    "dimension_id": 0,
-                                    "zone_id": 52,
-                                    "start_weight": 0,
-                                    "middle_weight": 0,
-                                    "end_weight": 5000
-                                },
                                 {
                                     "layer_id": 0,
                                     "dimension_id": 0,

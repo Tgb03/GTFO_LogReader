@@ -121,11 +121,11 @@ impl GeneratedZone {
                 v.len()
             )
             .collect();
-        if spawns_per_room.len() == 0 { return 0 }
         
+        let seed = seed_iter.next().unwrap();
+        if spawns_per_room.len() == 0 { return 0 }
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
 
-        let seed = seed_iter.next().unwrap();
         // match debug_str {
         //     Some(s) => println!("s: {} from {}", seed, s),
         //     None => println!("s: {}", seed),
