@@ -249,14 +249,20 @@ pub fn grab_spawn_id(
     debug_str: Option<&str>,
 ) -> Option<usize> {
     
-    zones.iter_mut()
+    if let Some(zone) = zones.iter_mut()
         .filter(|v| v.zone_id == spawn.zone_id)
-        .nth(0)
-        .map(|v| v.spawn_id(
+        .nth(0) {
+        
+        Some(zone.spawn_id(
             &[spawn.start_weight, spawn.middle_weight, spawn.end_weight], 
             &alloc_type, 
             seed_iter,
             debug_str,
         ))
+    } else {
+        let _ = seed_iter.next();
+
+        None
+    }
 }
 

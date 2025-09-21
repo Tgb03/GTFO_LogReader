@@ -2046,76 +2046,224 @@
     ],
     "R2A1": [
         {
-            "Ignore": {
-                "count": 5
-            }
-        },
-        {
-            "KeyConsumer": {
-                "key_type": "ColoredKey",
+            "LevelData": {
+                "skip_start": 5,
                 "zones": [
                     {
-                        "name": "Key",
-                        "zone": 103,
-                        "start_weight": 500,
-                        "middle_weight": 2500,
-                        "end_weight": 10000,
-                        "spawns_per_room": [
-                            4,
-                            9,
-                            1,
-                            4,
-                            6
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            "Ignore": {
-                "count": 96
-            }
-        },
-        {
-            "ObjectiveConsumer": {
-                "item_count": 2,
-                "max_per_zone": 1,
-                "objectives_in_zones": [
-                    [
-                        {
-                            "name": "Cargo",
-                            "zone": 106,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 1000,
-                            "spawns_per_room": [
-                                1,
-                                5
-                            ]
-                        }
-                    ],
-                    [
-                        {
-                            "name": "Cargo",
-                            "zone": 104,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 0,
-                            "spawns_per_room": [
-                                2
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 102,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "placement_count": 1,
+                            "zones": []
+                        },
+                        "rooms": [
+                            "Small",
+                            "Small",
+                            "Large",
+                            "Medium"
+                        ],
+                        "terminals": [],
+                        "alloc_other": [],
+                        "medi": 0.33,
+                        "disi": 0.0,
+                        "ammo": 0.33,
+                        "tool": 0.33,
+                        "consumables": [
+                            "Container",
+                            "Container",
+                            "Container",
+                            "Container",
+                            "Container"
+                        ],
+                        "artifacts": [
+                            "Worldspawn",
+                            "Worldspawn",
+                            "Worldspawn"
+                        ],
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 103,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "placement_count": 1,
+                            "zones": []
+                        },
+                        "rooms": [
+                            "Small",
+                            "Large",
+                            "Tiny",
+                            "Small",
+                            "Medium"
+                        ],
+                        "terminals": [],
+                        "alloc_other": [],
+                        "medi": 0.5,
+                        "disi": 0.0,
+                        "ammo": 0.5,
+                        "tool": 0.5,
+                        "consumables": [
+                            "Container",
+                            "Container",
+                            "Container",
+                            "Container",
+                            "Container"
+                        ],
+                        "artifacts": [
+                            "Container",
+                            "Worldspawn",
+                            "Container",
+                            "Worldspawn",
+                            "Worldspawn"
+                        ],
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 104,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "placement_count": 1,
+                            "zones": []
+                        },
+                        "rooms": [
+                            "Medium"
+                        ],
+                        "terminals": [],
+                        "alloc_other": [],
+                        "medi": 0.33,
+                        "disi": 0.0,
+                        "ammo": 0.33,
+                        "tool": 0.33,
+                        "consumables": [
+                            "Container"
+                        ],
+                        "artifacts": [
+                            "Worldspawn"
+                        ],
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 105,
+                        "unlocked_by": {
+                            "unlock_type": "None",
+                            "placement_count": 1,
+                            "zones": []
+                        },
+                        "rooms": [
+                            "Large"
+                        ],
+                        "terminals": [],
+                        "alloc_other": [],
+                        "medi": 0.33,
+                        "disi": 0.0,
+                        "ammo": 0.33,
+                        "tool": 0.33,
+                        "consumables": [
+                            "Container"
+                        ],
+                        "artifacts": [
+                            "Worldspawn",
+                            "Worldspawn"
+                        ],
+                        "small_pickups": [],
+                        "big_pickups": []
+                    },
+                    {
+                        "layer_id": 0,
+                        "dimension_id": 0,
+                        "zone_id": 106,
+                        "unlocked_by": {
+                            "unlock_type": "ColoredKey",
+                            "placement_count": 1,
+                            "zones": [
+                                {
+                                    "layer_id": 0,
+                                    "dimension_id": 0,
+                                    "zone_id": 103,
+                                    "start_weight": 500,
+                                    "middle_weight": 2500,
+                                    "end_weight": 10000
+                                }
                             ]
                         },
-                        {
-                            "name": "Cargo",
-                            "zone": 105,
-                            "start_weight": 0,
-                            "middle_weight": 0,
-                            "end_weight": 0,
-                            "spawns_per_room": [
-                                3
+                        "rooms": [
+                            "Small",
+                            "Huge"
+                        ],
+                        "terminals": [],
+                        "alloc_other": [],
+                        "medi": 0.5,
+                        "disi": 0.3,
+                        "ammo": 0.5,
+                        "tool": 0.3,
+                        "consumables": [
+                            "Container",
+                            "Container",
+                            "Container",
+                            "Container",
+                            "Container"
+                        ],
+                        "artifacts": [
+                            "Worldspawn",
+                            "Worldspawn",
+                            "Worldspawn"
+                        ],
+                        "small_pickups": [],
+                        "big_pickups": []
+                    }
+                ],
+                "bulk_keys_main": [],
+                "bulk_keys_sec": [],
+                "bulk_keys_ovrl": [],
+                "staged_objectives": [
+                    {
+                        "locations": [
+                            [
+                                {
+                                    "layer_id": 0,
+                                    "dimension_id": 0,
+                                    "zone_id": 106,
+                                    "start_weight": 0,
+                                    "middle_weight": 0,
+                                    "end_weight": 1000
+                                }
+                            ],
+                            [
+                                {
+                                    "layer_id": 0,
+                                    "dimension_id": 0,
+                                    "zone_id": 104,
+                                    "start_weight": 0,
+                                    "middle_weight": 0,
+                                    "end_weight": 1000
+                                },
+                                {
+                                    "layer_id": 0,
+                                    "dimension_id": 0,
+                                    "zone_id": 105,
+                                    "start_weight": 0,
+                                    "middle_weight": 0,
+                                    "end_weight": 1000
+                                }
                             ]
-                        }
-                    ]
+                        ],
+                        "spawn_type": "BigPickup",
+                        "name": "RetrieveBigItems",
+                        "count": 2,
+                        "max_per_zone": 1000,
+                        "spawn_in_layer": false
+                    }
                 ]
             }
         }
