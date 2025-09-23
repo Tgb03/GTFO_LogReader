@@ -14932,7 +14932,7 @@
     "R5A1": [
         {
             "LevelData": {
-                "skip_start": 6,
+                "skip_start": 5,
                 "zones": [
                     {
                         "layer_id": 0,
@@ -14940,6 +14940,7 @@
                         "zone_id": 61,
                         "unlocked_by": {
                             "unlock_type": "None",
+                            "placement_count": 0,
                             "zones": []
                         },
                         "rooms": [
@@ -14950,6 +14951,8 @@
                             "Medium",
                             "Large"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.5,
                         "disi": 0.0,
                         "ammo": 0.5,
@@ -14962,7 +14965,7 @@
                             "Container"
                         ],
                         "artifacts": [
-                            "Worldspawn",
+                            "Container",
                             "Worldspawn",
                             "Worldspawn",
                             "Worldspawn"
@@ -14976,6 +14979,7 @@
                         "zone_id": 62,
                         "unlocked_by": {
                             "unlock_type": "None",
+                            "placement_count": 0,
                             "zones": []
                         },
                         "rooms": [
@@ -14985,17 +14989,18 @@
                             "Large",
                             "Huge"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.5,
                         "disi": 0.0,
                         "ammo": 0.5,
                         "tool": 0.2,
                         "consumables": [
                             "Container",
+                            "Worldspawn",
                             "Container",
                             "Container",
-                            "Container",
-                            "Container",
-                            "Worldspawn"
+                            "Container"
                         ],
                         "artifacts": [
                             "Worldspawn",
@@ -15021,6 +15026,7 @@
                         "zone_id": 63,
                         "unlocked_by": {
                             "unlock_type": "Cell",
+                            "placement_count": 0,
                             "zones": []
                         },
                         "rooms": [
@@ -15030,6 +15036,8 @@
                             "Medium",
                             "Huge"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.6,
                         "disi": 0.0,
                         "ammo": 0.6,
@@ -15042,7 +15050,7 @@
                             "Container"
                         ],
                         "artifacts": [
-                            "Worldspawn",
+                            "Container",
                             "Worldspawn",
                             "Worldspawn",
                             "Worldspawn"
@@ -15056,6 +15064,7 @@
                         "zone_id": 64,
                         "unlocked_by": {
                             "unlock_type": "None",
+                            "placement_count": 1,
                             "zones": []
                         },
                         "rooms": [
@@ -15064,6 +15073,8 @@
                             "Medium",
                             "Large"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.5,
                         "disi": 0.0,
                         "ammo": 0.5,
@@ -15092,12 +15103,15 @@
                         "zone_id": 65,
                         "unlocked_by": {
                             "unlock_type": "None",
+                            "placement_count": 0,
                             "zones": []
                         },
                         "rooms": [
                             "Medium",
                             "Medium"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.0,
                         "disi": 0.0,
                         "ammo": 0.0,
@@ -15115,6 +15129,7 @@
                         "zone_id": 191,
                         "unlocked_by": {
                             "unlock_type": "None",
+                            "placement_count": 1,
                             "zones": []
                         },
                         "rooms": [
@@ -15124,17 +15139,18 @@
                             "Medium",
                             "Large"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.6,
                         "disi": 0.0,
                         "ammo": 0.6,
                         "tool": 0.6,
                         "consumables": [
+                            "Worldspawn",
                             "Container",
                             "Container",
                             "Container",
-                            "Container",
-                            "Container",
-                            "Worldspawn"
+                            "Container"
                         ],
                         "artifacts": [
                             "Worldspawn",
@@ -15157,6 +15173,7 @@
                         "zone_id": 192,
                         "unlocked_by": {
                             "unlock_type": "Cell",
+                            "placement_count": 1,
                             "zones": [
                                 {
                                     "layer_id": 1,
@@ -15174,23 +15191,24 @@
                             "Medium",
                             "Large"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.5,
                         "disi": 0.0,
                         "ammo": 0.3,
                         "tool": 0.3,
                         "consumables": [
                             "Container",
+                            "Worldspawn",
                             "Container",
                             "Container",
-                            "Container",
-                            "Container",
-                            "Worldspawn"
+                            "Container"
                         ],
                         "artifacts": [
                             "Worldspawn",
                             "Worldspawn",
-                            "Worldspawn",
-                            "Worldspawn"
+                            "Container",
+                            "Container"
                         ],
                         "small_pickups": [],
                         "big_pickups": []
@@ -15201,6 +15219,7 @@
                         "zone_id": 193,
                         "unlocked_by": {
                             "unlock_type": "Cell",
+                            "placement_count": 1,
                             "zones": [
                                 {
                                     "layer_id": 1,
@@ -15217,17 +15236,18 @@
                             "Small",
                             "Large"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.0,
                         "disi": 0.0,
                         "ammo": 0.4,
                         "tool": 0.4,
                         "consumables": [
+                            "Worldspawn",
                             "Container",
                             "Container",
                             "Container",
-                            "Container",
-                            "Container",
-                            "Worldspawn"
+                            "Container"
                         ],
                         "artifacts": [
                             "Worldspawn",
@@ -15242,6 +15262,7 @@
                         "zone_id": 194,
                         "unlocked_by": {
                             "unlock_type": "Cell",
+                            "placement_count": 1,
                             "zones": [
                                 {
                                     "layer_id": 1,
@@ -15255,10 +15276,12 @@
                         },
                         "rooms": [
                             "Large",
-                            "Large",
+                            "Medium",
                             "Large",
                             "Large"
                         ],
+                        "terminals": [],
+                        "alloc_other": [],
                         "medi": 0.4,
                         "disi": 0.0,
                         "ammo": 0.4,
@@ -15273,8 +15296,7 @@
                         "artifacts": [
                             "Worldspawn",
                             "Worldspawn",
-                            "Worldspawn",
-                            "Worldspawn"
+                            "Container"
                         ],
                         "small_pickups": [],
                         "big_pickups": []
@@ -15312,7 +15334,7 @@
                         "name": "SpecialTerminalCommand",
                         "count": 1,
                         "max_per_zone": 1000,
-                        "spawn_in_layer": false
+                        "spawn_in_layer": true
                     },
                     {
                         "locations": [
