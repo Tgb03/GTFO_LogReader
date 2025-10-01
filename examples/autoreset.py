@@ -95,21 +95,19 @@ def my_event_callback(context, message):
         if "Key" in data:
             name, zone, id = data["Key"]
             text = f"{name} in ZONE_{zone} at {id}"
+
+            if name in ["ArtifactWorldspawn", "ArtifactContainer", "ConsumableWorldspawn", "ConsumableContainer"]:
+                return
+
             label = Label(frame, text=text)
             label.pack()
             labels.append(label)
 
-            if name == 'Key':
+            if name == 'KeyZ52':
                 key_id = id
 
-            if name == 'HSU':
+            if name == 'HSU_FindTakeSample':
                 hsu_id = id
-
-        if "ResourcePack" in data:
-            name, id, size = data["ResourcePack"]
-            label = Label(frame, text=f"{name} of size {size} at {id}")
-            label.pack()
-            labels.append(label)
 
         if data == "GenerationEnd":
             print("Stop?: ", key_id, hsu_id, check_stop())
@@ -127,10 +125,10 @@ def cycle_reset():
         BlockInput("MouseMove")
 
         positions := [
-            { x: -2000, y: -2000, pre: 300, click: 1, delay: 10 },
-            { x: 300,   y: 43,    pre: 300, click: 100, delay: 10 },
-            { x: 573,   y: 248,   pre: 300, click: 100, delay: 10 },
-            { x: -85,   y: 400,   pre: 300, click: 900, delay: 10 }
+            { x: -2000, y: -2000, pre: 300, click: 10, delay: 50 },
+            { x: 300,   y: 43,    pre: 300, click: 10, delay: 50 },
+            { x: 753,   y: 308,   pre: 300, click: 10, delay: 50 },
+            { x: -85,   y: 430,   pre: 300, click: 900, delay: 50 }
         ]
 
         for index, pos in positions {
@@ -152,7 +150,7 @@ def check_stop():
     # if key_id in [0, 1, 2, 3]:
     #     return True
     
-    stop_keys = [14, 16, 18]
+    stop_keys = [0, 1, 2, 3, 16, 18]
     stop_hsus = [1]
 
     if key_id in stop_keys and hsu_id in stop_hsus:

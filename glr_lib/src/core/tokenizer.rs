@@ -105,13 +105,13 @@ impl Tokenizer for BaseTokenizer {
             .get(len.saturating_sub(21)..len.saturating_sub(1))
             .is_some_and(|v| v == "was added to session")
         {
-            return Some(Token::PlayerJoinedLobby);
+            return Some(Token::create_player_joined(line));
         }
         if line
             .get(15..45)
             .is_some_and(|v| v == "DEBUG : Closed connection with")
         {
-            return Some(Token::PlayerLeftLobby);
+            return Some(Token::create_player_left(line));
         }
         if line
             .get(15..43)
@@ -365,8 +365,8 @@ mod tests {
             .tokenize(&file_str)
             .into_iter()
             .filter_map(|(_, v)| match v {
-                Token::PlayerJoinedLobby
-                | Token::PlayerLeftLobby
+                Token::PlayerJoinedLobby(_)
+                | Token::PlayerLeftLobby(_)
                 | Token::UserExitLobby
                 | Token::SessionSeed(_)
                 | Token::PlayerDroppedInLevel(_)

@@ -107,7 +107,7 @@ impl GeneratedZone {
         weights: &[i32; 3], 
         alloc_type: &AllocType, 
         seed_iter: &mut dyn Iterator<Item = f32>,
-        debug_str: Option<&str>,
+        _debug_str: Option<&str>,
     ) -> usize {
         let spawns_per_room: Vec<usize> = match alloc_type {
             AllocType::Container => &mut self.alloc_containers,

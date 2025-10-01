@@ -11,7 +11,7 @@ pub struct ObjectiveItemGenerator {
     buffer_zones: Vec<(usize, u64)>,
 
     level_name: String,
-    player_count: u8,
+    players: Vec<String>,
 }
 
 impl Default for ObjectiveItemGenerator {
@@ -22,7 +22,7 @@ impl Default for ObjectiveItemGenerator {
             buffer_names: Default::default(), 
             buffer_zones: Default::default(), 
             level_name: Default::default(),
-            player_count: Default::default(),
+            players: Default::default(),
         }
     }
 }
@@ -30,18 +30,23 @@ impl Default for ObjectiveItemGenerator {
 impl LocationGenerator for ObjectiveItemGenerator {
     fn accept_token(&mut self, token: &Token) -> Option<Location> {
         match token {
-            Token::PlayerJoinedLobby => {
-                self.player_count += 1;
+            Token::PlayerJoinedLobby(name) => {
+                self.players.push(name.clone());
             
                 None
             }
-            Token::PlayerLeftLobby => {
-                self.player_count -= self.player_count.saturating_sub(1);
+            Token::PlayerLeftLobby(name) => {
+                if let Some(id) = self.players
+                    .iter()
+                    .position(|v| v == name) {
+                        
+                    self.players.swap_remove(id);
+                }
 
                 None
             }
             Token::UserExitLobby => {
-                self.player_count = 0;
+                self.players.clear();
 
                 None
             }
@@ -119,7 +124,7 @@ impl LocationGenerator for ObjectiveItemGenerator {
                 self.buffer_zones.clear();
                 self.dimension = 0;
                 
-                Some(Location::GenerationStarted(format!("{}_{}", self.level_name, self.player_count)))
+                Some(Location::GenerationStarted(format!("{}_{}", self.level_name, self.players.len())))
             }
             _ => None,
         }

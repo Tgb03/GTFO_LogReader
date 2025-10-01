@@ -15,7 +15,7 @@ where
     ignore_next_door: bool,
     in_death_screen: bool,
 
-    player_count: u8,
+    players: Vec<String>,
 
 }
 
@@ -27,7 +27,7 @@ impl<S: Split> Default for RunGenerator<S> {
             last_level_name: Default::default(), 
             door_count: Default::default(), 
             bulk_count: Default::default(),
-            player_count: Default::default(),
+            players: Default::default(),
             ignore_next_door: false,
             in_death_screen: false,
         }
@@ -58,22 +58,27 @@ impl RunGenerator<NamedSplit> {
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
-            Token::PlayerJoinedLobby => { 
-                self.player_count = self.player_count.saturating_add(1);
+            Token::PlayerJoinedLobby(name) => {
+                self.players.push(name.clone());
             },
-            Token::PlayerLeftLobby => { 
-                self.player_count = self.player_count.saturating_sub(1);
+            Token::PlayerLeftLobby(name) => {
+                if let Some(id) = self.players
+                    .iter()
+                    .position(|v| v == name) {
+                        
+                    self.players.swap_remove(id);
+                }
             },
             Token::UserExitLobby => { 
-                self.player_count = 0;
+                self.players.clear();
             },
             Token::GameStarted => { 
                 self.last_split_time = time;
                 self.current_run = Some(
-                    TimedRun::new(self.last_level_name.clone(), self.player_count)
+                    TimedRun::new(self.last_level_name.clone(), self.players.clone())
                 );
                 
-                return Some(RunGeneratorResult::GameStarted(self.last_level_name.clone(), self.player_count));
+                return Some(RunGeneratorResult::GameStarted(self.last_level_name.clone(), self.players.len() as u8));
             },
             Token::DoorOpen => {
                 if self.in_death_screen { return None }
@@ -104,6 +109,7 @@ impl RunGenerator<NamedSplit> {
                 self.current_run.as_mut().map(|v| v.add_checkpoint());
                 self.ignore_next_door = true;
                 self.in_death_screen = false;
+                self.last_split_time = time;
                 
                 return Some(RunGeneratorResult::CheckpointUsed);
             },

@@ -6,8 +6,8 @@ use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
 pub enum Token {
     GeneratingLevel,
 
-    PlayerJoinedLobby,
-    PlayerLeftLobby,
+    PlayerJoinedLobby(String),
+    PlayerLeftLobby(String),
     UserExitLobby,
 
     SessionSeed(u64),
@@ -38,6 +38,20 @@ pub enum Token {
 }
 
 impl Token {
+    pub fn create_player_joined(line: &str) -> Token {
+        line
+            .get(22..line.len().saturating_sub(21))
+            .map(|v| Token::PlayerJoinedLobby(v.to_owned()))
+            .unwrap_or_else(|| Token::Invalid)
+    }
+
+    pub fn create_player_left(line: &str) -> Token {
+        line
+            .get(47..line.len().saturating_sub(1))
+            .map(|v| Token::PlayerLeftLobby(v.to_owned()))
+            .unwrap_or_else(|| Token::Invalid)
+    }
+
     pub fn create_session_seed(line: &str) -> Token {
         let words: Vec<&str> = line.split(" ").collect();
 

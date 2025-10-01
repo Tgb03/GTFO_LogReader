@@ -10,7 +10,7 @@ where
 
     name: LevelDescriptor,
     total_time: Time,
-    player_count: u8,
+    players: Vec<String>,
 
     used_checkpoint: bool,
     is_win: bool,
@@ -27,7 +27,7 @@ impl<S: Split> Default for TimedRun<S> {
         Self { 
             name: Default::default(),
             total_time: Default::default(), 
-            player_count: Default::default(), 
+            players: Default::default(), 
             used_checkpoint: Default::default(), 
             is_win: Default::default(), 
             did_secondary: Default::default(), 
@@ -41,10 +41,10 @@ impl<S> TimedRun<S>
 where 
     S: Split {
 
-    pub fn new(name: LevelDescriptor, player_count: u8) -> Self {
+    pub fn new(name: LevelDescriptor, players: Vec<String>) -> Self {
         Self {
             name,
-            player_count,
+            players,
             ..Default::default()
         }
     }
@@ -92,7 +92,11 @@ where
     }
 
     pub fn get_player_count(&self) -> u8 {
-        self.player_count
+        self.players.len() as u8
+    }
+
+    pub fn get_players_iter(&self) -> impl Iterator<Item = &String> {
+        self.players.iter()
     }
 
     pub fn iter_splits(&self) -> impl Iterator<Item = &S> {
