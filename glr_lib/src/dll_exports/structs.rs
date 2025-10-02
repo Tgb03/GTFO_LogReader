@@ -22,10 +22,10 @@ pub struct ThreadSafePtr{
     p: *const c_void
 }
 
-impl From<*const c_void> for ThreadSafePtr {
-    fn from(value: *const c_void) -> Self {
+impl<T> From<*const T> for ThreadSafePtr {
+    fn from(value: *const T) -> Self {
         Self {
-            p: value
+            p: value as *const c_void
         }
     }
 }
@@ -61,7 +61,7 @@ impl CallbackInfo {
             code,
             message_type,
             channel_id,
-            context: context.into(),
+            context,
             event_callback,
         }
     }

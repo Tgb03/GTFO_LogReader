@@ -119,6 +119,12 @@ impl Tokenizer for BaseTokenizer {
         {
             return Some(Token::UserExitLobby);
         }
+        if line
+            .get(15..26)
+            .is_some_and(|v| v == "Player Down") 
+        {
+            return Some(Token::create_player_down(line))    
+        }
 
         None
     }

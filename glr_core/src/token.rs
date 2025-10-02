@@ -8,6 +8,7 @@ pub enum Token {
 
     PlayerJoinedLobby(String),
     PlayerLeftLobby(String),
+    PlayerDown(String),
     UserExitLobby,
 
     SessionSeed(u64),
@@ -40,15 +41,22 @@ pub enum Token {
 impl Token {
     pub fn create_player_joined(line: &str) -> Token {
         line
-            .get(22..line.len().saturating_sub(21))
+            .get(22..line.len().saturating_sub(22))
             .map(|v| Token::PlayerJoinedLobby(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_left(line: &str) -> Token {
         line
-            .get(47..line.len().saturating_sub(1))
+            .get(46..line.len().saturating_sub(1))
             .map(|v| Token::PlayerLeftLobby(v.to_owned()))
+            .unwrap_or_else(|| Token::Invalid)
+    }
+
+    pub fn create_player_down(line: &str) -> Token {
+        line
+            .get(28..line.len().saturating_sub(1))
+            .map(|v| Token::PlayerDown(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 

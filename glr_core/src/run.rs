@@ -1,7 +1,16 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{data::LevelDescriptor, split::Split, time::Time};
 
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct PlayerData {
+
+    pub death_count: usize,
+
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TimedRun<S>
@@ -10,7 +19,7 @@ where
 
     name: LevelDescriptor,
     total_time: Time,
-    players: Vec<String>,
+    players: HashMap<String, PlayerData>,
 
     used_checkpoint: bool,
     is_win: bool,
@@ -44,7 +53,9 @@ where
     pub fn new(name: LevelDescriptor, players: Vec<String>) -> Self {
         Self {
             name,
-            players,
+            players: players.iter()
+                .map(|p| (p.clone(), PlayerData::default()))
+                .collect(),
             ..Default::default()
         }
     }
@@ -96,7 +107,7 @@ where
     }
 
     pub fn get_players_iter(&self) -> impl Iterator<Item = &String> {
-        self.players.iter()
+        self.players.keys().into_iter()
     }
 
     pub fn iter_splits(&self) -> impl Iterator<Item = &S> {
@@ -105,5 +116,10 @@ where
 
     pub fn iter_splits_mut(&mut self) -> impl Iterator<Item = &mut S> {
         self.splits.iter_mut()
+    }
+
+    pub fn add_player_down(&mut self, name: &String) {
+        self.players.get_mut(name)
+            .map(|v| v.death_count += 1);
     }
 }

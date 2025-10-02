@@ -69,6 +69,10 @@ impl RunGenerator<NamedSplit> {
                     self.players.swap_remove(id);
                 }
             },
+            Token::PlayerDown(name) => {
+                self.current_run.as_mut()
+                    .map(|v| v.add_player_down(name));
+            }
             Token::UserExitLobby => { 
                 self.players.clear();
             },
