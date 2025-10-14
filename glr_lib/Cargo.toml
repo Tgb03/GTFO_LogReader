@@ -18,3 +18,4 @@ strum_macros = "0.26.4"
 winapi = "0.3.9"
 serde = { version = "1.0.217", features = ["derive"] }
 num_enum = "0.7.4"
+regex = "1.11.3"

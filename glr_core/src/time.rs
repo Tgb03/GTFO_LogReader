@@ -3,17 +3,11 @@ use std::ops::{Add, AddAssign, Sub, SubAssign};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone, Serialize, Deserialize)]
-pub struct Time {
-    // specific time stamp.
-    // millisecond time precision
-    stamp: u64,
-}
+pub struct Time(u64);
 
 impl Default for Time {
     fn default() -> Self {
-        Self {
-            stamp: Default::default(),
-        }
+        Self(0)
     }
 }
 
@@ -22,17 +16,17 @@ impl Time {
     /// Creates a Time with stamp 0
     ///
     pub const fn new() -> Time {
-        return Time { stamp: 0 };
+        return Time(0);
     }
 
     pub const fn from_stamp(stamp: u64) -> Time {
-        return Time { stamp };
+        return Time(stamp);
     }
 
     pub const fn from_min_secs(min: u64, sec: u64) -> Time {
-        return Time {
-            stamp: (min * 60 + sec) * 1000,
-        };
+        Time(
+            (min * 60 + sec) * 1000,
+        )
     }
 
     ///
@@ -45,29 +39,29 @@ impl Time {
         let seconds: u64 = time.get(6..8)?.parse::<u64>().ok()?;
         let milliseconds: u64 = time.get(9..12)?.parse::<u64>().ok()?;
 
-        Some(Time {
-            stamp: (((hours * 60 + minutes) * 60) + seconds) * 1000 + milliseconds,
-        })
+        Some(
+            Time((((hours * 60 + minutes) * 60) + seconds) * 1000 + milliseconds)
+        )
     }
 
     pub const fn max() -> Time {
-        Time {
-            stamp: 24 * 60 * 60 * 1000,
-        }
+        Time (
+            24 * 60 * 60 * 1000
+        )
     }
 
     pub fn get_stamp(&self) -> u64 {
-        return self.stamp;
+        return self.0;
     }
 
     ///
     /// Returns a string showing the time of the object.
     ///
     pub fn to_string(&self) -> String {
-        let milliseconds: u64 = self.stamp % 1000;
-        let seconds: u64 = self.stamp / 1000 % 60;
-        let minutes: u64 = self.stamp / 60000 % 60;
-        let hours: u64 = self.stamp / 3600000;
+        let milliseconds: u64 = self.0 % 1000;
+        let seconds: u64 = self.0 / 1000 % 60;
+        let minutes: u64 = self.0 / 60000 % 60;
+        let hours: u64 = self.0 / 3600000;
 
         return format!(
             "{:02}:{:02}:{:02}.{:03}",
@@ -80,10 +74,10 @@ impl Time {
     /// without the hours mark if the hours is 0
     ///
     pub fn to_string_no_hours(&self) -> String {
-        let milliseconds: u64 = self.stamp % 1000;
-        let seconds: u64 = self.stamp / 1000 % 60;
-        let minutes: u64 = self.stamp / 60000 % 60;
-        let hours: u64 = self.stamp / 3600000;
+        let milliseconds: u64 = self.0 % 1000;
+        let seconds: u64 = self.0 / 1000 % 60;
+        let minutes: u64 = self.0 / 60000 % 60;
+        let hours: u64 = self.0 / 3600000;
 
         if hours > 0 {
             return format!(
@@ -104,19 +98,27 @@ impl Time {
     }
 }
 
+impl From<u64> for Time {
+    fn from(value: u64) -> Self {
+        Self (
+            value
+        )
+    }
+}
+
 impl Add for Time {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self {
-            stamp: self.stamp + rhs.stamp,
-        }
+        Self (
+            self.0 + rhs.0,
+        )
     }
 }
 
 impl AddAssign for Time {
     fn add_assign(&mut self, rhs: Self) {
-        self.stamp += rhs.stamp;
+        self.0 += rhs.0;
     }
 }
 
@@ -125,14 +127,14 @@ impl Sub for Time {
 
     fn sub(self, rhs: Self) -> Self::Output {
         if self < rhs {
-            return Time {
-                stamp: self.stamp + 24 * 60 * 60 * 1000 - rhs.stamp,
-            };
+            return Time (
+                self.0 + 24 * 60 * 60 * 1000 - rhs.0,
+            );
         }
 
-        return Time {
-            stamp: self.stamp - rhs.stamp,
-        };
+        Time (
+            self.0 - rhs.0,
+        )
     }
 }
 
@@ -149,7 +151,7 @@ mod tests {
     #[test]
     fn test_new() {
         let time: Time = Time::new();
-        let stamp: u64 = time.stamp;
+        let stamp: u64 = time.0;
 
         assert_eq!(stamp, 0);
     }
@@ -160,9 +162,9 @@ mod tests {
         let time2 = Time::from("23:59:59.999");
         let time3 = Time::from("00:00:00.000");
 
-        assert_eq!(time1.unwrap().stamp, 40953444);
-        assert_eq!(time2.unwrap().stamp, 86399999);
-        assert_eq!(time3.unwrap().stamp, 0);
+        assert_eq!(time1.unwrap().0, 40953444);
+        assert_eq!(time2.unwrap().0, 86399999);
+        assert_eq!(time3.unwrap().0, 0);
     }
 
     #[test]
@@ -171,9 +173,9 @@ mod tests {
         let time2 = Time::from("23:59:59.999adda");
         let time3 = Time::from("00:00:00.000111");
 
-        assert_eq!(time1.unwrap().stamp, 40953444);
-        assert_eq!(time2.unwrap().stamp, 86399999);
-        assert_eq!(time3.unwrap().stamp, 0);
+        assert_eq!(time1.unwrap().0, 40953444);
+        assert_eq!(time2.unwrap().0, 86399999);
+        assert_eq!(time3.unwrap().0, 0);
     }
 
     #[test]

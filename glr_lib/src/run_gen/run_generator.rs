@@ -1,5 +1,12 @@
-use glr_core::{data::LevelDescriptor, run::TimedRun, run_gen_result::RunGeneratorResult, split::{NamedSplit, Split}, time::Time, token::Token};
+use std::collections::HashMap;
 
+use glr_core::{data::LevelDescriptor, run::TimedRun, run_gen_result::RunGeneratorResult, split::{NamedSplit, Split}, time::Time, token::Token};
+use regex::Regex;
+
+fn strip_html_tags(input: &str) -> String {
+    let re = Regex::new(r"<[^>]*>").unwrap();
+    re.replace_all(input, "").into_owned()
+}
 
 pub struct RunGenerator<S>
 where
@@ -15,7 +22,7 @@ where
     ignore_next_door: bool,
     in_death_screen: bool,
 
-    players: Vec<String>,
+    players: HashMap<String, Time>,
 
 }
 
@@ -59,19 +66,25 @@ impl RunGenerator<NamedSplit> {
                 }
             },
             Token::PlayerJoinedLobby(name) => {
-                self.players.push(name.clone());
+                self.players.insert(strip_html_tags(name), time);
             },
             Token::PlayerLeftLobby(name) => {
-                if let Some(id) = self.players
-                    .iter()
-                    .position(|v| v == name) {
-                        
-                    self.players.swap_remove(id);
-                }
+                self.players.remove(&strip_html_tags(name));
             },
             Token::PlayerDown(name) => {
-                self.current_run.as_mut()
-                    .map(|v| v.add_player_down(name));
+                let name = strip_html_tags(name);
+
+                if self.players
+                    .get(&name)
+                    .cloned()
+                    .is_some_and(|t| (time - t) > Time::from_stamp(6000)) {
+                    
+                    self.players.get_mut(&name)
+                        .map(|v| *v = time);
+
+                    self.current_run.as_mut()
+                        .map(|v| v.add_player_down(&name));
+                }
             }
             Token::UserExitLobby => { 
                 self.players.clear();
@@ -79,7 +92,12 @@ impl RunGenerator<NamedSplit> {
             Token::GameStarted => { 
                 self.last_split_time = time;
                 self.current_run = Some(
-                    TimedRun::new(self.last_level_name.clone(), self.players.clone())
+                    TimedRun::new(
+                        self.last_level_name.clone(), 
+                        self.players.iter()
+                            .map(|(v, _)| v.clone())
+                            .collect()
+                    )
                 );
                 
                 return Some(RunGeneratorResult::GameStarted(self.last_level_name.clone(), self.players.len() as u8));
