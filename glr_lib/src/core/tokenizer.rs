@@ -90,6 +90,12 @@ impl Tokenizer for BaseTokenizer {
             return Some(Token::create_session_seed(line));
         }
         if line
+            .get(29..53)
+            .is_some_and(|v| v == "PlayFab.OnGetCurrentTime") 
+        {
+            return Some(Token::create_utc_time(line))    
+        }
+        if line
             .get(30..52)
             .is_some_and(|v| v == "SelectActiveExpedition")
         {

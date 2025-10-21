@@ -1,3 +1,7 @@
+use std::error::Error;
+
+use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use regex::Regex;
 use serde::{Serialize, Deserialize};
 
 use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
@@ -11,6 +15,7 @@ pub enum Token {
     PlayerDown(String),
     UserExitLobby,
 
+    TimeSessionStart(DateTime<Utc>),
     SessionSeed(u64),
     GeneratingFinished,
     ItemAllocated(KeyDescriptor),                     // name
@@ -39,6 +44,56 @@ pub enum Token {
 }
 
 impl Token {
+    pub fn create_utc_time(line: &str) -> Token {
+        match Self::utc_time_getter(line) {
+            Ok(t) => t,
+            Err(_) => Token::Invalid,
+        }
+    }
+
+    fn utc_time_getter(line: &str) -> Result<Token, Box<dyn Error>> {
+        let re = Regex::new(
+            r"(?P<h>\d{2}):(?P<m>\d{2}):(?P<s>\d{2}\.\d{3}).*?(?P<day>\d{2}) (?P<month>\w+) (?P<year>\d{4})"
+        )?;
+
+        let caps = re.captures(line).ok_or("No match found")?;
+
+        let hour: u32 = caps["h"].parse()?;
+        let minute: u32 = caps["m"].parse()?;
+        let sec_ms: f64 = caps["s"].parse()?;
+        let seconds = sec_ms.trunc() as u32;
+        let millis = ((sec_ms.fract()) * 1000.0).round() as u32;
+
+        let day: u32 = caps["day"].parse()?;
+        let year: i32 = caps["year"].parse()?;
+        let month_name = &caps["month"];
+
+        // Map month name to number
+        let month = match month_name.to_lowercase().as_str() {
+            "january" => 1,
+            "february" => 2,
+            "march" => 3,
+            "april" => 4,
+            "may" => 5,
+            "june" => 6,
+            "july" => 7,
+            "august" => 8,
+            "september" => 9,
+            "october" => 10,
+            "november" => 11,
+            "december" => 12,
+            _ => return Err(format!("Unknown month: {}", month_name).into()),
+        };
+
+        // Build a UTC DateTime
+        let date = NaiveDate::from_ymd_opt(year, month, day).ok_or("Invalid date")?;
+        let time = NaiveTime::from_hms_milli_opt(hour, minute, seconds, millis).ok_or("Invalid time")?;
+        let naive_dt = NaiveDateTime::new(date, time);
+        let utc_dt: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(naive_dt, Utc);
+
+        Ok(Token::TimeSessionStart(utc_dt))
+    }
+
     pub fn create_player_joined(line: &str) -> Token {
         line
             .get(22..line.len().saturating_sub(22))

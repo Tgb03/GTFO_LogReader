@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use chrono::{DateTime, Duration, Utc};
 use glr_core::{data::LevelDescriptor, run::TimedRun, run_gen_result::RunGeneratorResult, split::{NamedSplit, Split}, time::Time, token::Token};
 use regex::Regex;
 
@@ -22,6 +23,9 @@ where
     ignore_next_door: bool,
     in_death_screen: bool,
 
+    utc_time_started: DateTime<Utc>,
+    utc_time_stamp: Time,
+
     players: HashMap<String, Time>,
 
 }
@@ -35,6 +39,8 @@ impl<S: Split> Default for RunGenerator<S> {
             door_count: Default::default(), 
             bulk_count: Default::default(),
             players: Default::default(),
+            utc_time_started: Default::default(),
+            utc_time_stamp: Default::default(),
             ignore_next_door: false,
             in_death_screen: false,
         }
@@ -65,6 +71,10 @@ impl RunGenerator<NamedSplit> {
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
+            Token::TimeSessionStart(utc_time) => {
+                self.utc_time_started = utc_time.clone();
+                self.utc_time_stamp = time;
+            }
             Token::PlayerJoinedLobby(name) => {
                 self.players.insert(strip_html_tags(name), time);
             },
@@ -96,7 +106,8 @@ impl RunGenerator<NamedSplit> {
                         self.last_level_name.clone(), 
                         self.players.iter()
                             .map(|(v, _)| v.clone())
-                            .collect()
+                            .collect(),
+                        self.utc_time_started + Duration::milliseconds((time - self.utc_time_stamp).get_stamp() as i64),
                     )
                 );
                 

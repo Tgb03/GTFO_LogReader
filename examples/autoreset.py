@@ -10,6 +10,35 @@ from tkinter import ttk
 from ahk import AHK
 import time
 
+watchdog_after_id = None
+watchdog_timeout = 10000  
+watchdog_active = False
+
+def start_watchdog():
+    global watchdog_after_id, watchdog_active
+    cancel_watchdog()  # clear any previous
+    watchdog_active = True
+    watchdog_after_id = root.after(watchdog_timeout, watchdog_triggered)
+    print("[WATCHDOG] Started.")
+
+def cancel_watchdog():
+    global watchdog_after_id, watchdog_active
+    if watchdog_after_id is not None:
+        root.after_cancel(watchdog_after_id)
+        watchdog_after_id = None
+    watchdog_active = False
+    print("[WATCHDOG] Canceled.")
+
+def watchdog_triggered():
+    global watchdog_active
+    if not watchdog_active:
+        print("[WATCHDOG] Fired but inactive, ignoring.")
+        return
+    watchdog_active = False
+    if check_stop() == False:
+        print("[FAILSAFE] Watchdog triggered: cycle took too long, restarting...")
+        cycle_reset()
+
 dll_relative_path = "../target/release/glr_dylib.dll"
 ahk_executable_path = 'C:\Program Files\AutoHotkey\\v2\\AutoHotkey64.exe'
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
@@ -110,9 +139,11 @@ def my_event_callback(context, message):
                 hsu_id = id
 
         if data == "GenerationEnd":
-            print("Stop?: ", key_id, hsu_id, check_stop())
+            print("Stop?: ", key_id, hsu_id, check_stop(), is_valid)
             if check_stop() is False and is_valid is True:
                 cycle_reset()
+            else:
+                cancel_watchdog()
 
 def start_cycling():
     global is_valid
@@ -121,6 +152,7 @@ def start_cycling():
 
 
 def cycle_reset():
+    start_watchdog()
     ahk.run_script(r"""
         BlockInput("MouseMove")
 

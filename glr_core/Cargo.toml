@@ -12,3 +12,5 @@ strum = { version = "0.26.3", features = ["derive"] }
 strum_macros = "0.26.4"
 serde = { version = "1.0.217", features = ["derive"] }
 num_enum = "0.7.4"
+regex = "1.12.2"
+chrono = { version = "0.4.42", features = ["serde"] }

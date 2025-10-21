@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::{data::LevelDescriptor, split::Split, time::Time};
@@ -27,6 +28,8 @@ where
     did_secondary: bool,
     did_overload: bool,
 
+    utc_time_started: DateTime<Utc>,
+
     splits: Vec<S>,
 
 }
@@ -41,7 +44,8 @@ impl<S: Split> Default for TimedRun<S> {
             is_win: Default::default(), 
             did_secondary: Default::default(), 
             did_overload: Default::default(),
-            splits: Default::default() 
+            splits: Default::default() ,
+            utc_time_started: Default::default(),
         }
     }
 }
@@ -50,12 +54,13 @@ impl<S> TimedRun<S>
 where 
     S: Split {
 
-    pub fn new(name: LevelDescriptor, players: Vec<String>) -> Self {
+    pub fn new(name: LevelDescriptor, players: Vec<String>, time: DateTime<Utc>) -> Self {
         Self {
             name,
             players: players.iter()
                 .map(|p| (p.clone(), PlayerData::default()))
                 .collect(),
+            utc_time_started: time,
             ..Default::default()
         }
     }
