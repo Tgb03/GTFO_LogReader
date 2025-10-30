@@ -22,7 +22,7 @@ where
     total_time: Time,
     players: HashMap<String, PlayerData>,
 
-    used_checkpoint: bool,
+    used_checkpoint: u8,
     is_win: bool,
 
     did_secondary: bool,
@@ -72,7 +72,7 @@ where
     }
 
     pub fn add_checkpoint(&mut self) {
-        self.used_checkpoint = true;
+        self.used_checkpoint = self.used_checkpoint.saturating_add(1);
     }
 
     pub fn add_win(&mut self) {

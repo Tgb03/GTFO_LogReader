@@ -63,12 +63,15 @@ impl<S: Split> RunGenerator<S> {
 impl RunGenerator<NamedSplit> {
 
     pub fn accept_token(&mut self, time: Time, token: &Token) -> Option<RunGeneratorResult> {
+        // println!("token obtained: {token:?}");
         match token {
             Token::SelectExpedition(level_id, _) => {
                 self.last_level_name = level_id.clone();
-                if let Some(run) = self.current_run.take() {
-                    self.reset();
-                    return Some(RunGeneratorResult::LevelRun(run));
+                if self.in_death_screen == false {
+                    if let Some(run) = self.current_run.take() {
+                        self.reset();
+                        return Some(RunGeneratorResult::LevelRun(run));
+                    }
                 }
             },
             Token::TimeSessionStart(utc_time) => {
@@ -182,7 +185,7 @@ impl RunGenerator<NamedSplit> {
                 if let Some(mut run) = self.current_run.take() {
                     run.add_split(split.clone());
                     self.reset();
-                return Some(RunGeneratorResult::LevelRun(run));
+                    return Some(RunGeneratorResult::LevelRun(run));
                 }
             },
             Token::GameEndLost => {

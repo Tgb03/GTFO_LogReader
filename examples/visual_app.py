@@ -10,7 +10,6 @@ from tkinter import ttk
 from collections import Counter
 from collections import defaultdict
 
-
 dll_relative_path = "../target/release/glr_dylib.dll"
 # dll_relative_path = "../target/debug/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
@@ -63,6 +62,12 @@ frame.pack()
 reset_counter = 0
 reset_counter_label = Label(frame, text=f"Reset counter: {reset_counter}")
 reset_counter_label.pack()
+
+colors_thingy = {
+    "Ammopack": 'forest green',
+    "Healthpack": 'red',
+    "ToolRefillpack": 'royalblue1',
+}
 
 class NumberCounter:
     def __init__(self):
@@ -139,9 +144,13 @@ def my_event_callback(context, message):
 
         if "ResourcePack" in data:
             name, zone, id, size = data["ResourcePack"]
+            
+            if zone not in [144, 146, 150]:
+                return
+            
             if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
                         "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
-                groups[(name, zone)].append(id)
+                groups[(zone, name)].append(id)
                 # counter.add(zone)
                 return
             label = Label(frame, text=f"{name} in ZONE_{zone} of size {size} at {id}")
@@ -159,9 +168,19 @@ def my_event_callback(context, message):
             print(data)
 
         if data == "GenerationEnd":
-            for (name, zone) in sorted(groups.keys()):
-                ids = groups[(name, zone)]
-                label = Label(frame, text=f"ZONE_{zone} has {name}: {ids}")
+            last_zone = None
+            for (zone, name) in sorted(groups.keys()):
+                if last_zone != zone:
+                    last_zone = zone
+                    label = Label(frame, text=f"ZONE_{zone}", font='Helvetica 15 bold')
+                    label.pack()
+                    labels.append(label)
+
+                ids = groups[(zone, name)]
+                color = ''
+                if name in colors_thingy:
+                    color = colors_thingy[name]
+                label = Label(frame, text=f"{name}: {ids}", fg = color, font='Helvetica 10 bold')
                 label.pack()
                 labels.append(label)
             for num, count in counter:
