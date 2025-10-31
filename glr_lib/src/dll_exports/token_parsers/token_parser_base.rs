@@ -24,7 +24,7 @@ impl HasCallbackHandler for TokenParserBase {
 }
 
 impl TokenParser for TokenParserBase {
-    fn parse_token(&mut self, _: Time, token: Token) {
+    fn parse_token(&mut self, _: Time, token: &Token) {
         if self.callback_handler.is_empty() {
             return;
         }

@@ -23,7 +23,7 @@ impl HasCallbackHandler for TokenParserSeed {
 }
 
 impl TokenParser for TokenParserSeed {
-    fn parse_token(&mut self, _: Time, token: Token) {
+    fn parse_token(&mut self, _: Time, token: &Token) {
         if self.callback_handler.is_empty() {
             return;
         }
@@ -31,7 +31,7 @@ impl TokenParser for TokenParserSeed {
         if let Token::SelectExpedition(level, seed) = token {
             self.output(OutputSeedIndexer::GenerationStart);
 
-            let mut unity_random = UnityRandom::from(seed);
+            let mut unity_random = UnityRandom::from(*seed);
             self.level_descriptors
                 .get_level(&level)
                 .map(|v| v.take(&mut unity_random, &mut self.callback_handler));

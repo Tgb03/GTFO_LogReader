@@ -4,6 +4,7 @@ use glr_core::{time::Time, token::Token};
 
 pub trait Tokenizer {
     fn tokenize_single(&self, line: &str) -> Option<Token>;
+    #[allow(unused)]
     fn tokenize(&self, lines: &str) -> Vec<(Time, Token)> {
         let mut result = Vec::new();
 
@@ -20,6 +21,18 @@ pub trait Tokenizer {
         result
     }
 }
+
+pub trait TokenizerGetIter: Tokenizer {
+    fn tokenize_to_iter(&self, lines: &str) -> impl Iterator<Item = (Time, Token)> {
+        lines.split('\n')
+            .map(|v| v.trim_start())
+            .map(|v| (Time::from(v), self.tokenize_single(v)))
+            .filter(|(a, b)| a.is_some() && b.is_some())
+            .map(|(a, b)| (a.unwrap(), b.unwrap()))
+    }
+}
+
+impl<T: Tokenizer> TokenizerGetIter for T {}
 
 pub struct TokenizeIter<'a, I, T>
 where

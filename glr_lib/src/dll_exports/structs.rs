@@ -7,11 +7,11 @@ use might_sleep::prelude::CpuLimiter;
 
 use crate::{
     core::{
-        token_parser::IterTokenParser, tokenizer::{GenericTokenizer, TokenizeIter, Tokenizer}
+        token_parser::{IterTokenParser, TokenParser}, tokenizer::{GenericTokenizer, TokenizeIter, TokenizerGetIter}
     }, dll_exports::{
         callback_handler::{CallbackClone, HasCallbackHandler},
         enums::{SubscribeCode, SubscriptionType},
-        token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed, CallbackTokenParser},
+        token_parsers::{CallbackTokenParser, token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed},
     }, readers::{file_reader::FileReader, folder_watcher::FolderWatcher}
 };
 
@@ -162,7 +162,7 @@ impl MainThread {
                 .map(|v| Time::from(v))
                 .flatten() {
                 
-                parser.parse_token(last_line, Token::LogFileEnd);
+                parser.parse_token(last_line, &Token::LogFileEnd);
             }
         }
     }
@@ -202,12 +202,13 @@ impl MainThread {
             }
 
             if let Some(new_lines) = file_reader.get_new_lines() {
-                let tokens = tokenizer.tokenize(&new_lines);
-
-                parser_base.parse_tokens(tokens.iter().cloned());
-                parser_mapper.parse_tokens(tokens.iter().cloned());
-                parser_seeds.parse_tokens(tokens.iter().cloned());
-                parser_runs.parse_tokens(tokens.iter().cloned());
+                tokenizer.tokenize_to_iter(&new_lines)
+                    .for_each(|(time, token)| {
+                        parser_base.parse_token(time, &token);
+                        parser_mapper.parse_token(time, &token);
+                        parser_seeds.parse_token(time, &token);
+                        parser_runs.parse_token(time, &token);
+                    });
             }
 
             limiter.might_sleep();
