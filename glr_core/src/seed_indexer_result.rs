@@ -20,7 +20,7 @@ pub enum OutputSeedIndexer {
     ResourcePack(ResourceType, i32, i32, u8), // zone, id of box, pack size
     ConsumableFound(i32, bool),          // id of box, found or not
     GenerationEnd,
-    GenerationStart,
+    GenerationStart(String),
     ZoneGenEnded(u32),
     
     ProcessFailed,

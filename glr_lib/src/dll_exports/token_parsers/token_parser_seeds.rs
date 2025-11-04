@@ -29,7 +29,7 @@ impl TokenParser for TokenParserSeed {
         }
 
         if let Token::SelectExpedition(level, seed) = token {
-            self.output(OutputSeedIndexer::GenerationStart);
+            self.output(OutputSeedIndexer::GenerationStart(level.to_string()));
 
             let mut unity_random = UnityRandom::from(*seed);
             self.level_descriptors
