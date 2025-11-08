@@ -23461,7 +23461,27 @@
                 "bulk_keys_main": [],
                 "bulk_keys_sec": [],
                 "bulk_keys_ovrl": [],
-                "staged_objectives": []
+                "staged_objectives": [
+                        {
+                            "locations": [
+                                [
+                                    {
+                                        "layer_id": 0,
+                                        "dimension_id": 1,
+                                        "zone_id": 31,
+                                        "start_weight": 0,
+                                        "middle_weight": 0,
+                                        "end_weight": 0
+                                    }
+                                ]
+                            ],
+                            "spawn_type": "Terminal",
+                            "name": "SpecialTerminalCommand",
+                            "count": 1,
+                            "max_per_zone": 1000,
+                            "spawn_in_layer": true
+                        }
+                ]
             }
         }
     ],

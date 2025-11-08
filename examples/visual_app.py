@@ -103,7 +103,7 @@ def my_event_callback(context, message):
         data = json.loads(message)
         # print(message)
 
-        if data == "GenerationStart":
+        if "GenerationStart" in data:
             for label in labels:
                 label.destroy()
 
