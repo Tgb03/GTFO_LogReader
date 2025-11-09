@@ -84,9 +84,14 @@ impl RunGenerator<NamedSplit> {
             Token::PlayerExitElevator(name) => {
                 // println!("Got name: <{name}>");
                 let name = strip_html_tags(name);
+                let was_already_in = self.players.contains_key(&name);
                 self.players.insert(name.clone(), time);
                 self.current_run.as_mut()
                     .map(|v| { v.add_player(name); });
+
+                if !was_already_in {
+                    return Some(RunGeneratorResult::PlayerCountUpdate(self.players.len() as u8));
+                }
             }
             // Token::PlayerJoinedLobby(name) => {
             //     self.players.insert(strip_html_tags(name), time);

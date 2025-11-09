@@ -9,6 +9,7 @@ pub enum RunGeneratorResult {
 
     GameStarted(LevelDescriptor, u8),
     SplitAdded(NamedSplit),
+    PlayerCountUpdate(u8),
 
     SecondaryDone,
     OverloadDone,
