@@ -107,6 +107,10 @@ where
         self.is_win
     }
 
+    pub fn add_player(&mut self, player_name: String) {
+        self.players.insert(player_name, PlayerData::default());
+    }
+
     pub fn get_player_count(&self) -> u8 {
         self.players.len() as u8
     }

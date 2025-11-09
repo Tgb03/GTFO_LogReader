@@ -13,6 +13,7 @@ pub enum Token {
     PlayerJoinedLobby(String),
     PlayerLeftLobby(String),
     PlayerDown(String),
+    PlayerExitElevator(String),
     UserExitLobby,
 
     TimeSessionStart(DateTime<Utc>),
@@ -41,6 +42,13 @@ pub enum Token {
     LogFileEnd,
 
     Invalid,
+}
+
+fn nth_space_index(s: &str, n: usize) -> Option<usize> {
+    s.char_indices()
+        .filter(|&(_, c)| c == ' ')
+        .nth(n)
+        .map(|(i, _)| i)
 }
 
 impl Token {
@@ -112,6 +120,18 @@ impl Token {
         line
             .get(28..line.len().saturating_sub(1))
             .map(|v| Token::PlayerDown(v.to_owned()))
+            .unwrap_or_else(|| Token::Invalid)
+    }
+
+    pub fn create_player_exit_elevator(line: &str) -> Token {
+        let start = nth_space_index(line, 5);
+        if let None = start {
+            return Token::Invalid
+        }
+
+        line
+            .get(start.unwrap() + 1..line.len().saturating_sub(54))
+            .map(|v| Token::PlayerExitElevator(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 

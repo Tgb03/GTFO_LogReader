@@ -77,13 +77,23 @@ impl RunGenerator<NamedSplit> {
             Token::TimeSessionStart(utc_time) => {
                 self.utc_time_started = utc_time.clone();
                 self.utc_time_stamp = time;
+            },
+            Token::GeneratingLevel => {
+                self.players.clear();
             }
-            Token::PlayerJoinedLobby(name) => {
-                self.players.insert(strip_html_tags(name), time);
-            },
-            Token::PlayerLeftLobby(name) => {
-                self.players.remove(&strip_html_tags(name));
-            },
+            Token::PlayerExitElevator(name) => {
+                // println!("Got name: <{name}>");
+                let name = strip_html_tags(name);
+                self.players.insert(name.clone(), time);
+                self.current_run.as_mut()
+                    .map(|v| { v.add_player(name); });
+            }
+            // Token::PlayerJoinedLobby(name) => {
+            //     self.players.insert(strip_html_tags(name), time);
+            // },
+            // Token::PlayerLeftLobby(name) => {
+            //     self.players.remove(&strip_html_tags(name));
+            // },
             Token::PlayerDown(name) => {
                 let name = strip_html_tags(name);
 

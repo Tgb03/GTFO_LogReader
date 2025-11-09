@@ -127,6 +127,12 @@ impl Tokenizer for BaseTokenizer {
             return Some(Token::create_player_joined(line));
         }
         if line
+            .get(15..41)
+            .is_some_and(|v| v == "<color=green>SNET : Player") 
+        {
+            return Some(Token::create_player_exit_elevator(line))
+        }
+        if line
             .get(15..45)
             .is_some_and(|v| v == "DEBUG : Closed connection with")
         {
