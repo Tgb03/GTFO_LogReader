@@ -31,6 +31,7 @@ pub struct ZoneData {
     pub big_pickups: Vec<ZoneObjectSpawn>,
     #[serde(default)] pub other_pickups: Vec<ZoneObjectSpawn>,
 
+    #[serde(default)] pub allow_big_pickups: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq, Eq)]

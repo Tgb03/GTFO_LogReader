@@ -16,6 +16,8 @@ pub struct GeneratedZone {
     alloc_terminals: Vec<Vec<u8>>,
     alloc_other: Vec<Vec<u8>>,
 
+    allow_big_pickups: bool
+
 }
 
 
@@ -42,6 +44,7 @@ impl From<&ZoneData> for GeneratedZone {
             alloc_big_pickups: Self::initial_allocations(AllocType::BigPickup, &value.rooms),
             alloc_terminals: Self::initial_allocations_from_vec(&value.terminals, 1),
             alloc_other: Self::initial_allocations_from_vec(&value.alloc_other, 1),
+            allow_big_pickups: value.allow_big_pickups,
         }
     }
 }
@@ -108,7 +111,13 @@ impl GeneratedZone {
         alloc_type: &AllocType, 
         seed_iter: &mut dyn Iterator<Item = f32>,
         _debug_str: Option<&str>,
+        _check_alloc: bool,
     ) -> usize {
+        // disabled for now as ALL of this is just testing
+        // if *alloc_type == AllocType::BigPickup && check_alloc && !self.allow_big_pickups {
+        //     return usize::MAX
+        // }
+
         let spawns_per_room: Vec<usize> = match alloc_type {
             AllocType::Container => &mut self.alloc_containers,
             AllocType::SmallPickup => &mut self.alloc_small_pickups,
@@ -247,6 +256,7 @@ pub fn grab_spawn_id(
     alloc_type: AllocType, 
     seed_iter: &mut dyn Iterator<Item = f32>,
     debug_str: Option<&str>,
+    check_alloc: bool,
 ) -> Option<usize> {
     
     if let Some(zone) = zones.iter_mut()
@@ -258,6 +268,7 @@ pub fn grab_spawn_id(
             &alloc_type, 
             seed_iter,
             debug_str,
+            check_alloc,
         ))
     } else {
         let _ = seed_iter.next();

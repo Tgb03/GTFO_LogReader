@@ -67,6 +67,7 @@ colors_thingy = {
     "Ammopack": 'forest green',
     "Healthpack": 'red',
     "ToolRefillpack": 'royalblue1',
+    "ConsumableWorldspawn": 'royalblue1',
 }
 
 class NumberCounter:
@@ -118,14 +119,14 @@ def my_event_callback(context, message):
 
         if "Key" in data:
             name, zone, id = data["Key"]
-            if name in ["ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
+            if name in ["ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
                 return
             
-            # if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
-            #             "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
-            #     groups[(name, zone)].append(id)
-            #     # counter.add(zone)
-            #     return
+            if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
+                        "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
+                groups[(name, zone)].append(id)
+                # counter.add(zone)
+                return
 
             # if name == "ArtifactWorldspawn":
             #     return
@@ -177,7 +178,7 @@ def my_event_callback(context, message):
                     labels.append(label)
 
                 ids = groups[(zone, name)]
-                color = ''
+                color = 'red'
                 if name in colors_thingy:
                     color = colors_thingy[name]
                 label = Label(frame, text=f"{name}: {ids}", fg = color, font='Helvetica 10 bold')

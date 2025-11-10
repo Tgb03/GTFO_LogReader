@@ -38,12 +38,21 @@ lib.process_paths.restype = None
 # From here u can modify the code and do whatever u want with it.
 #
 
+count = 0
+
 # 4. Implement a Python callback function
 # The callback returns a message that is based on the values
 # u set when the callback is created by add_callback(...)
 @CALLBACK_TYPE
 def my_event_callback(context, message):
-    print(message.decode())
+    global count
+    
+    data = json.loads(message)
+    
+    if "SelectExpedition" in data: 
+        level = data["SelectExpedition"][0]
+        if level["rundown"] == "R1" and level["tier"] == 0 and level["level"] == 0:
+            count += 1
 
 file_paths = filedialog.askopenfilenames(title="Select files to process")
 encoded_paths = [path.encode('utf-8') for path in file_paths]
@@ -57,4 +66,4 @@ msg_type = 1      # e.g., SubscriptionType::JSON
 
 lib.process_paths(c_paths, length, code, msg_type, 0, callback_fn_ptr)
 
-print("Done")
+print(f"Done: {count}")

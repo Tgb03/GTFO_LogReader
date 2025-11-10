@@ -39,7 +39,8 @@ impl SpawnObject {
             }, 
             self.alloc_type, 
             seed_iter,
-            Some("SpawnObject alloc")
+            Some("SpawnObject alloc"),
+            true
         )?;
 
         if is_container { let _ = seed_iter.next(); }

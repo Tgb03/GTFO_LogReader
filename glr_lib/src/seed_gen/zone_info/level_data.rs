@@ -78,7 +78,8 @@ impl StagedObjective {
                                 selected, 
                                 alloc_type, 
                                 seed_iter,
-                                Some("WardenObjective alloc")
+                                Some("WardenObjective alloc"),
+                                true
                             ).unwrap_or_default();
 
                             output.output(OutputSeedIndexer::Key(
@@ -165,7 +166,8 @@ impl LevelData {
                     zone, 
                     (&key.unlock_type).try_into().ok()?, 
                     seed_iter,
-                    Some("colored key")
+                    Some("colored key"),
+                    false,
                 )?;
 
                 output.output(OutputSeedIndexer::Key(format!("{name}Z{zone_id}"), zone.zone_id.zone_id, id as i32));
@@ -192,7 +194,8 @@ impl LevelData {
                     zone, 
                     AllocType::Container, 
                     seed_iter,
-                    Some("Cell zone alloc")
+                    Some("Cell zone alloc"),
+                    false,
                 ).unwrap_or_default();
 
                 println!("Got bulk key: layer {} dim {}", layer, dim);
@@ -247,7 +250,8 @@ impl LevelData {
                 }, 
                 AllocType::Container, 
                 seed_iter,
-                Some("ResourceSpawn")
+                Some("ResourceSpawn"),
+                false
             )?;
 
             let (l, pack_size) = if take_seed < 0.333333f32 {
@@ -293,7 +297,8 @@ impl LevelData {
                 }, 
                 val.into(), 
                 seed_iter,
-                Some("Artifact alloc")
+                Some("Artifact alloc"),
+                false
             )?;
 
             let name = match val {
@@ -315,7 +320,8 @@ impl LevelData {
                 }, 
                 val.into(), 
                 seed_iter,
-                Some("Consumable alloc")
+                Some("Consumable alloc"),
+                false
             )?;
 
             let name = match val {
@@ -349,7 +355,8 @@ impl LevelData {
                 }, 
                 AllocType::BigPickup, 
                 seed_iter,
-                Some("Big pickup in Zone")
+                Some("Big pickup in Zone"),
+                false,
             )?;
 
             output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
@@ -375,7 +382,8 @@ impl LevelData {
                 }, 
                 AllocType::Other, 
                 seed_iter,
-                Some("Other pickup in Zone")
+                Some("Other pickup in Zone"),
+                false,
             )?;
 
             output.output(OutputSeedIndexer::Key(pickup.name.clone(), zone.zone_id.zone_id, id as i32));
