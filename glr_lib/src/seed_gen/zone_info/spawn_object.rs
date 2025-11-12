@@ -39,7 +39,7 @@ impl SpawnObject {
             }, 
             self.alloc_type, 
             seed_iter,
-            Some("SpawnObject alloc"),
+            Some(format!("SpawnObject alloc: {}", self.name).as_str()),
             true
         )?;
 
