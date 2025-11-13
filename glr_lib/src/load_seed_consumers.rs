@@ -12,9 +12,9 @@ impl LoadSeedConsumers {
 
     #[cfg(not(debug_assertions))]
     pub fn load_all() -> Option<HashMap<String, VecDeque<ConsumerEnum>>> {
-        let file_text = include_str!("..\\..\\resources\\level_descriptors.json");
+        let file_text = include_bytes!("..\\..\\interop\\level_descriptors.bin");
 
-        match serde_json::from_str(file_text) {
+        match bincode::deserialize(file_text) {
             Ok(k) => { return Some(k); },
             Err(e) => { println!("{:?}", e); return None; },
         }
@@ -26,10 +26,10 @@ impl LoadSeedConsumers {
             .join("resources")
             .join("level_descriptors.json");
         let mut file = File::open(current_dir).ok()?;
-        let mut file_text = String::default();
-        let _ = file.read_to_string(&mut file_text).ok()?;
+        let mut file_text = Vec::default();
+        let _ = file.read_to_end(&mut file_text).ok()?;
         
-        match serde_json::from_str(&file_text) {
+        match bincode::deserialize(&file_text) {
             Ok(k) => { return Some(k); },
             Err(e) => { println!("{:?}", e); return None; },
         }

@@ -7,7 +7,6 @@ use crate::seed_gen::zone_info::{generated_data::AllocType, unlock_method::Unloc
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ZoneData {
 
-    #[serde(flatten)]
     pub zone_id: ZoneIdentifier,
     pub unlocked_by: UnlockMethod,
     pub rooms: Vec<RoomSize>,

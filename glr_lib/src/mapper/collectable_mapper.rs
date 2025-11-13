@@ -10,9 +10,9 @@ pub struct CollectableMapper {
 impl CollectableMapper {
 
     pub fn load_from_file() -> Option<Self> {
-        let baked = include_str!("..\\..\\..\\resources\\collectable_maps.ron");
+        let baked = include_bytes!("..\\..\\..\\interop\\collectable_maps.bin");
 
-        ron::from_str(&baked).ok()
+        bincode::deserialize(baked).ok()
     }
 
     pub fn get_id(&self, level_name: &str, zone: u64, seed: u64) -> Option<u64> {
