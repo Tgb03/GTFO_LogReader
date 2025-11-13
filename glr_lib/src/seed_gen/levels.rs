@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::HashMap,
     fmt::Debug,
 };
 
@@ -10,7 +10,7 @@ use crate::{load_seed_consumers::LoadSeedConsumers, seed_gen::consumers::Consume
 
 #[derive(Deserialize, Debug)]
 pub struct LevelDescriptors {
-    levels: HashMap<String, VecDeque<ConsumerEnum>>,
+    levels: HashMap<String, Vec<ConsumerEnum>>,
 }
 
 impl Default for LevelDescriptors {
@@ -22,7 +22,7 @@ impl Default for LevelDescriptors {
 }
 
 impl LevelDescriptors {
-    pub fn get_level(&self, level: &LevelDescriptor) -> Option<&VecDeque<ConsumerEnum>> {
+    pub fn get_level(&self, level: &LevelDescriptor) -> Option<&Vec<ConsumerEnum>> {
         self.levels.get(&level.to_string())
     }
 }

@@ -30,7 +30,6 @@ impl TryInto<AllocType> for &UnlockMethodType {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ZoneLocationSpawn {
 
-    #[serde(flatten)]
     pub zone_id: ZoneIdentifier,
 
     pub start_weight: i32,

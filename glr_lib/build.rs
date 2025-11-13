@@ -51,8 +51,6 @@ pub enum ConsumerEnum {
     ConsumableConsumer(ConsumableConsumer),
     LevelData(LevelData),
 }
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub struct OutputSeed;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LevelData {
     pub skip_start: usize,
@@ -216,12 +214,12 @@ fn main() {
     fs::create_dir_all(&interop_dir).expect("Failed to create interop directory");
 
     // 4️⃣ Write to OUT_DIR so it’s included in the build artifacts
-    fs::write(interop_dir.join("level_descriptors.bin"), descriptors_bin)
+    fs::write(interop_dir.join("level_descriptors.bin"), &descriptors_bin)
         .expect("Failed to write descriptors binary");
-    fs::write(interop_dir.join("collectable_maps.bin"), collectables_bin)
+    fs::write(interop_dir.join("collectable_maps.bin"), &collectables_bin)
         .expect("Failed to write collectables binary");
 
-    // 6️⃣ Tell Cargo when to rebuild
-    println!("cargo:rerun-if-changed=resources/level_descriptors.json");
-    println!("cargo:rerun-if-changed=resources/collectable_maps.json");
+    // checks: 
+    let _: HashMap<String, Vec<ConsumerEnum>> = bincode::deserialize(&descriptors_bin).unwrap();
+    let _: CollectableMapper = bincode::deserialize(&collectables_bin).unwrap();
 }
