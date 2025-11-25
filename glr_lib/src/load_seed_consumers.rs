@@ -12,7 +12,7 @@ impl LoadSeedConsumers {
 
     #[cfg(not(debug_assertions))]
     pub fn load_all() -> Option<HashMap<String, Vec<ConsumerEnum>>> {
-        let file_text = include_bytes!("..\\..\\interop\\level_descriptors.bin");
+        let file_text = include_bytes!("..\\..\\resources\\level_descriptors.json");
 
         match serde_json::from_slice(file_text) {
             Ok(k) => { return Some(k); },
