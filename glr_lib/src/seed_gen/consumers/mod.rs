@@ -13,12 +13,10 @@ pub mod base_consumer;
 pub mod ignore_consumer;
 pub mod key_consumer;
 pub mod key_id_consumer;
-pub mod output_seed;
 pub mod resource_generation;
 pub mod zone_consumer;
 pub mod objective_consumer;
 pub mod consumable_consumer;
-pub mod r4a2_wrapper;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum ConsumerEnum {
