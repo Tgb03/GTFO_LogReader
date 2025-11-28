@@ -1,10 +1,8 @@
-
 use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler,
-    output_trait::OutputTrait,
+    dll_exports::callback_handler::HasCallbackHandler, output_trait::OutputTrait,
     seed_gen::consumers::base_consumer::Consumer,
 };
 
@@ -15,9 +13,12 @@ pub struct KeyIDConsumer {
     #[serde(default)]
     zone: i32,
 
-    #[serde(default)] start_weight: i32,
-    #[serde(default)] middle_weight: i32,
-    #[serde(default)] end_weight: i32,
+    #[serde(default)]
+    start_weight: i32,
+    #[serde(default)]
+    middle_weight: i32,
+    #[serde(default)]
+    end_weight: i32,
 
     spawns_per_room: Vec<i32>,
 }
@@ -38,9 +39,7 @@ where
 }
 
 impl KeyIDConsumer {
-
     fn get_room(&self, seed: f32, values_per_room: &Vec<f32>) -> usize {
-
         for (i, count) in values_per_room.iter().enumerate() {
             if seed <= *count {
                 return i;

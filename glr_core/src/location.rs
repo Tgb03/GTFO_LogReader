@@ -3,9 +3,21 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 use strum_macros::{Display, FromRepr};
 
-
 /// taken from https://github.com/Angry-Maid/rusted-mapper
-#[derive(FromRepr, Display, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy, Serialize, Deserialize)]
+#[derive(
+    FromRepr,
+    Display,
+    Debug,
+    PartialEq,
+    Eq,
+    PartialOrd,
+    Ord,
+    Hash,
+    Clone,
+    Copy,
+    Serialize,
+    Deserialize,
+)]
 #[repr(u8)]
 pub enum ItemIdentifier {
     ID = 128,

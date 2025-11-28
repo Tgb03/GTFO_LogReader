@@ -24,7 +24,8 @@ pub trait Tokenizer {
 
 pub trait TokenizerGetIter: Tokenizer {
     fn tokenize_to_iter(&self, lines: &str) -> impl Iterator<Item = (Time, Token)> {
-        lines.split('\n')
+        lines
+            .split('\n')
             .map(|v| v.trim_start())
             .map(|v| (Time::from(v), self.tokenize_single(v)))
             .filter(|(a, b)| a.is_some() && b.is_some())
@@ -104,9 +105,9 @@ impl Tokenizer for BaseTokenizer {
         }
         if line
             .get(29..53)
-            .is_some_and(|v| v == "PlayFab.OnGetCurrentTime") 
+            .is_some_and(|v| v == "PlayFab.OnGetCurrentTime")
         {
-            return Some(Token::create_utc_time(line))    
+            return Some(Token::create_utc_time(line));
         }
         if line
             .get(30..52)
@@ -128,9 +129,9 @@ impl Tokenizer for BaseTokenizer {
         }
         if line
             .get(15..41)
-            .is_some_and(|v| v == "<color=green>SNET : Player") 
+            .is_some_and(|v| v == "<color=green>SNET : Player")
         {
-            return Some(Token::create_player_exit_elevator(line))
+            return Some(Token::create_player_exit_elevator(line));
         }
         if line
             .get(15..45)
@@ -144,11 +145,8 @@ impl Tokenizer for BaseTokenizer {
         {
             return Some(Token::UserExitLobby);
         }
-        if line
-            .get(15..26)
-            .is_some_and(|v| v == "Player Down") 
-        {
-            return Some(Token::create_player_down(line))    
+        if line.get(15..26).is_some_and(|v| v == "Player Down") {
+            return Some(Token::create_player_down(line));
         }
 
         None
@@ -332,7 +330,6 @@ impl Default for GenericTokenizer {
 }
 
 impl GenericTokenizer {
-    
     #[allow(dead_code)]
     pub fn add_tokenizer<T>(mut self, tokenizer: T) -> Self
     where

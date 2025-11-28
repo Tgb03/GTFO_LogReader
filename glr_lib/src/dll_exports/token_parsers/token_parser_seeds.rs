@@ -3,7 +3,11 @@ use std::collections::HashMap;
 use glr_core::{seed_indexer_result::OutputSeedIndexer, time::Time, token::Token};
 
 use crate::{
-    core::token_parser::TokenParser, dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo}, seed_gen::levels::LevelDescriptors, output_trait::OutputTrait, seed_gen::{consumers::base_consumer::Consumer, unity_random::UnityRandom}
+    core::token_parser::TokenParser,
+    dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo},
+    output_trait::OutputTrait,
+    seed_gen::levels::LevelDescriptors,
+    seed_gen::{consumers::base_consumer::Consumer, unity_random::UnityRandom},
 };
 
 #[derive(Default)]
@@ -35,7 +39,7 @@ impl TokenParser for TokenParserSeed {
             self.level_descriptors
                 .get_level(&level)
                 .map(|v| v.take(&mut unity_random, &mut self.callback_handler));
-            
+
             self.output(OutputSeedIndexer::GenerationEnd);
         }
     }

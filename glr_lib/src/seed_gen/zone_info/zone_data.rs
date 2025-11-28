@@ -1,47 +1,61 @@
-
 use serde::{Deserialize, Serialize};
 
-use crate::seed_gen::zone_info::{generated_data::AllocType, unlock_method::UnlockMethod, zone_identifier::ZoneIdentifier, zone_obj_spawn::ZoneObjectSpawn};
-
+use crate::seed_gen::zone_info::{
+    generated_data::AllocType, unlock_method::UnlockMethod, zone_identifier::ZoneIdentifier,
+    zone_obj_spawn::ZoneObjectSpawn,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ZoneData {
-
     pub zone_id: ZoneIdentifier,
     pub unlocked_by: UnlockMethod,
     pub rooms: Vec<RoomSize>,
 
-    #[serde(default)] pub terminals: Vec<u8>,
-    #[serde(default)] pub alloc_other: Vec<u8>,
-    
+    #[serde(default)]
+    pub terminals: Vec<u8>,
+    #[serde(default)]
+    pub alloc_other: Vec<u8>,
     pub medi: f32,
-    #[serde(default)] pub medi_weights: [i32; 3],
+    #[serde(default)]
+    pub medi_weights: [i32; 3],
     pub disi: f32,
-    #[serde(default)] pub disi_weights: [i32; 3],
+    #[serde(default)]
+    pub disi_weights: [i32; 3],
     pub ammo: f32,
-    #[serde(default)] pub ammo_weights: [i32; 3],
+    #[serde(default)]
+    pub ammo_weights: [i32; 3],
     pub tool: f32,
-    #[serde(default)] pub tool_weights: [i32; 3],
-    
-    pub consumables: Vec<ContainerOrWorldspawn>,
-    pub artifacts: Vec<ContainerOrWorldspawn>,
-    
+    #[serde(default)]
+    pub tool_weights: [i32; 3],
+
+    pub consumable_count: u16,
+    pub artifact_count: u16,
+
     pub small_pickups: Vec<ZoneObjectSpawn>,
     pub big_pickups: Vec<ZoneObjectSpawn>,
-    #[serde(default)] pub other_pickups: Vec<ZoneObjectSpawn>,
 
-    #[serde(default)] pub allow_big_pickups: bool,
+    pub chance_box_consumable: f32,
+
+    #[serde(default)] 
+    pub allow_big_pickups: bool,
+    #[serde(default)]
+    pub allow_small_pickups: bool,
+    #[serde(default)]
+    pub allow_containers_alloc: bool,
+
+    #[serde(default)]
+    pub build_seed_spawners_before: u16,
+    #[serde(default)]
+    pub build_seed_spawners_after: u16,
 }
 
 #[derive(Debug, Serialize, Deserialize, Copy, Clone, PartialEq, Eq)]
 pub enum ContainerOrWorldspawn {
-
     Container,
     Worldspawn,
-
 }
 
-impl Into<AllocType> for &ContainerOrWorldspawn {
+impl Into<AllocType> for ContainerOrWorldspawn {
     fn into(self) -> AllocType {
         match self {
             ContainerOrWorldspawn::Container => AllocType::Container,
@@ -50,22 +64,18 @@ impl Into<AllocType> for &ContainerOrWorldspawn {
     }
 }
 
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum RoomSize {
-
     Tiny,
     Small,
     Medium,
     Large,
     Huge,
     Other(u8, u8, u8),
-
 }
 
 impl RoomSize {
-
     pub fn into_containers(&self) -> u8 {
         match self {
             RoomSize::Tiny => 1,
@@ -98,5 +108,4 @@ impl RoomSize {
             RoomSize::Other(_, _, v) => *v,
         }
     }
-
 }

@@ -1,60 +1,147 @@
+use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::seed_gen::zone_info::{unlock_method::ZoneLocationSpawn, zone_data::{RoomSize, ZoneData}, zone_identifier::ZoneIdentifier};
-
+use crate::seed_gen::zone_info::{
+    unlock_method::ZoneLocationSpawn,
+    zone_data::{RoomSize, ZoneData},
+    zone_identifier::ZoneIdentifier,
+};
 
 #[derive(Debug)]
 pub struct GeneratedZone {
-
     zone_id: ZoneIdentifier,
-    
-    alloc_containers: Vec<Vec<u8>>,
-    alloc_small_pickups: Vec<Vec<u8>>,
-    alloc_big_pickups: Vec<Vec<u8>>,
 
-    alloc_terminals: Vec<Vec<u8>>,
-    alloc_other: Vec<Vec<u8>>,
+    alloc_containers: Vec<Vec<(u8, u8)>>,
+    alloc_small_pickups: Vec<Vec<(u8, u8)>>,
+    alloc_big_pickups: Vec<Vec<(u8, u8)>>,
 
-    allow_big_pickups: bool
-
+    alloc_terminals: Vec<Vec<(u8, u8)>>,
+    alloc_other: Vec<Vec<(u8, u8)>>,
 }
-
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 #[repr(u8)]
 pub enum AllocType {
-
     Container = 0,
     SmallPickup = 1,
     BigPickup = 2,
-    
+
     Terminal = 3,
     Other = 4,
-
-}
-
-
-impl From<&ZoneData> for GeneratedZone {
-    fn from(value: &ZoneData) -> Self {
-        Self {
-            zone_id: value.zone_id.clone(),
-            alloc_containers: Self::initial_allocations(AllocType::Container, &value.rooms),
-            alloc_small_pickups: Self::initial_allocations(AllocType::SmallPickup, &value.rooms),
-            alloc_big_pickups: Self::initial_allocations(AllocType::BigPickup, &value.rooms),
-            alloc_terminals: Self::initial_allocations_from_vec(&value.terminals, 1),
-            alloc_other: Self::initial_allocations_from_vec(&value.alloc_other, 1),
-            allow_big_pickups: value.allow_big_pickups,
-        }
-    }
 }
 
 impl GeneratedZone {
+    pub fn new(build_seeds: &mut impl Iterator<Item = f32>, zone_data: &ZoneData) -> Self {
+        Self {
+            zone_id: zone_data.zone_id.clone(),
+            alloc_containers: Self::create_container_alloc(
+                build_seeds,
+                &zone_data.rooms,
+                zone_data.allow_containers_alloc,
+            ),
+            alloc_small_pickups: Self::create_small_pickups_alloc(
+                build_seeds,
+                &zone_data.rooms,
+                zone_data.allow_small_pickups,
+            ),
+            alloc_big_pickups: Self::create_big_pickups_alloc(
+                build_seeds,
+                &zone_data.rooms,
+                zone_data.allow_big_pickups,
+            ),
+            alloc_terminals: Self::initial_allocations_from_vec(&zone_data.terminals, 1),
+            alloc_other: Self::initial_allocations_from_vec(&zone_data.alloc_other, 1),
+        }
+    }
 
-    fn initial_allocations_from_vec(
-        rooms: &Vec<u8>,
-        per_id: u8,
-    ) -> Vec<Vec<u8>> {
+    fn create_container_alloc(
+        build_seeds: &mut impl Iterator<Item = f32>,
+        rooms: &Vec<RoomSize>,
+        generate: bool,
+    ) -> Vec<Vec<(u8, u8)>> {
+        if !generate {
+            return Vec::new();
+        }
+
+        let mut result = Vec::with_capacity(rooms.len());
+        let mut start = 0;
+
+        for room in rooms {
+            let room_len = room.into_containers();
+            let mut append_res = Vec::with_capacity(room_len as usize * 2);
+
+            for id in 0..room_len {
+                let big_box = (build_seeds.nth(2).unwrap() * 2f32) as u8 + 2;
+                // println!("Container generated with {} alloc", big_box);
+                append_res.push((id + start, big_box));
+            }
+
+            start += room_len;
+            result.push(append_res);
+        }
+
+        result
+    }
+
+    fn create_small_pickups_alloc(
+        build_seeds: &mut impl Iterator<Item = f32>,
+        rooms: &Vec<RoomSize>,
+        generate: bool,
+    ) -> Vec<Vec<(u8, u8)>> {
+        if !generate {
+            return Vec::new();
+        }
+
+        let mut result = Vec::with_capacity(rooms.len());
+        let mut start = 0;
+
+        for room in rooms {
+            let room_len = room.into_small_pickups();
+            let mut append_res = Vec::with_capacity(room_len as usize);
+
+            for id in 0..room_len {
+                let seed = build_seeds.next().unwrap();
+                // println!("Small pickup seed: {}", (seed * 2147483647f32) as usize);
+                append_res.push((id + start, 1));
+            }
+
+            start += room_len;
+            result.push(append_res);
+        }
+
+        result
+    }
+
+    fn create_big_pickups_alloc(
+        build_seeds: &mut impl Iterator<Item = f32>,
+        rooms: &Vec<RoomSize>,
+        generate: bool,
+    ) -> Vec<Vec<(u8, u8)>> {
+        if !generate {
+            return Vec::new();
+        }
+
+        let mut result = Vec::with_capacity(rooms.len());
+        let mut start = 0;
+
+        for room in rooms {
+            let room_len = room.into_big_pickups();
+            let mut append_res = Vec::with_capacity(room_len as usize);
+
+            for id in 0..room_len {
+                let _ = build_seeds.next();
+                append_res.push((id + start, 1));
+            }
+
+            start += room_len;
+            result.push(append_res);
+        }
+
+        result
+    }
+
+    fn initial_allocations_from_vec(rooms: &Vec<u8>, per_id: u8) -> Vec<Vec<(u8, u8)>> {
         let mut result = Vec::with_capacity(rooms.len());
         let mut start = 0;
 
@@ -64,58 +151,28 @@ impl GeneratedZone {
             let mut append_res = Vec::with_capacity(room_len as usize * alloc_per_space);
 
             for id in 0..room_len {
-                for _ in 0..alloc_per_space {
-                    append_res.push(id + start);
-                }
+                append_res.push((id + start, alloc_per_space as u8));
             }
 
             start += room_len;
             result.push(append_res);
         }
 
-        result    
-    }
-
-    fn initial_allocations(
-        alloc_type: AllocType,
-        rooms: &Vec<RoomSize>,
-    ) -> Vec<Vec<u8>> {
-        let mut result = Vec::with_capacity(rooms.len());
-        let mut start = 0;
-
-        for room in rooms {
-            let (room_len, alloc_per_space) = match alloc_type {
-                AllocType::Container => (room.into_containers(), 3),
-                AllocType::SmallPickup => (room.into_small_pickups(), 1),
-                _ => (room.into_big_pickups(), 1),
-            };
-
-            let mut append_res = Vec::with_capacity(room_len as usize * alloc_per_space);
-
-            for id in 0..room_len {
-                for _ in 0..alloc_per_space {
-                    append_res.push(id + start);
-                }
-            }
-
-            start += room_len;
-            result.push(append_res);
-        }
-
-        result    
+        result
     }
 
     pub fn spawn_id(
-        &mut self, 
-        weights: &[i32; 3], 
-        alloc_type: &AllocType, 
+        &mut self,
+        weights: &[i32; 3],
+        alloc_type: &AllocType,
         seed_iter: &mut dyn Iterator<Item = f32>,
+        build_seeds: &mut impl Iterator<Item = f32>,
         _debug_str: Option<&str>,
-        _check_alloc: bool,
-    ) -> usize {
+        check_alloc: bool,
+    ) -> isize {
         // disabled for now as ALL of this is just testing
-        // if *alloc_type == AllocType::BigPickup && check_alloc && !self.allow_big_pickups {
-        //     return usize::MAX
+        // if *alloc_type == AllocType::BigPickup && check_alloc {
+        //     return -1
         // }
 
         let spawns_per_room: Vec<usize> = match alloc_type {
@@ -125,22 +182,38 @@ impl GeneratedZone {
             AllocType::Other => &mut self.alloc_other,
             AllocType::Terminal => &mut self.alloc_terminals,
         }
-            .iter()
-            .map(|v| 
-                v.len()
-            )
-            .collect();
-        
+        .iter()
+        .map(|v| {
+            v.len()
+        })
+        .collect();
+
+        let total = spawns_per_room.iter().fold(0, |r, v| r + v);
         let seed = seed_iter.next().unwrap();
-        if spawns_per_room.len() == 0 { return 0 }
+        
+        if total == 0 {
+            // println!("     extra allocation done");
+            let _ = match alloc_type {
+                AllocType::Container => build_seeds.nth(3),
+                AllocType::SmallPickup => build_seeds.nth(1),
+                AllocType::BigPickup => build_seeds.next(),
+                AllocType::Terminal => None,
+                AllocType::Other => None,
+            };
+            
+            return -1;
+        }
+
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
 
-        // match debug_str {
+        // match _debug_str {
         //     Some(s) => println!("s: {} from {}", seed, s),
         //     None => println!("s: {}", seed),
         // }
         let mut room = Self::get_room(seed, &values_per_room);
-        if room >= spawns_per_room.len() { room -= 1; }
+        if room >= spawns_per_room.len() {
+            room -= 1;
+        }
         let spawn_count = spawns_per_room[room];
         let previous_room = match room > 0 {
             true => values_per_room[room - 1],
@@ -160,25 +233,27 @@ impl GeneratedZone {
             AllocType::Terminal => &mut self.alloc_terminals,
         };
 
-        let id = vec.get_mut(room)
-            .map(|v| v.get_mut(in_room_id))
+        let id = vec
+            .get(room)
+            .map(|v| v.get(in_room_id))
             .flatten()
-            .map(|id| *id);
+            .map(|(id, _)| id)
+            .cloned();
 
-        if *alloc_type != AllocType::Container {
-            vec.get_mut(room)
-                .map(|v| 
-                    if v.len() > in_room_id {
-                        v.remove(in_room_id);
-                    }
-                );
-        }
+        vec.get_mut(room)
+            .map(|v| {
+                v.get_mut(in_room_id as usize)
+                    .map(|(_, a)| {
+                        *a -= 1;
+                    });
+                
+                v.retain(|(_, v)| *v > 0);
+        });
 
-        id.unwrap_or_default() as usize
+        id.unwrap_or_default() as isize
     }
 
     fn get_room(seed: f32, values_per_room: &Vec<f32>) -> usize {
-
         for (i, count) in values_per_room.iter().enumerate() {
             if seed <= *count {
                 return i;
@@ -246,34 +321,37 @@ impl GeneratedZone {
 
         values_per_id
     }
-
 }
 
-
 pub fn grab_spawn_id(
-    zones: &mut Vec<GeneratedZone>, 
-    spawn: &ZoneLocationSpawn, 
-    alloc_type: AllocType, 
+    zones: &mut Vec<GeneratedZone>,
+    spawn: &ZoneLocationSpawn,
+    alloc_type: AllocType,
     seed_iter: &mut dyn Iterator<Item = f32>,
+    build_seeds: &mut impl Iterator<Item = f32>,
+    overflow_counter: &mut usize,
     debug_str: Option<&str>,
     check_alloc: bool,
-) -> Option<usize> {
-    
-    if let Some(zone) = zones.iter_mut()
+) -> Option<isize> {
+    if let Some(zone) = zones
+        .iter_mut()
         .filter(|v| v.zone_id == spawn.zone_id)
-        .nth(0) {
-        
-        Some(zone.spawn_id(
-            &[spawn.start_weight, spawn.middle_weight, spawn.end_weight], 
-            &alloc_type, 
+        .nth(0)
+    {
+        let id = zone.spawn_id(
+            &[spawn.start_weight, spawn.middle_weight, spawn.end_weight],
+            &alloc_type,
             seed_iter,
+            build_seeds,
             debug_str,
             check_alloc,
-        ))
+        );
+        if id == -1 { *overflow_counter += 1; }
+        
+        Some(id)
     } else {
         let _ = seed_iter.next();
 
         None
     }
 }
-

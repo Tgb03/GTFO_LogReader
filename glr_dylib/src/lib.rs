@@ -1,7 +1,9 @@
-use std::{ffi::{c_char, c_void, CStr}, path::PathBuf};
+use std::{
+    ffi::{c_char, c_void, CStr},
+    path::PathBuf,
+};
 
 use glr_lib::dll_exports::structs::{CallbackInfo, EventCallback};
-
 
 /// starts a folder listener in that file_path. This file_path must
 /// containg GTFO logs that the program will then read and output
@@ -47,9 +49,13 @@ pub extern "C" fn add_callback(
         })
     };
 
-    glr_lib::dll_exports::functions::add_callback(
-        CallbackInfo::new(code, message_type, channel_id, context.into(), event_callback)
-    );
+    glr_lib::dll_exports::functions::add_callback(CallbackInfo::new(
+        code,
+        message_type,
+        channel_id,
+        context.into(),
+        event_callback,
+    ));
 }
 
 ///
@@ -62,7 +68,7 @@ pub extern "C" fn remove_callback(code: u8, channel_id: u32) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn process_paths(
-    paths: *const *const c_char, 
+    paths: *const *const c_char,
     len: u32,
     code: u8,
     message_type: u8,
@@ -86,7 +92,7 @@ pub extern "C" fn process_paths(
             }
         })
         .collect();
-    
+
     let code = code.into();
     let message_type = message_type.into();
     let event_callback = if event_callback_ptr.is_null() {
@@ -105,6 +111,5 @@ pub extern "C" fn process_paths(
 
 #[unsafe(no_mangle)]
 pub extern "C" fn shutdown_all() {
-    glr_lib::dll_exports::functions::shutdown_all();     
+    glr_lib::dll_exports::functions::shutdown_all();
 }
-

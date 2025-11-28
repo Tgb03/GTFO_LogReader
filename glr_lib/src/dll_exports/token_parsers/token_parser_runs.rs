@@ -2,15 +2,18 @@ use std::collections::HashMap;
 
 use glr_core::{split::NamedSplit, time::Time, token::Token};
 
-use crate::{core::token_parser::TokenParser, dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo}, output_trait::OutputTrait, run_gen::run_generator::RunGenerator};
+use crate::{
+    core::token_parser::TokenParser,
+    dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo},
+    output_trait::OutputTrait,
+    run_gen::run_generator::RunGenerator,
+};
 
 #[derive(Default)]
 pub struct TokenParserRuns {
-    
     callback_handler: HashMap<u32, CallbackInfo>,
 
     run_parser: RunGenerator<NamedSplit>,
-
 }
 
 impl HasCallbackHandler for TokenParserRuns {
@@ -28,7 +31,7 @@ impl TokenParser for TokenParserRuns {
         if self.callback_handler.is_empty() {
             return;
         }
-        
+
         if let Some(res) = self.run_parser.accept_token(time, &token) {
             self.output(res);
         }

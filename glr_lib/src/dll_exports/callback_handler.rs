@@ -19,15 +19,13 @@ pub trait HasCallbackHandler {
 }
 
 pub trait CallbackClone: Sized {
-
     fn clone_callbacks(self) -> Self;
-
 }
 
-impl<T> CallbackClone for T 
+impl<T> CallbackClone for T
 where
-    T: Sized + HasCallbackHandler + Default {
-
+    T: Sized + HasCallbackHandler + Default,
+{
     fn clone_callbacks(self) -> Self {
         let mut s = Self::default();
 

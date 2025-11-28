@@ -1,4 +1,3 @@
-
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -11,11 +10,9 @@ pub struct IgnoreConsumer {
 }
 
 impl IgnoreConsumer {
-
     pub fn new(count: usize) -> Self {
         Self { count }
     }
-
 }
 
 impl<O> Consumer<O> for IgnoreConsumer

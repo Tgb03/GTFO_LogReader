@@ -5,19 +5,16 @@ use serde::{Deserialize, Serialize};
 
 use crate::{data::LevelDescriptor, split::Split, time::Time};
 
-
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct PlayerData {
-
     pub death_count: usize,
-
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct TimedRun<S>
-where 
-    S: Split {
-
+where
+    S: Split,
+{
     name: LevelDescriptor,
     total_time: Time,
     players: HashMap<String, PlayerData>,
@@ -31,33 +28,33 @@ where
     utc_time_started: DateTime<Utc>,
 
     splits: Vec<S>,
-
 }
 
 impl<S: Split> Default for TimedRun<S> {
     fn default() -> Self {
-        Self { 
+        Self {
             name: Default::default(),
-            total_time: Default::default(), 
-            players: Default::default(), 
-            used_checkpoint: Default::default(), 
-            is_win: Default::default(), 
-            did_secondary: Default::default(), 
+            total_time: Default::default(),
+            players: Default::default(),
+            used_checkpoint: Default::default(),
+            is_win: Default::default(),
+            did_secondary: Default::default(),
             did_overload: Default::default(),
-            splits: Default::default() ,
+            splits: Default::default(),
             utc_time_started: Default::default(),
         }
     }
 }
 
 impl<S> TimedRun<S>
-where 
-    S: Split {
-
+where
+    S: Split,
+{
     pub fn new(name: LevelDescriptor, players: Vec<String>, time: DateTime<Utc>) -> Self {
         Self {
             name,
-            players: players.iter()
+            players: players
+                .iter()
                 .map(|p| (p.clone(), PlayerData::default()))
                 .collect(),
             utc_time_started: time,
@@ -78,7 +75,7 @@ where
     pub fn add_win(&mut self) {
         self.is_win = true;
     }
-    
+
     pub fn did_secondary(&mut self) {
         self.did_secondary = true;
     }
@@ -128,7 +125,6 @@ where
     }
 
     pub fn add_player_down(&mut self, name: &String) {
-        self.players.get_mut(name)
-            .map(|v| v.death_count += 1);
+        self.players.get_mut(name).map(|v| v.death_count += 1);
     }
 }

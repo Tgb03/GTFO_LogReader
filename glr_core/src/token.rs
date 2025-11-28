@@ -2,7 +2,7 @@ use std::error::Error;
 
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use regex::Regex;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
 
@@ -61,7 +61,7 @@ impl Token {
 
     fn utc_time_getter(line: &str) -> Result<Token, Box<dyn Error>> {
         let re = Regex::new(
-            r"(?P<h>\d{2}):(?P<m>\d{2}):(?P<s>\d{2}\.\d{3}).*?(?P<day>\d{2}) (?P<month>\w+) (?P<year>\d{4})"
+            r"(?P<h>\d{2}):(?P<m>\d{2}):(?P<s>\d{2}\.\d{3}).*?(?P<day>\d{2}) (?P<month>\w+) (?P<year>\d{4})",
         )?;
 
         let caps = re.captures(line).ok_or("No match found")?;
@@ -95,7 +95,8 @@ impl Token {
 
         // Build a UTC DateTime
         let date = NaiveDate::from_ymd_opt(year, month, day).ok_or("Invalid date")?;
-        let time = NaiveTime::from_hms_milli_opt(hour, minute, seconds, millis).ok_or("Invalid time")?;
+        let time =
+            NaiveTime::from_hms_milli_opt(hour, minute, seconds, millis).ok_or("Invalid time")?;
         let naive_dt = NaiveDateTime::new(date, time);
         let utc_dt: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(naive_dt, Utc);
 
@@ -103,22 +104,19 @@ impl Token {
     }
 
     pub fn create_player_joined(line: &str) -> Token {
-        line
-            .get(22..line.len().saturating_sub(22))
+        line.get(22..line.len().saturating_sub(22))
             .map(|v| Token::PlayerJoinedLobby(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_left(line: &str) -> Token {
-        line
-            .get(46..line.len().saturating_sub(1))
+        line.get(46..line.len().saturating_sub(1))
             .map(|v| Token::PlayerLeftLobby(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_down(line: &str) -> Token {
-        line
-            .get(28..line.len().saturating_sub(1))
+        line.get(28..line.len().saturating_sub(1))
             .map(|v| Token::PlayerDown(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
@@ -126,11 +124,10 @@ impl Token {
     pub fn create_player_exit_elevator(line: &str) -> Token {
         let start = nth_space_index(line, 5);
         if let None = start {
-            return Token::Invalid
+            return Token::Invalid;
         }
 
-        line
-            .get(start.unwrap() + 1..line.len().saturating_sub(54))
+        line.get(start.unwrap() + 1..line.len().saturating_sub(54))
             .map(|v| Token::PlayerExitElevator(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }

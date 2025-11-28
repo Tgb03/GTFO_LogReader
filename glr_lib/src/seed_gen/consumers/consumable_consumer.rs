@@ -1,25 +1,24 @@
 use std::collections::HashSet;
 
+use crate::output_trait::OutputTrait;
 use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
-use crate::output_trait::OutputTrait;
 
-use crate::{dll_exports::callback_handler::HasCallbackHandler, seed_gen::consumers::base_consumer::Consumer};
-
+use crate::{
+    dll_exports::callback_handler::HasCallbackHandler, seed_gen::consumers::base_consumer::Consumer,
+};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ConsumableConsumer {
-
     tracked_containers: Vec<i32>,
     total_container_count: i32,
     consumable_count: i32,
-
 }
 
 impl<O> Consumer<O> for ConsumableConsumer
-where 
-    O: HasCallbackHandler {
-        
+where
+    O: HasCallbackHandler,
+{
     fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         let mut found_counters = HashSet::<i32>::new();
 
@@ -31,8 +30,10 @@ where
         }
 
         for id in &self.tracked_containers {
-            output.output(OutputSeedIndexer::ConsumableFound(*id, found_counters.contains(id)));
+            output.output(OutputSeedIndexer::ConsumableFound(
+                *id,
+                found_counters.contains(id),
+            ));
         }
     }
-
 }

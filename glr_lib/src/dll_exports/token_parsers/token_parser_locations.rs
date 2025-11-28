@@ -2,17 +2,22 @@ use std::collections::HashMap;
 
 use glr_core::{time::Time, token::Token};
 
-use crate::{core::token_parser::TokenParser, dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo}, mapper::{key_generator::KeyGenerator, location_generator::LocationGenerator, objective_item_generator::ObjectiveItemGenerator}, output_trait::OutputTrait};
-
+use crate::{
+    core::token_parser::TokenParser,
+    dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo},
+    mapper::{
+        key_generator::KeyGenerator, location_generator::LocationGenerator,
+        objective_item_generator::ObjectiveItemGenerator,
+    },
+    output_trait::OutputTrait,
+};
 
 #[derive(Default)]
 pub struct TokenParserLocations {
-    
     callback_handler: HashMap<u32, CallbackInfo>,
 
     key_gen: KeyGenerator,
     obj_gen: ObjectiveItemGenerator,
-
 }
 
 impl HasCallbackHandler for TokenParserLocations {
@@ -30,7 +35,7 @@ impl TokenParser for TokenParserLocations {
         if self.callback_handler.is_empty() {
             return;
         }
-        
+
         if let Some(key) = self.key_gen.accept_token(&token) {
             self.output(key);
         }
@@ -40,5 +45,3 @@ impl TokenParser for TokenParserLocations {
         }
     }
 }
-
-

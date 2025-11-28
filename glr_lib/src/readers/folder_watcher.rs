@@ -81,7 +81,7 @@ impl FolderWatcher {
                     .as_ref()
                     .map(|f| fs::read_dir(&f).ok())
                     .flatten()
-                    .map(|rd| 
+                    .map(|rd| {
                         rd.flatten()
                             .filter(|f| {
                                 let metadata = match f.metadata() {
@@ -102,7 +102,7 @@ impl FolderWatcher {
                                 Err(_) => Default::default(),
                             })
                             .map(|v| v.path())
-                    )
+                    })
                     .flatten();
 
                 if path != last_path {

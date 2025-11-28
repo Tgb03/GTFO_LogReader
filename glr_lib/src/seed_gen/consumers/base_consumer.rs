@@ -2,9 +2,8 @@ use enum_dispatch::enum_dispatch;
 use glr_core::seed_indexer_result::OutputSeedIndexer;
 
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler,
-    output_trait::OutputTrait,
-    seed_gen::{consumers::ConsumerEnum},
+    dll_exports::callback_handler::HasCallbackHandler, output_trait::OutputTrait,
+    seed_gen::consumers::ConsumerEnum,
 };
 use std::{collections::VecDeque, fmt::Debug};
 

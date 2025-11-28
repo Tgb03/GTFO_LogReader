@@ -1,5 +1,10 @@
 use std::{
-    ffi::c_char, os::raw::c_void, path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
+    ffi::c_char,
+    os::raw::c_void,
+    path::PathBuf,
+    sync::mpsc::{self, Receiver, Sender},
+    thread::{self, JoinHandle},
+    time::Duration,
 };
 
 use glr_core::{time::Time, token::Token};
@@ -7,25 +12,32 @@ use might_sleep::prelude::CpuLimiter;
 
 use crate::{
     core::{
-        token_parser::{IterTokenParser, TokenParser}, tokenizer::{GenericTokenizer, TokenizeIter, TokenizerGetIter}
-    }, dll_exports::{
+        token_parser::{IterTokenParser, TokenParser},
+        tokenizer::{GenericTokenizer, TokenizeIter, TokenizerGetIter},
+    },
+    dll_exports::{
         callback_handler::{CallbackClone, HasCallbackHandler},
         enums::{SubscribeCode, SubscriptionType},
-        token_parsers::{CallbackTokenParser, token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed},
-    }, readers::{file_reader::FileReader, folder_watcher::FolderWatcher}
+        token_parsers::{
+            CallbackTokenParser, token_parser_base::TokenParserBase,
+            token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns,
+            token_parser_seeds::TokenParserSeed,
+        },
+    },
+    readers::{file_reader::FileReader, folder_watcher::FolderWatcher},
 };
 
 pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char);
 
 #[derive(Debug, Clone, Copy)]
-pub struct ThreadSafePtr{
-    p: *const c_void
+pub struct ThreadSafePtr {
+    p: *const c_void,
 }
 
 impl<T> From<*const T> for ThreadSafePtr {
     fn from(value: *const T) -> Self {
         Self {
-            p: value as *const c_void
+            p: value as *const c_void,
         }
     }
 }
@@ -120,7 +132,9 @@ impl MainThread {
         let _ = self.send_callbacks.send(CallbackInfo {
             channel_id: id,
             code,
-            context: ThreadSafePtr{ p: 0 as *mut c_void },
+            context: ThreadSafePtr {
+                p: 0 as *mut c_void,
+            },
             event_callback: None,
             message_type: 0.into(),
         });
@@ -130,10 +144,7 @@ impl MainThread {
         self.folder_watcher.update_path(new_path);
     }
 
-    pub fn static_run(
-        mut paths: Vec<PathBuf>,
-        callback: CallbackInfo,
-    ) {
+    pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
         let tokenizer = GenericTokenizer::all_tokenizers();
 
         while let Some(path) = paths.pop() {
@@ -151,17 +162,10 @@ impl MainThread {
                 continue;
             };
 
-            let tok_iter = TokenizeIter::new(
-                text.split("\n"), 
-                &tokenizer
-            );
-    
+            let tok_iter = TokenizeIter::new(text.split("\n"), &tokenizer);
+
             parser.parse_tokens(tok_iter);
-            if let Some(last_line) = text.split("\n")
-                .last()
-                .map(|v| Time::from(v))
-                .flatten() {
-                
+            if let Some(last_line) = text.split("\n").last().map(|v| Time::from(v)).flatten() {
                 parser.parse_token(last_line, &Token::LogFileEnd);
             }
         }
@@ -193,7 +197,7 @@ impl MainThread {
                     SubscribeCode::SeedIndexer => parser_seeds.add_callback(callback),
                 }
             }
-            
+
             if file_reader.get_was_new_file() {
                 parser_base = parser_base.clone_callbacks();
                 parser_seeds = parser_seeds.clone_callbacks();
@@ -202,7 +206,8 @@ impl MainThread {
             }
 
             if let Some(new_lines) = file_reader.get_new_lines() {
-                tokenizer.tokenize_to_iter(&new_lines)
+                tokenizer
+                    .tokenize_to_iter(&new_lines)
                     .for_each(|(time, token)| {
                         parser_base.parse_token(time, &token);
                         parser_mapper.parse_token(time, &token);

@@ -2,8 +2,6 @@ use glr_core::{data::KeyDescriptor, location::Location, token::Token};
 
 use crate::mapper::location_generator::LocationGenerator;
 
-
-
 /// generates ColoredKey & BulkheadKey
 #[derive(Default)]
 pub struct KeyGenerator {
@@ -19,7 +17,11 @@ impl LocationGenerator for KeyGenerator {
                 None
             }
             Token::ItemSpawn(zone, id) => match self.first_iteration.take() {
-                Some(key_descriptor) => Some(KeyDescriptor::into_location(&key_descriptor, *zone, *id as u64)),
+                Some(key_descriptor) => Some(KeyDescriptor::into_location(
+                    &key_descriptor,
+                    *zone,
+                    *id as u64,
+                )),
                 None => None,
             },
             _ => None,

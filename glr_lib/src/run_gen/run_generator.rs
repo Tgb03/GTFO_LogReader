@@ -1,7 +1,14 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Duration, Utc};
-use glr_core::{data::LevelDescriptor, run::TimedRun, run_gen_result::RunGeneratorResult, split::{NamedSplit, Split}, time::Time, token::Token};
+use glr_core::{
+    data::LevelDescriptor,
+    run::TimedRun,
+    run_gen_result::RunGeneratorResult,
+    split::{NamedSplit, Split},
+    time::Time,
+    token::Token,
+};
 use regex::Regex;
 
 fn strip_html_tags(input: &str) -> String {
@@ -11,8 +18,8 @@ fn strip_html_tags(input: &str) -> String {
 
 pub struct RunGenerator<S>
 where
-    S: Split {
-
+    S: Split,
+{
     current_run: Option<TimedRun<S>>,
     last_split_time: Time,
     last_level_name: LevelDescriptor,
@@ -27,16 +34,15 @@ where
     utc_time_stamp: Time,
 
     players: HashMap<String, Time>,
-
 }
 
 impl<S: Split> Default for RunGenerator<S> {
     fn default() -> Self {
-        Self { 
-            current_run: Default::default(), 
+        Self {
+            current_run: Default::default(),
             last_split_time: Default::default(),
-            last_level_name: Default::default(), 
-            door_count: Default::default(), 
+            last_level_name: Default::default(),
+            door_count: Default::default(),
             bulk_count: Default::default(),
             players: Default::default(),
             utc_time_started: Default::default(),
@@ -48,7 +54,6 @@ impl<S: Split> Default for RunGenerator<S> {
 }
 
 impl<S: Split> RunGenerator<S> {
-
     pub fn reset(&mut self) {
         self.current_run = None;
         self.last_split_time = Time::new();
@@ -57,11 +62,9 @@ impl<S: Split> RunGenerator<S> {
         self.ignore_next_door = false;
         self.in_death_screen = false;
     }
-
 }
 
 impl RunGenerator<NamedSplit> {
-
     pub fn accept_token(&mut self, time: Time, token: &Token) -> Option<RunGeneratorResult> {
         // println!("token obtained: {token:?}");
         match token {
@@ -73,11 +76,11 @@ impl RunGenerator<NamedSplit> {
                         return Some(RunGeneratorResult::LevelRun(run));
                     }
                 }
-            },
+            }
             Token::TimeSessionStart(utc_time) => {
                 self.utc_time_started = utc_time.clone();
                 self.utc_time_stamp = time;
-            },
+            }
             Token::GeneratingLevel => {
                 self.players.clear();
             }
@@ -86,11 +89,14 @@ impl RunGenerator<NamedSplit> {
                 let name = strip_html_tags(name);
                 let was_already_in = self.players.contains_key(&name);
                 self.players.insert(name.clone(), time);
-                self.current_run.as_mut()
-                    .map(|v| { v.add_player(name); });
+                self.current_run.as_mut().map(|v| {
+                    v.add_player(name);
+                });
 
                 if !was_already_in {
-                    return Some(RunGeneratorResult::PlayerCountUpdate(self.players.len() as u8));
+                    return Some(RunGeneratorResult::PlayerCountUpdate(
+                        self.players.len() as u8
+                    ));
                 }
             }
             // Token::PlayerJoinedLobby(name) => {
@@ -102,126 +108,110 @@ impl RunGenerator<NamedSplit> {
             Token::PlayerDown(name) => {
                 let name = strip_html_tags(name);
 
-                if self.players
+                if self
+                    .players
                     .get(&name)
                     .cloned()
-                    .is_some_and(|t| (time - t) > Time::from_stamp(6000)) {
-                    
-                    self.players.get_mut(&name)
-                        .map(|v| *v = time);
+                    .is_some_and(|t| (time - t) > Time::from_stamp(6000))
+                {
+                    self.players.get_mut(&name).map(|v| *v = time);
 
-                    self.current_run.as_mut()
-                        .map(|v| v.add_player_down(&name));
+                    self.current_run.as_mut().map(|v| v.add_player_down(&name));
                 }
             }
-            Token::UserExitLobby => { 
+            Token::UserExitLobby => {
                 self.players.clear();
-            },
-            Token::GameStarted => { 
+            }
+            Token::GameStarted => {
                 self.last_split_time = time;
-                self.current_run = Some(
-                    TimedRun::new(
-                        self.last_level_name.clone(), 
-                        self.players.iter()
-                            .map(|(v, _)| v.clone())
-                            .collect(),
-                        self.utc_time_started + Duration::milliseconds((time - self.utc_time_stamp).get_stamp() as i64),
-                    )
-                );
-                
-                return Some(RunGeneratorResult::GameStarted(self.last_level_name.clone(), self.players.len() as u8));
-            },
+                self.current_run = Some(TimedRun::new(
+                    self.last_level_name.clone(),
+                    self.players.iter().map(|(v, _)| v.clone()).collect(),
+                    self.utc_time_started
+                        + Duration::milliseconds((time - self.utc_time_stamp).get_stamp() as i64),
+                ));
+
+                return Some(RunGeneratorResult::GameStarted(
+                    self.last_level_name.clone(),
+                    self.players.len() as u8,
+                ));
+            }
             Token::DoorOpen => {
-                if self.in_death_screen { return None }
+                if self.in_death_screen {
+                    return None;
+                }
 
                 if self.ignore_next_door {
                     self.ignore_next_door = false;
-                    return None
+                    return None;
                 }
 
                 self.door_count += 1;
                 let split = NamedSplit::new(
-                    time - self.last_split_time, 
+                    time - self.last_split_time,
                     format!("D_{}", self.door_count),
                 );
-                self.last_split_time = time; 
+                self.last_split_time = time;
 
                 self.current_run
                     .as_mut()
-                    .map(|v| v
-                        .add_split(
-                            split.clone()
-                        )
-                    );
+                    .map(|v| v.add_split(split.clone()));
 
                 return Some(RunGeneratorResult::SplitAdded(split));
-            },
-            Token::CheckpointReset => { 
+            }
+            Token::CheckpointReset => {
                 self.current_run.as_mut().map(|v| v.add_checkpoint());
                 self.ignore_next_door = true;
                 self.in_death_screen = false;
                 self.last_split_time = time;
-                
+
                 return Some(RunGeneratorResult::CheckpointUsed);
-            },
+            }
             Token::BulkheadScanDone => {
-                if self.in_death_screen { return None }
+                if self.in_death_screen {
+                    return None;
+                }
 
                 self.bulk_count += 1;
                 let split = NamedSplit::new(
-                    time - self.last_split_time, 
+                    time - self.last_split_time,
                     format!("B_{}", self.bulk_count),
                 );
-                self.last_split_time = time; 
-                
-                self.current_run.as_mut()
-                    .map(|v| v.add_split(
-                        split.clone()
-                    )
-                );
+                self.last_split_time = time;
+
+                self.current_run
+                    .as_mut()
+                    .map(|v| v.add_split(split.clone()));
 
                 return Some(RunGeneratorResult::SplitAdded(split));
-            },
-            Token::SecondaryDone => { 
-                self.current_run.as_mut().map(|v| v.did_secondary()); 
+            }
+            Token::SecondaryDone => {
+                self.current_run.as_mut().map(|v| v.did_secondary());
                 return Some(RunGeneratorResult::SecondaryDone);
-            },
-            Token::OverloadDone => { 
+            }
+            Token::OverloadDone => {
                 self.current_run.as_mut().map(|v| v.did_overload());
-                return Some(RunGeneratorResult::OverloadDone); 
-            },
+                return Some(RunGeneratorResult::OverloadDone);
+            }
             Token::GameEndWin => {
                 self.current_run.as_mut().map(|v| v.add_win());
-                let split = NamedSplit::new(
-                    time - self.last_split_time, 
-                    "WIN".to_owned(),
-                );
+                let split = NamedSplit::new(time - self.last_split_time, "WIN".to_owned());
 
                 if let Some(mut run) = self.current_run.take() {
                     run.add_split(split.clone());
                     self.reset();
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
-            },
+            }
             Token::GameEndLost => {
                 self.in_death_screen = true;
-                let split = NamedSplit::new(
-                    time - self.last_split_time, 
-                    "LOSS".to_owned(),
-                );
+                let split = NamedSplit::new(time - self.last_split_time, "LOSS".to_owned());
 
-                self.current_run.as_mut()
-                    .map(|r| r.add_split(
-                        split
-                    )
-                );
+                self.current_run.as_mut().map(|r| r.add_split(split));
             }
             Token::GameEndAbort | Token::LogFileEnd => {
                 if let Some(mut run) = self.current_run.take() {
-                    let split = NamedSplit::new(
-                        time - self.last_split_time, 
-                        "STOP".to_owned(),
-                    );
+                    let split = NamedSplit::new(time - self.last_split_time, "STOP".to_owned());
 
                     if run.get_last_split().is_none_or(|v| v.get_name() != "LOSS") {
                         run.add_split(split);
@@ -230,11 +220,10 @@ impl RunGenerator<NamedSplit> {
                     self.reset();
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
-            },
+            }
             _ => {}
         };
 
         None
     }
-
 }

@@ -32,7 +32,7 @@ impl FileReader {
             println!("Reading live {:?}", new_path);
             self.new_file(new_path);
 
-            return true
+            return true;
         }
 
         false
@@ -40,7 +40,9 @@ impl FileReader {
 
     pub fn get_new_lines(&mut self) -> Option<String> {
         let reader = self.file.as_mut()?;
-        let _ = reader.seek(std::io::SeekFrom::Start(self.last_position)).ok()?;
+        let _ = reader
+            .seek(std::io::SeekFrom::Start(self.last_position))
+            .ok()?;
 
         let mut buffer = String::new();
         let mut line = String::new();

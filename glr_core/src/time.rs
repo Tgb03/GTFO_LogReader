@@ -24,9 +24,7 @@ impl Time {
     }
 
     pub const fn from_min_secs(min: u64, sec: u64) -> Time {
-        Time(
-            (min * 60 + sec) * 1000,
-        )
+        Time((min * 60 + sec) * 1000)
     }
 
     ///
@@ -39,15 +37,13 @@ impl Time {
         let seconds: u64 = time.get(6..8)?.parse::<u64>().ok()?;
         let milliseconds: u64 = time.get(9..12)?.parse::<u64>().ok()?;
 
-        Some(
-            Time((((hours * 60 + minutes) * 60) + seconds) * 1000 + milliseconds)
-        )
+        Some(Time(
+            (((hours * 60 + minutes) * 60) + seconds) * 1000 + milliseconds,
+        ))
     }
 
     pub const fn max() -> Time {
-        Time (
-            24 * 60 * 60 * 1000
-        )
+        Time(24 * 60 * 60 * 1000)
     }
 
     pub fn get_stamp(&self) -> u64 {
@@ -100,9 +96,7 @@ impl Time {
 
 impl From<u64> for Time {
     fn from(value: u64) -> Self {
-        Self (
-            value
-        )
+        Self(value)
     }
 }
 
@@ -110,9 +104,7 @@ impl Add for Time {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self (
-            self.0 + rhs.0,
-        )
+        Self(self.0 + rhs.0)
     }
 }
 
@@ -127,14 +119,10 @@ impl Sub for Time {
 
     fn sub(self, rhs: Self) -> Self::Output {
         if self < rhs {
-            return Time (
-                self.0 + 24 * 60 * 60 * 1000 - rhs.0,
-            );
+            return Time(self.0 + 24 * 60 * 60 * 1000 - rhs.0);
         }
 
-        Time (
-            self.0 - rhs.0,
-        )
+        Time(self.0 - rhs.0)
     }
 }
 

@@ -1,5 +1,3 @@
-
-
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -12,7 +10,7 @@ pub enum KeyType {
     #[default]
     ColoredKey,
     BulkheadKey,
-    Other
+    Other,
 }
 
 #[derive(Debug, Default, Clone, Serialize, Deserialize)]

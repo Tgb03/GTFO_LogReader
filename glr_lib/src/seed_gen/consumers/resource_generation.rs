@@ -1,4 +1,3 @@
-
 use glr_core::seed_indexer_result::{OutputSeedIndexer, ResourceType};
 use serde::{Deserialize, Serialize};
 
@@ -12,7 +11,8 @@ use crate::{
 pub struct ResourceGeneration {
     left: f32,
     res_type: ResourceType,
-    #[serde(default)] zone: i32,
+    #[serde(default)]
+    zone: i32,
 
     #[serde(default)]
     track_spawn: Option<KeyIDConsumer>,
@@ -48,11 +48,12 @@ where
     O: HasCallbackHandler,
 {
     fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
-        let mut left = self.left * match self.res_type {
-            ResourceType::Ammopack => 0.8f32,
-            ResourceType::ToolRefillpack => 0.7f32,
-            _ => 1f32,
-        };
+        let mut left = self.left
+            * match self.res_type {
+                ResourceType::Ammopack => 0.8f32,
+                ResourceType::ToolRefillpack => 0.7f32,
+                _ => 1f32,
+            };
 
         loop {
             let _number_seed = seed_iter.next().unwrap();
@@ -68,12 +69,19 @@ where
             };
 
             if let Some(t_s) = &self.track_spawn {
-                output.output(OutputSeedIndexer::ResourcePack(self.res_type, self.zone, t_s.get_id(id_seed) as i32, pack_size));
+                output.output(OutputSeedIndexer::ResourcePack(
+                    self.res_type,
+                    self.zone,
+                    t_s.get_id(id_seed) as i32,
+                    pack_size,
+                ));
             }
 
             left = l;
 
-            if left <= 0.2f32 { break } 
+            if left <= 0.2f32 {
+                break;
+            }
         }
     }
 }

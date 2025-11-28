@@ -1,7 +1,9 @@
-use glr_core::{location::{ItemIdentifier, Location}, token::Token};
+use glr_core::{
+    location::{ItemIdentifier, Location},
+    token::Token,
+};
 
 use crate::mapper::{collectable_mapper::CollectableMapper, location_generator::LocationGenerator};
-
 
 pub struct ObjectiveItemGenerator {
     collectable_mapper: Option<CollectableMapper>,
@@ -16,11 +18,11 @@ pub struct ObjectiveItemGenerator {
 
 impl Default for ObjectiveItemGenerator {
     fn default() -> Self {
-        Self { 
-            collectable_mapper: CollectableMapper::load_from_file(), 
-            dimension: Default::default(), 
-            buffer_names: Default::default(), 
-            buffer_zones: Default::default(), 
+        Self {
+            collectable_mapper: CollectableMapper::load_from_file(),
+            dimension: Default::default(),
+            buffer_names: Default::default(),
+            buffer_zones: Default::default(),
             level_name: Default::default(),
             players: Default::default(),
         }
@@ -32,14 +34,11 @@ impl LocationGenerator for ObjectiveItemGenerator {
         match token {
             Token::PlayerJoinedLobby(name) => {
                 self.players.push(name.clone());
-            
+
                 None
             }
             Token::PlayerLeftLobby(name) => {
-                if let Some(id) = self.players
-                    .iter()
-                    .position(|v| v == name) {
-                        
+                if let Some(id) = self.players.iter().position(|v| v == name) {
                     self.players.swap_remove(id);
                 }
 
@@ -101,7 +100,8 @@ impl LocationGenerator for ObjectiveItemGenerator {
                 }
                 let (_, zone) = self.buffer_zones.remove(0);
 
-                let new_seed = self.collectable_mapper
+                let new_seed = self
+                    .collectable_mapper
                     .as_ref()
                     .map(|c| c.get_id(&self.level_name, zone, *seed))
                     .flatten()
@@ -123,11 +123,14 @@ impl LocationGenerator for ObjectiveItemGenerator {
                 self.buffer_names.clear();
                 self.buffer_zones.clear();
                 self.dimension = 0;
-                
-                Some(Location::GenerationStarted(format!("{}_{}", self.level_name, self.players.len())))
+
+                Some(Location::GenerationStarted(format!(
+                    "{}_{}",
+                    self.level_name,
+                    self.players.len()
+                )))
             }
             _ => None,
         }
     }
 }
-
