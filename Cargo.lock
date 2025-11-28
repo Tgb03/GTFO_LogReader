@@ -118,7 +118,7 @@ checksum = "52051878f80a721bb68ebfbc930e07b65ba72f2da88968ea5c06fd6ca3d3a127"
 
 [[package]]
 name = "glr_core"
-version = "1.0.2"
+version = "1.1.0"
 dependencies = [
  "chrono",
  "num_enum",
@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "glr_dylib"
-version = "1.0.2"
+version = "1.1.0"
 dependencies = [
  "glr_core",
  "glr_lib",
@@ -138,7 +138,7 @@ dependencies = [
 
 [[package]]
 name = "glr_lib"
-version = "1.0.2"
+version = "1.1.0"
 dependencies = [
  "bincode",
  "chrono",
