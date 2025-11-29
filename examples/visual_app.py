@@ -136,6 +136,9 @@ def my_event_callback(context, message):
             label.pack()
             labels.append(label)
 
+        if "GenerationOverflow" in data:
+            print(f"Generation overflow {data['GenerationOverflow']}")
+            
         if "ConsumableFound" in data:
             c_id, found = data["ConsumableFound"]
             text = f"Container {c_id}: {found}"
