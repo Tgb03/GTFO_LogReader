@@ -11,8 +11,8 @@ from collections import Counter
 from collections import defaultdict
 import base64
 
-dll_relative_path = "../target/release/glr_dylib.dll"
-# dll_relative_path = "../target/debug/glr_dylib.dll"
+# dll_relative_path = "../target/release/glr_dylib.dll"
+dll_relative_path = "../target/debug/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #
@@ -142,7 +142,7 @@ def my_event_callback(context, message):
             
         if "GenerationOverflowHash" in data:
             b = bytes(data['GenerationOverflowHash'])
-            b64 = base64.b64encode(b).decode()
+            b64 = b.hex()
             print(b64)
             
         if "ConsumableFound" in data:

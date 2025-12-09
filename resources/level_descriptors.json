@@ -45300,7 +45300,7 @@
         "allow_big_pickups": false,
         "allow_small_pickups": true,
         "allow_containers_alloc": true,
-        "build_seed_spawners_before": 10,
+        "build_seed_spawners_before": 11,
         "build_seed_spawners_after": 0
       },
       {
@@ -45623,7 +45623,7 @@
         "allow_big_pickups": false,
         "allow_small_pickups": true,
         "allow_containers_alloc": true,
-        "build_seed_spawners_before": 10,
+        "build_seed_spawners_before": 11,
         "build_seed_spawners_after": 0
       },
       {
