@@ -5,14 +5,12 @@ use crate::{
     dll_exports::callback_handler::HasCallbackHandler,
     output_trait::OutputTrait,
     seed_gen::{
-        consumers::base_consumer::Consumer,
-        unity_random::UnityRandom,
-        zone_info::{
-            generated_data::{AllocType, GeneratedZone, grab_spawn_id},
+        consumers::base_consumer::Consumer, marker_set::MarkerSetHash, unity_random::UnityRandom, zone_info::{
+            generated_data::{grab_spawn_id, AllocType, GeneratedZone},
             spawn_object::SpawnObject,
             unlock_method::{UnlockMethodType, ZoneLocationSpawn},
             zone_data::{ContainerOrWorldspawn, ZoneData},
-        },
+        }
     },
 };
 
@@ -50,7 +48,7 @@ impl StagedObjective {
         generated_zones: &mut Vec<GeneratedZone>,
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Vec<SpawnObject> {
         let mut new_vec: Vec<Vec<(usize, ZoneLocationSpawn)>> = self
@@ -152,7 +150,7 @@ impl LevelData {
         layer: u8,
         dim: u8,
         seed_iter: &mut dyn Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Option<Vec<ZoneLocationSpawn>> {
         let result = self
@@ -264,7 +262,7 @@ impl LevelData {
         zone: &ZoneData,
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
         res_type: ResourceType,
     ) -> Option<()> {
@@ -338,7 +336,7 @@ impl LevelData {
         build_seeds: &mut impl Iterator<Item = f32>,
         zone: &ZoneData,
         seed_iter: &mut dyn Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Option<()> {
         let location = ZoneLocationSpawn {
@@ -424,7 +422,7 @@ impl LevelData {
         zone: &ZoneData,
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Option<()> {
         for pickup in &zone.big_pickups {
@@ -463,7 +461,7 @@ impl LevelData {
         zone: &ZoneData,
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Option<()> {
         for pickup in &zone.small_pickups {
@@ -500,7 +498,7 @@ impl LevelData {
         layer: u8,
         dim: u8,
         seed_iter: &mut dyn Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Option<Vec<SpawnObject>> {
         let cell_iter =
@@ -603,9 +601,9 @@ where
 {
     fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         // println!("Skipped {} build seeds", self.build_seed_gate_count);
-        let mut overflow_counter = 0usize;
         let mut build_seeds = UnityRandom::from(self.build_seed).skip(self.build_seed_gate_count);
 
+        let mut hasher_set_data = MarkerSetHash::default();
         let mut generated_zones: Vec<GeneratedZone> = self
             .zones
             .iter()
@@ -627,7 +625,7 @@ where
                 0,
                 0,
                 seed_iter,
-                &mut overflow_counter,
+                &mut hasher_set_data,
                 output,
             ),
             self.do_layer(
@@ -636,7 +634,7 @@ where
                 1,
                 0,
                 seed_iter,
-                &mut overflow_counter,
+                &mut hasher_set_data,
                 output,
             ),
             self.do_layer(
@@ -645,7 +643,7 @@ where
                 2,
                 0,
                 seed_iter,
-                &mut overflow_counter,
+                &mut hasher_set_data,
                 output,
             ),
         ];
@@ -662,7 +660,7 @@ where
                     0,
                     dim,
                     seed_iter,
-                    &mut overflow_counter,
+                    &mut hasher_set_data,
                     output,
                 )
                 .into_iter()
@@ -679,12 +677,13 @@ where
             })
             .into_iter()
             .for_each(|v| {
-                v.take(&mut generated_zones, seed_iter, &mut build_seeds, &mut overflow_counter, output);
+                v.take(&mut generated_zones, seed_iter, &mut build_seeds, &mut hasher_set_data, output);
             });
         
-        if overflow_counter > 0 {
+        if hasher_set_data.get_count() > 0 {
             // println!("Overflow: {overflow_counter}");
-            output.output(OutputSeedIndexer::GenerationOverflow(overflow_counter));
+            output.output(OutputSeedIndexer::GenerationOverflow(hasher_set_data.get_count()));
+            output.output(OutputSeedIndexer::GenerationOverflowHash(hasher_set_data.into()));
         }
     }
 }

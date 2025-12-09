@@ -17,6 +17,7 @@ pub enum OutputSeedIndexer {
     ResourcePack(ResourceType, i32, i32, u8), // zone, id of box, pack size
     ConsumableFound(i32, bool),               // id of box, found or not
     GenerationOverflow(usize),                // how many times the build seed went over in the level
+    GenerationOverflowHash([u8; 32]),         // the hash for the generation overflow
     GenerationEnd,
     GenerationStart(String),
     ZoneGenEnded(u32),

@@ -1,12 +1,11 @@
-use std::collections::HashSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::seed_gen::zone_info::{
+use crate::seed_gen::{marker_set::MarkerSetHash, zone_info::{
     unlock_method::ZoneLocationSpawn,
     zone_data::{RoomSize, ZoneData},
     zone_identifier::ZoneIdentifier,
-};
+}};
 
 #[derive(Debug)]
 pub struct GeneratedZone {
@@ -329,7 +328,7 @@ pub fn grab_spawn_id(
     alloc_type: AllocType,
     seed_iter: &mut dyn Iterator<Item = f32>,
     build_seeds: &mut impl Iterator<Item = f32>,
-    overflow_counter: &mut usize,
+    overflow_counter: &mut MarkerSetHash,
     debug_str: Option<&str>,
     check_alloc: bool,
 ) -> Option<isize> {
@@ -346,7 +345,9 @@ pub fn grab_spawn_id(
             debug_str,
             check_alloc,
         );
-        if id == -1 { *overflow_counter += 1; }
+        if id == -1 { 
+            overflow_counter.add_to_hash(&spawn.zone_id);
+        }
         
         Some(id)
     } else {

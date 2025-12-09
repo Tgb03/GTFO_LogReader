@@ -9,6 +9,7 @@ from tkinter import *
 from tkinter import ttk
 from collections import Counter
 from collections import defaultdict
+import base64
 
 dll_relative_path = "../target/release/glr_dylib.dll"
 # dll_relative_path = "../target/debug/glr_dylib.dll"
@@ -138,6 +139,11 @@ def my_event_callback(context, message):
 
         if "GenerationOverflow" in data:
             print(f"Generation overflow {data['GenerationOverflow']}")
+            
+        if "GenerationOverflowHash" in data:
+            b = bytes(data['GenerationOverflowHash'])
+            b64 = base64.b64encode(b).decode()
+            print(b64)
             
         if "ConsumableFound" in data:
             c_id, found = data["ConsumableFound"]

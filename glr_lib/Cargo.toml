@@ -29,3 +29,4 @@ serde = { version = "1.0.217", features = ["derive"] }
 num_enum = "0.7.4"
 regex = "1.11.3"
 chrono = { version = "0.4.42", features = ["serde"] }
+sha2 = "0.10.9"

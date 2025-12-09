@@ -2,6 +2,7 @@ use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
 use crate::output_trait::OutputTrait;
+use crate::seed_gen::marker_set::MarkerSetHash;
 use crate::{
     dll_exports::callback_handler::HasCallbackHandler,
     seed_gen::zone_info::{
@@ -30,7 +31,7 @@ impl SpawnObject {
         generated_data: &mut Vec<GeneratedZone>,
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
-        overflow_counter: &mut usize,
+        overflow_counter: &mut MarkerSetHash,
         output: &mut O,
     ) -> Option<()> {
         let is_container = self.alloc_type == AllocType::Container;
