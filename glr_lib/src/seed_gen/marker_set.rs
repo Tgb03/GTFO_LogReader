@@ -1,6 +1,6 @@
 use sha2::{digest::DynDigest, Digest, Sha256};
 
-use crate::seed_gen::zone_info::zone_identifier::ZoneIdentifier;
+use crate::seed_gen::zone_info::{generated_data::AllocType, zone_identifier::ZoneIdentifier};
 
 
 #[derive(Default, Debug)]
@@ -19,13 +19,17 @@ impl MarkerSetHash {
     
     pub fn add_to_hash(
         &mut self,
-        zone_id: &ZoneIdentifier
+        zone_id: &ZoneIdentifier,
+        alloc_type: &AllocType
     ) {
         let id_bin = bincode::serialize(zone_id)
+            .unwrap();
+        let alloc_bin = bincode::serialize(alloc_type)
             .unwrap();
         
         self.count += 1;
         Digest::update(&mut self.hash, &id_bin);
+        Digest::update(&mut self.hash, &alloc_bin);
     }
     
 }

@@ -19161,7 +19161,7 @@
           "Large"
         ],
         "terminals": [],
-        "alloc_other": [],
+        "alloc_other": [ 1 ],
         "medi": 0.0,
         "disi": 0.0,
         "ammo": 0.0,
@@ -21050,7 +21050,7 @@
         "rooms": [
           "Large"
         ],
-        "terminals": [],
+        "terminals": [ 1 ],
         "alloc_other": [],
         "medi": 1.0,
         "disi": 0.0,

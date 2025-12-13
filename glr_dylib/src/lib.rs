@@ -3,7 +3,7 @@ use std::{
     path::PathBuf,
 };
 
-use glr_lib::dll_exports::structs::{CallbackInfo, EventCallback};
+use glr_lib::dll_exports::{enums::SubscribeCode, structs::{CallbackInfo, EventCallback}};
 
 /// starts a folder listener in that file_path. This file_path must
 /// containg GTFO logs that the program will then read and output
@@ -65,6 +65,29 @@ pub extern "C" fn remove_callback(code: u8, channel_id: u32) {
 
     glr_lib::dll_exports::functions::remove_callback(code, channel_id);
 }
+
+/* 
+#[unsafe(no_mangle)]
+pub extern "C" fn process_seed(
+    seed: i32,
+    message_type: u8,
+    context: *const c_void,
+    event_callback_ptr: *const c_void,
+) {
+    let code = SubscribeCode::SeedIndexer;
+    let message_type = message_type.into();
+    let event_callback = if event_callback_ptr.is_null() {
+        None
+    } else {
+        Some(unsafe {
+            // Cast the void pointer into a function pointer
+            std::mem::transmute::<*const c_void, EventCallback>(event_callback_ptr)
+        })
+    };
+    
+    let callback_info = CallbackInfo::new(code, message_type, 0, context.into(), event_callback);
+}
+*/
 
 #[unsafe(no_mangle)]
 pub extern "C" fn process_paths(

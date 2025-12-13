@@ -346,7 +346,7 @@ pub fn grab_spawn_id(
             check_alloc,
         );
         if id == -1 { 
-            overflow_counter.add_to_hash(&spawn.zone_id);
+            overflow_counter.add_to_hash(&spawn.zone_id, &alloc_type);
         }
         
         Some(id)
