@@ -3,7 +3,7 @@ use std::{
     path::PathBuf,
 };
 
-use glr_lib::dll_exports::{enums::SubscribeCode, structs::{CallbackInfo, EventCallback}};
+use glr_lib::dll_exports::structs::{CallbackInfo, EventCallback};
 
 /// starts a folder listener in that file_path. This file_path must
 /// containg GTFO logs that the program will then read and output

@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use std::{any::TypeId, collections::BTreeMap, ops::Deref};
 
 use glr_core::{time::Time, token::Token};
 
@@ -90,7 +90,7 @@ where
 }
 
 #[derive(Default)]
-struct BaseTokenizer;
+pub struct BaseTokenizer;
 #[derive(Default)]
 pub struct RunTokenizer;
 #[derive(Default)]
@@ -309,6 +309,58 @@ impl Tokenizer for GenerationTokenizer {
 
         None
     }
+}
+
+#[derive(Default)]
+pub struct CounterTokenizer {
+    tokenizers: BTreeMap<TypeId, (usize, Box<dyn Tokenizer>)>,
+}
+
+impl Tokenizer for CounterTokenizer {
+    fn tokenize_single(&self, line: &str) -> Option<Token> {
+        self.tokenizers.iter()
+            .filter_map(|(_, (_, tok))| tok.tokenize_single(line))
+            .next()
+    }
+}
+
+impl CounterTokenizer {
+    
+    pub fn add_tokenizer<T: Tokenizer + 'static>(&mut self, tokenizer: T) {
+        let type_id = TypeId::of::<T>();
+        
+        if let Some((id, _)) = self.tokenizers.get_mut(&type_id) {
+            *id += 1;
+            return;
+        }
+        
+        self.tokenizers.insert(type_id, (1, Box::new(tokenizer)));
+    }
+    
+    pub fn add_tokenizer_default<T: Tokenizer + Default + 'static>(&mut self) {
+        let tokenizer = T::default();
+        self.add_tokenizer(tokenizer);
+    }
+    
+    pub fn remove_tokenizer<T: Tokenizer + 'static>(&mut self) {
+        let type_id = TypeId::of::<T>();
+        
+        let mut remove = false;
+        match self.tokenizers.get_mut(&type_id) {
+            Some((1, _)) => { remove = true; },
+            Some((v, _)) => {
+                *v -= 1;
+            },
+            None => {},
+        }
+        
+        if remove {
+            self.tokenizers.remove(&type_id);
+        }
+    }
+    
+    
+    
 }
 
 pub struct GenericTokenizer {

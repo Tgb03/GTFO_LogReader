@@ -1,10 +1,5 @@
 use std::{
-    ffi::c_char,
-    os::raw::c_void,
-    path::PathBuf,
-    sync::mpsc::{self, Receiver, Sender},
-    thread::{self, JoinHandle},
-    time::Duration,
+    any::TypeId, ffi::c_char, os::raw::c_void, path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
 };
 
 use glr_core::{time::Time, token::Token};
@@ -13,7 +8,7 @@ use might_sleep::prelude::CpuLimiter;
 use crate::{
     core::{
         token_parser::{IterTokenParser, TokenParser},
-        tokenizer::{GenericTokenizer, TokenizeIter, TokenizerGetIter},
+        tokenizer::{BaseTokenizer, CheckpointTokenizer, CounterTokenizer, GenerationTokenizer, GenericTokenizer, RunTokenizer, TokenizeIter, TokenizerGetIter},
     },
     dll_exports::{
         callback_handler::{CallbackClone, HasCallbackHandler},
@@ -145,7 +140,8 @@ impl MainThread {
     }
 
     pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
-        let tokenizer = GenericTokenizer::all_tokenizers();
+        let mut tokenizer = CounterTokenizer::default();
+        Self::generate_tokenizers(&mut tokenizer, callback.code);
 
         while let Some(path) = paths.pop() {
             let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
@@ -170,6 +166,56 @@ impl MainThread {
             }
         }
     }
+    
+    fn generate_tokenizers(
+        tokenizer: &mut CounterTokenizer, 
+        code: SubscribeCode,
+    ) {
+        match code {
+            SubscribeCode::Tokenizer => {
+                tokenizer.add_tokenizer_default::<BaseTokenizer>();
+                tokenizer.add_tokenizer_default::<RunTokenizer>();
+                tokenizer.add_tokenizer_default::<GenerationTokenizer>();
+                tokenizer.add_tokenizer_default::<CheckpointTokenizer>();
+            },
+            SubscribeCode::RunInfo => {
+                tokenizer.add_tokenizer_default::<BaseTokenizer>();
+                tokenizer.add_tokenizer_default::<RunTokenizer>();
+            },
+            SubscribeCode::Mapper => {
+                tokenizer.add_tokenizer_default::<BaseTokenizer>();
+                tokenizer.add_tokenizer_default::<GenericTokenizer>();
+            },
+            SubscribeCode::SeedIndexer => {
+                tokenizer.add_tokenizer_default::<BaseTokenizer>();
+            },
+        }
+    }
+    
+    fn remove_tokenizers(
+        tokenizer: &mut CounterTokenizer, 
+        code: SubscribeCode,
+    ) {
+        match code {
+            SubscribeCode::Tokenizer => {
+                tokenizer.remove_tokenizer::<BaseTokenizer>();
+                tokenizer.remove_tokenizer::<RunTokenizer>();
+                tokenizer.remove_tokenizer::<GenerationTokenizer>();
+                tokenizer.remove_tokenizer::<CheckpointTokenizer>();
+            },
+            SubscribeCode::RunInfo => {
+                tokenizer.remove_tokenizer::<BaseTokenizer>();
+                tokenizer.remove_tokenizer::<RunTokenizer>();
+            },
+            SubscribeCode::Mapper => {
+                tokenizer.remove_tokenizer::<BaseTokenizer>();
+                tokenizer.remove_tokenizer::<GenericTokenizer>();
+            },
+            SubscribeCode::SeedIndexer => {
+                tokenizer.remove_tokenizer::<BaseTokenizer>();
+            },
+        }
+    }
 
     fn thread_run(
         mut file_reader: FileReader,
@@ -177,7 +223,7 @@ impl MainThread {
         shutdown: Receiver<()>,
     ) {
         let mut limiter = CpuLimiter::new(Duration::from_millis(200));
-        let tokenizer = GenericTokenizer::all_tokenizers();
+        let mut tokenizer = CounterTokenizer::default();
 
         let mut parser_base = TokenParserBase::default();
         let mut parser_seeds = TokenParserSeed::default();
@@ -190,11 +236,24 @@ impl MainThread {
             }
 
             while let Ok(callback) = callback_recv.try_recv() {
-                match callback.code {
-                    SubscribeCode::Tokenizer => parser_base.add_callback(callback),
-                    SubscribeCode::RunInfo => parser_runs.add_callback(callback),
-                    SubscribeCode::Mapper => parser_mapper.add_callback(callback),
-                    SubscribeCode::SeedIndexer => parser_seeds.add_callback(callback),
+                if callback.event_callback.is_some() {
+                    Self::generate_tokenizers(&mut tokenizer, callback.code);
+                    
+                    match callback.code {
+                        SubscribeCode::Tokenizer => parser_base.add_callback(callback),
+                        SubscribeCode::RunInfo => parser_runs.add_callback(callback),
+                        SubscribeCode::Mapper => parser_mapper.add_callback(callback),
+                        SubscribeCode::SeedIndexer => parser_seeds.add_callback(callback),
+                    }
+                } else {
+                    Self::remove_tokenizers(&mut tokenizer, callback.code);
+                    
+                    match callback.code {
+                        SubscribeCode::Tokenizer => parser_base.remove_callback(callback.get_id()),
+                        SubscribeCode::RunInfo => parser_runs.remove_callback(callback.get_id()),
+                        SubscribeCode::Mapper => parser_mapper.remove_callback(callback.get_id()),
+                        SubscribeCode::SeedIndexer => parser_seeds.remove_callback(callback.get_id()),
+                    }
                 }
             }
 
