@@ -15,7 +15,8 @@ pub enum AdvancedTokenizerType {
 
 pub struct CheckMatch<'a> {
     
-    range: Range<usize>,
+    range_start: usize,
+    range_end: usize,
     search_str: &'a str,
     at_start: bool,
     
@@ -39,7 +40,8 @@ impl<'a> CheckMatch<'a> {
         start_id: usize,
     ) -> Self {
         Self {
-            range: start_id..(start_id + search_str.len()),
+            range_start: start_id,
+            range_end: start_id + search_str.len(),
             search_str,
             at_start: true,
         }
@@ -50,7 +52,8 @@ impl<'a> CheckMatch<'a> {
         start_id: usize,
     ) -> Self {
         Self {
-            range: start_id..(start_id - search_str.len()),
+            range_start: start_id,
+            range_end: start_id - search_str.len(),
             search_str,
             at_start: false,
         }
@@ -59,11 +62,11 @@ impl<'a> CheckMatch<'a> {
     pub fn check(&self, line: &str) -> bool {
         match self.at_start {
             true => {
-                line.get(self.range.clone())
+                line.get(self.range_start..self.range_end)
                     .is_some_and(|v| v == self.search_str)
             },
             false => {
-                line.get((line.len() - self.range.start)..(line.len() - self.range.end))
+                line.get((line.len() - self.range_start)..(line.len() - self.range_end))
                     .is_some_and(|v| v == self.search_str)
             },
         }
@@ -130,9 +133,13 @@ impl<'a> Tokenizer for TokenGenerator<'a> {
 
 impl<'a> Tokenizer for [TokenGenerator<'a>] {
     fn tokenize_single(&self, line: &str) -> Option<Token> {
-        self.iter()
-            .filter_map(|v| v.tokenize_single(line))
-            .next()
+        for item in self {
+            if let Some(token) = item.tokenize_single(line) {
+                return Some(token)
+            }
+        }
+        
+        None
     }
 }
 
