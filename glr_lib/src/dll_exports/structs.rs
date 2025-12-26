@@ -7,8 +7,7 @@ use might_sleep::prelude::CpuLimiter;
 
 use crate::{
     core::{
-        token_parser::{IterTokenParser, TokenParser},
-        tokenizer::{BaseTokenizer, CheckpointTokenizer, CounterTokenizer, GenerationTokenizer, GenericTokenizer, RunTokenizer, TokenizeIter, TokenizerGetIter},
+        advanced_tokenizer::ALL_TOKENIZER, token_parser::{IterTokenParser, TokenParser}, tokenizer::{BaseTokenizer, CheckpointTokenizer, CounterTokenizer, GenerationTokenizer, GenericTokenizer, RunTokenizer, TokenizeIter, TokenizerGetIter}
     },
     dll_exports::{
         callback_handler::{CallbackClone, HasCallbackHandler},
@@ -140,8 +139,7 @@ impl MainThread {
     }
 
     pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
-        let mut tokenizer = CounterTokenizer::default();
-        Self::generate_tokenizers(&mut tokenizer, callback.code);
+        let tokenizer = ALL_TOKENIZER;
 
         while let Some(path) = paths.pop() {
             let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
@@ -181,6 +179,7 @@ impl MainThread {
             SubscribeCode::RunInfo => {
                 tokenizer.add_tokenizer_default::<BaseTokenizer>();
                 tokenizer.add_tokenizer_default::<RunTokenizer>();
+                tokenizer.add_tokenizer_default::<CheckpointTokenizer>();
             },
             SubscribeCode::Mapper => {
                 tokenizer.add_tokenizer_default::<BaseTokenizer>();
@@ -223,7 +222,7 @@ impl MainThread {
         shutdown: Receiver<()>,
     ) {
         let mut limiter = CpuLimiter::new(Duration::from_millis(200));
-        let mut tokenizer = CounterTokenizer::default();
+        let tokenizer = ALL_TOKENIZER;
 
         let mut parser_base = TokenParserBase::default();
         let mut parser_seeds = TokenParserSeed::default();
@@ -237,8 +236,6 @@ impl MainThread {
 
             while let Ok(callback) = callback_recv.try_recv() {
                 if callback.event_callback.is_some() {
-                    Self::generate_tokenizers(&mut tokenizer, callback.code);
-                    
                     match callback.code {
                         SubscribeCode::Tokenizer => parser_base.add_callback(callback),
                         SubscribeCode::RunInfo => parser_runs.add_callback(callback),
@@ -246,8 +243,6 @@ impl MainThread {
                         SubscribeCode::SeedIndexer => parser_seeds.add_callback(callback),
                     }
                 } else {
-                    Self::remove_tokenizers(&mut tokenizer, callback.code);
-                    
                     match callback.code {
                         SubscribeCode::Tokenizer => parser_base.remove_callback(callback.get_id()),
                         SubscribeCode::RunInfo => parser_runs.remove_callback(callback.get_id()),
