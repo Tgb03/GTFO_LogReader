@@ -139,7 +139,7 @@ impl MainThread {
     }
 
     pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
-        let tokenizer = ALL_TOKENIZER;
+        let tokenizer = GenericTokenizer::all_tokenizers();
 
         while let Some(path) = paths.pop() {
             let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
@@ -222,7 +222,7 @@ impl MainThread {
         shutdown: Receiver<()>,
     ) {
         let mut limiter = CpuLimiter::new(Duration::from_millis(200));
-        let tokenizer = ALL_TOKENIZER;
+        let tokenizer = GenericTokenizer::all_tokenizers();
 
         let mut parser_base = TokenParserBase::default();
         let mut parser_seeds = TokenParserSeed::default();
