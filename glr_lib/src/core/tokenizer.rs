@@ -1,4 +1,4 @@
-use std::{any::TypeId, collections::BTreeMap, ops::Deref};
+use std::ops::Deref;
 
 use glr_core::{time::Time, token::Token};
 
@@ -97,6 +97,8 @@ pub struct RunTokenizer;
 pub struct GenerationTokenizer;
 #[derive(Default)]
 pub struct CheckpointTokenizer;
+#[derive(Default)]
+pub struct AllTokenizer;
 
 fn check_match(line: &str, start_id: usize, search: &str) -> bool {
     line.get(start_id..(start_id + search.len()))
@@ -315,58 +317,6 @@ impl Tokenizer for GenerationTokenizer {
     }
 }
 
-#[derive(Default)]
-pub struct CounterTokenizer {
-    tokenizers: BTreeMap<TypeId, (usize, Box<dyn Tokenizer>)>,
-}
-
-impl Tokenizer for CounterTokenizer {
-    fn tokenize_single(&self, line: &str) -> Option<Token> {
-        self.tokenizers.iter()
-            .filter_map(|(_, (_, tok))| tok.tokenize_single(line))
-            .next()
-    }
-}
-
-impl CounterTokenizer {
-    
-    pub fn add_tokenizer<T: Tokenizer + 'static>(&mut self, tokenizer: T) {
-        let type_id = TypeId::of::<T>();
-        
-        if let Some((id, _)) = self.tokenizers.get_mut(&type_id) {
-            *id += 1;
-            return;
-        }
-        
-        self.tokenizers.insert(type_id, (1, Box::new(tokenizer)));
-    }
-    
-    pub fn add_tokenizer_default<T: Tokenizer + Default + 'static>(&mut self) {
-        let tokenizer = T::default();
-        self.add_tokenizer(tokenizer);
-    }
-    
-    pub fn remove_tokenizer<T: Tokenizer + 'static>(&mut self) {
-        let type_id = TypeId::of::<T>();
-        
-        let mut remove = false;
-        match self.tokenizers.get_mut(&type_id) {
-            Some((1, _)) => { remove = true; },
-            Some((v, _)) => {
-                *v -= 1;
-            },
-            None => {},
-        }
-        
-        if remove {
-            self.tokenizers.remove(&type_id);
-        }
-    }
-    
-    
-    
-}
-
 pub struct GenericTokenizer {
     tokenizers: Vec<Box<dyn Tokenizer>>,
 }
@@ -405,6 +355,15 @@ impl GenericTokenizer {
                 Box::new(CheckpointTokenizer),
             ],
         }
+    }
+}
+
+impl Tokenizer for AllTokenizer {
+    fn tokenize_single(&self, line: &str) -> Option<Token> {
+        BaseTokenizer.tokenize_single(line)
+            .or_else(|| RunTokenizer.tokenize_single(line))
+            .or_else(|| GenerationTokenizer.tokenize_single(line))
+            .or_else(|| CheckpointTokenizer.tokenize_single(line))
     }
 }
 

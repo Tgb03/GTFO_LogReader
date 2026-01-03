@@ -1,5 +1,5 @@
 use std::{
-    any::TypeId, ffi::c_char, os::raw::c_void, path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
+    ffi::c_char, os::raw::c_void, path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
 };
 
 use glr_core::{time::Time, token::Token};
@@ -7,7 +7,7 @@ use might_sleep::prelude::CpuLimiter;
 
 use crate::{
     core::{
-        advanced_tokenizer::ALL_TOKENIZER, token_parser::{IterTokenParser, TokenParser}, tokenizer::{BaseTokenizer, CheckpointTokenizer, CounterTokenizer, GenerationTokenizer, GenericTokenizer, RunTokenizer, TokenizeIter, TokenizerGetIter}
+        token_parser::{IterTokenParser, TokenParser}, tokenizer::{AllTokenizer, TokenizeIter, TokenizerGetIter}
     },
     dll_exports::{
         callback_handler::{CallbackClone, HasCallbackHandler},
@@ -139,7 +139,7 @@ impl MainThread {
     }
 
     pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
-        let tokenizer = GenericTokenizer::all_tokenizers();
+        let tokenizer = AllTokenizer;
 
         while let Some(path) = paths.pop() {
             let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
@@ -164,57 +164,6 @@ impl MainThread {
             }
         }
     }
-    
-    fn generate_tokenizers(
-        tokenizer: &mut CounterTokenizer, 
-        code: SubscribeCode,
-    ) {
-        match code {
-            SubscribeCode::Tokenizer => {
-                tokenizer.add_tokenizer_default::<BaseTokenizer>();
-                tokenizer.add_tokenizer_default::<RunTokenizer>();
-                tokenizer.add_tokenizer_default::<GenerationTokenizer>();
-                tokenizer.add_tokenizer_default::<CheckpointTokenizer>();
-            },
-            SubscribeCode::RunInfo => {
-                tokenizer.add_tokenizer_default::<BaseTokenizer>();
-                tokenizer.add_tokenizer_default::<RunTokenizer>();
-                tokenizer.add_tokenizer_default::<CheckpointTokenizer>();
-            },
-            SubscribeCode::Mapper => {
-                tokenizer.add_tokenizer_default::<BaseTokenizer>();
-                tokenizer.add_tokenizer_default::<GenericTokenizer>();
-            },
-            SubscribeCode::SeedIndexer => {
-                tokenizer.add_tokenizer_default::<BaseTokenizer>();
-            },
-        }
-    }
-    
-    fn remove_tokenizers(
-        tokenizer: &mut CounterTokenizer, 
-        code: SubscribeCode,
-    ) {
-        match code {
-            SubscribeCode::Tokenizer => {
-                tokenizer.remove_tokenizer::<BaseTokenizer>();
-                tokenizer.remove_tokenizer::<RunTokenizer>();
-                tokenizer.remove_tokenizer::<GenerationTokenizer>();
-                tokenizer.remove_tokenizer::<CheckpointTokenizer>();
-            },
-            SubscribeCode::RunInfo => {
-                tokenizer.remove_tokenizer::<BaseTokenizer>();
-                tokenizer.remove_tokenizer::<RunTokenizer>();
-            },
-            SubscribeCode::Mapper => {
-                tokenizer.remove_tokenizer::<BaseTokenizer>();
-                tokenizer.remove_tokenizer::<GenericTokenizer>();
-            },
-            SubscribeCode::SeedIndexer => {
-                tokenizer.remove_tokenizer::<BaseTokenizer>();
-            },
-        }
-    }
 
     fn thread_run(
         mut file_reader: FileReader,
@@ -222,7 +171,7 @@ impl MainThread {
         shutdown: Receiver<()>,
     ) {
         let mut limiter = CpuLimiter::new(Duration::from_millis(200));
-        let tokenizer = GenericTokenizer::all_tokenizers();
+        let tokenizer = AllTokenizer;
 
         let mut parser_base = TokenParserBase::default();
         let mut parser_seeds = TokenParserSeed::default();
