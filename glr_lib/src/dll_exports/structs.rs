@@ -138,8 +138,6 @@ impl MainThread {
     }
 
     pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
-        let tokenizer = AllTokenizer;
-
         while let Some(path) = paths.pop() {
             let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
                 SubscribeCode::Tokenizer => Box::new(TokenParserBase::default()),
@@ -157,7 +155,7 @@ impl MainThread {
 
             let tok_iter = TokenizeIter::new(
                 text, 
-                &tokenizer
+                AllTokenizer
             );
 
             parser.parse_tokens(tok_iter);

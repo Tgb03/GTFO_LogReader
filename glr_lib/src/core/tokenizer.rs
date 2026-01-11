@@ -35,16 +35,16 @@ pub trait TokenizerGetIter: Tokenizer {
 
 impl<T: Tokenizer> TokenizerGetIter for T {}
 
-pub struct TokenizeIter<'a, I, T>
+pub struct TokenizeIter<I, T>
 where
     I: Iterator<Item = String>,
     T: Tokenizer,
 {
     iter: I,
-    tokenizer: &'a T,
+    tokenizer: T,
 }
 
-impl<'a, I, T> Iterator for TokenizeIter<'a, I, T>
+impl<I, T> Iterator for TokenizeIter<I, T>
 where
     I: Iterator<Item = String>,
     T: Tokenizer,
@@ -64,12 +64,12 @@ where
     }
 }
 
-impl<'a, I, T> TokenizeIter<'a, I, T>
+impl<I, T> TokenizeIter<I, T>
 where
     I: Iterator<Item = String>,
     T: Tokenizer,
 {
-    pub fn new(iter: I, tokenizer: &'a T) -> Self {
+    pub fn new(iter: I, tokenizer: T) -> Self {
         Self { iter, tokenizer }
     }
 }
