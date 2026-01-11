@@ -37,7 +37,7 @@ impl<T: Tokenizer> TokenizerGetIter for T {}
 
 pub struct TokenizeIter<'a, I, T>
 where
-    I: Iterator<Item = &'a str>,
+    I: Iterator<Item = String>,
     T: Tokenizer,
 {
     iter: I,
@@ -46,14 +46,15 @@ where
 
 impl<'a, I, T> Iterator for TokenizeIter<'a, I, T>
 where
-    I: Iterator<Item = &'a str>,
+    I: Iterator<Item = String>,
     T: Tokenizer,
 {
     type Item = (Time, Token);
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
-            let line = self.iter.next()?.trim_start();
+            let owned = self.iter.next()?;
+            let line = owned.trim_start();
 
             match (self.tokenizer.tokenize_single(line), Time::from(line)) {
                 (Some(token), Some(time)) => return Some((time, token)),
@@ -65,7 +66,7 @@ where
 
 impl<'a, I, T> TokenizeIter<'a, I, T>
 where
-    I: Iterator<Item = &'a str>,
+    I: Iterator<Item = String>,
     T: Tokenizer,
 {
     pub fn new(iter: I, tokenizer: &'a T) -> Self {

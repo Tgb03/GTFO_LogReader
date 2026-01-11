@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{BufRead, BufReader, Read, Seek},
+    io::{BufRead, BufReader, Seek},
     path::PathBuf,
     sync::mpsc::Receiver,
 };
@@ -57,12 +57,11 @@ impl FileReader {
         Some(buffer)
     }
 
-    pub fn static_read(path: PathBuf) -> Option<String> {
-        let mut reader = File::open(path).map(|f| BufReader::new(f)).ok()?;
-        let mut buffer = String::new();
-
-        let _ = reader.read_to_string(&mut buffer).ok()?;
-
-        Some(buffer)
+    pub fn static_read(path: PathBuf) -> Option<impl Iterator<Item = String>> {
+        File::open(path).map(|f| BufReader::new(f))
+            .ok()?
+            .lines()
+            .filter_map(|line| line.ok())
+            .into()
     }
 }

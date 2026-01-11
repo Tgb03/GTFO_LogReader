@@ -2,7 +2,6 @@ use std::{
     ffi::c_char, os::raw::c_void, path::PathBuf, sync::mpsc::{self, Receiver, Sender}, thread::{self, JoinHandle}, time::Duration
 };
 
-use glr_core::{time::Time, token::Token};
 use might_sleep::prelude::CpuLimiter;
 
 use crate::{
@@ -156,12 +155,12 @@ impl MainThread {
                 continue;
             };
 
-            let tok_iter = TokenizeIter::new(text.split("\n"), &tokenizer);
+            let tok_iter = TokenizeIter::new(
+                text, 
+                &tokenizer
+            );
 
             parser.parse_tokens(tok_iter);
-            if let Some(last_line) = text.split("\n").last().map(|v| Time::from(v)).flatten() {
-                parser.parse_token(last_line, &Token::LogFileEnd);
-            }
         }
     }
 
