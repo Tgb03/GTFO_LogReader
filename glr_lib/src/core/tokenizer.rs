@@ -59,7 +59,10 @@ where
         while self.is_done == false {
             let Some(owned) = self.iter.next() else {
                 self.is_done = true;
-                return Some((self.last_time, Token::LogFileEnd))
+                return match self.end_token_read {
+                    true => None,
+                    false => Some((self.last_time, Token::LogFileEnd)),
+                }
             };
             let line = owned.trim_start();
 
