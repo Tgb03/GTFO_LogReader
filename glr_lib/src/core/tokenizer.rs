@@ -42,6 +42,10 @@ where
 {
     iter: I,
     tokenizer: T,
+
+    last_time: Time,
+    end_token_read: bool,
+    is_done: bool,
 }
 
 impl<I, T> Iterator for TokenizeIter<I, T>
@@ -52,15 +56,24 @@ where
     type Item = (Time, Token);
 
     fn next(&mut self) -> Option<Self::Item> {
-        loop {
-            let owned = self.iter.next()?;
+        while self.is_done == false {
+            let Some(owned) = self.iter.next() else {
+                self.is_done = true;
+                return Some((self.last_time, Token::LogFileEnd))
+            };
             let line = owned.trim_start();
 
             match (self.tokenizer.tokenize_single(line), Time::from(line)) {
-                (Some(token), Some(time)) => return Some((time, token)),
+                (Some(token), Some(time)) => { 
+                    self.end_token_read = self.end_token_read || token == Token::LogFileEnd;
+                    self.last_time = time;
+                    return Some((time, token))
+                },
                 _ => {}
             }
         }
+
+        None
     }
 }
 
@@ -70,7 +83,13 @@ where
     T: Tokenizer,
 {
     pub fn new(iter: I, tokenizer: T) -> Self {
-        Self { iter, tokenizer }
+        Self { 
+            iter, 
+            tokenizer, 
+            end_token_read: false,
+            last_time: Time::new(),
+            is_done: false, 
+        }
     }
 }
 
