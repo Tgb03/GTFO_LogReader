@@ -1,25 +1,16 @@
-use std::collections::HashMap;
+use glr_core::{time::Time, token::Token};
+use serde::Serialize;
 
-use crate::{
-    core::token_parser::TokenParser,
-    dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo},
-};
+use crate::output_trait::OutputTrait;
+
 
 pub mod token_parser_base;
 pub mod token_parser_locations;
 pub mod token_parser_runs;
 pub mod token_parser_seeds;
 
-pub trait CallbackTokenParser: HasCallbackHandler + TokenParser {}
+pub trait TokenParserInner {
+    type Output: Serialize;
 
-impl<T> CallbackTokenParser for T where T: HasCallbackHandler + TokenParser {}
-
-impl HasCallbackHandler for HashMap<u32, CallbackInfo> {
-    fn get_callback_handler(&self) -> &HashMap<u32, CallbackInfo> {
-        self
-    }
-
-    fn get_callback_handler_mut(&mut self) -> &mut HashMap<u32, CallbackInfo> {
-        self
-    }
+    fn parse(&mut self, time: Time, token: &Token, callback_handler: &impl OutputTrait<Self::Output>);
 }

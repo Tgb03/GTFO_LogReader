@@ -4,9 +4,7 @@ use crate::output_trait::OutputTrait;
 use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    dll_exports::callback_handler::HasCallbackHandler, seed_gen::consumers::base_consumer::Consumer,
-};
+use crate::seed_gen::consumers::base_consumer::Consumer;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ConsumableConsumer {
@@ -17,9 +15,9 @@ pub struct ConsumableConsumer {
 
 impl<O> Consumer<O> for ConsumableConsumer
 where
-    O: HasCallbackHandler,
+    O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
         let mut found_counters = HashSet::<i32>::new();
 
         for _ in 0..self.consumable_count {

@@ -5,7 +5,7 @@ use std::{
 
 use crate::dll_exports::{
     enums::SubscribeCode,
-    structs::{CallbackInfo, MainThread},
+    structs::{CallbackInfo, MainThread}, token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed},
 };
 
 static MAIN_THREAD: OnceLock<Mutex<Option<MainThread>>> = OnceLock::new();
@@ -46,5 +46,10 @@ pub fn shutdown_all() {
 }
 
 pub fn process_paths(paths: Vec<PathBuf>, callback: CallbackInfo) {
-    MainThread::static_run(paths, callback);
+    match callback.get_code() {
+        SubscribeCode::Tokenizer => MainThread::static_run::<TokenParserBase>(paths, callback),
+        SubscribeCode::RunInfo => MainThread::static_run::<TokenParserRuns>(paths, callback),
+        SubscribeCode::Mapper => MainThread::static_run::<TokenParserLocations>(paths, callback),
+        SubscribeCode::SeedIndexer => MainThread::static_run::<TokenParserSeed>(paths, callback),
+    }
 }

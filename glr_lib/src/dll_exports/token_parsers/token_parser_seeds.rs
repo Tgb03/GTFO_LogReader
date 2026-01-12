@@ -1,46 +1,28 @@
-use std::collections::HashMap;
 
 use glr_core::{seed_indexer_result::OutputSeedIndexer, time::Time, token::Token};
 
 use crate::{
-    core::token_parser::TokenParser,
-    dll_exports::{callback_handler::HasCallbackHandler, structs::CallbackInfo},
-    output_trait::OutputTrait,
-    seed_gen::levels::LevelDescriptors,
-    seed_gen::{consumers::base_consumer::Consumer, unity_random::UnityRandom},
+    dll_exports::token_parsers::TokenParserInner, output_trait::OutputTrait, seed_gen::{consumers::base_consumer::Consumer, levels::LevelDescriptors, unity_random::UnityRandom}
 };
 
 #[derive(Default)]
 pub struct TokenParserSeed {
-    callback_handler: HashMap<u32, CallbackInfo>,
     level_descriptors: LevelDescriptors,
 }
 
-impl HasCallbackHandler for TokenParserSeed {
-    fn get_callback_handler(&self) -> &HashMap<u32, CallbackInfo> {
-        &self.callback_handler
-    }
+impl TokenParserInner for TokenParserSeed {
+    type Output = OutputSeedIndexer;
 
-    fn get_callback_handler_mut(&mut self) -> &mut HashMap<u32, CallbackInfo> {
-        &mut self.callback_handler
-    }
-}
-
-impl TokenParser for TokenParserSeed {
-    fn parse_token(&mut self, _: Time, token: &Token) {
-        if self.callback_handler.is_empty() {
-            return;
-        }
-
+    fn parse(&mut self, _: Time, token: &Token, callback_handler: &impl OutputTrait<OutputSeedIndexer>) {
         if let Token::SelectExpedition(level, seed) = token {
-            self.output(OutputSeedIndexer::GenerationStart(level.to_string()));
+            callback_handler.output(OutputSeedIndexer::GenerationStart(level.to_string()));
 
             let mut unity_random = UnityRandom::from(*seed);
             self.level_descriptors
                 .get_level(&level)
-                .map(|v| v.take(&mut unity_random, &mut self.callback_handler));
+                .map(|v| v.take(&mut unity_random, callback_handler));
 
-            self.output(OutputSeedIndexer::GenerationEnd);
+            callback_handler.output(OutputSeedIndexer::GenerationEnd);
         }
     }
 }

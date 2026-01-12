@@ -1,49 +1,50 @@
 use std::collections::HashMap;
 
+use glr_core::{time::Time, token::Token};
 use serde::Serialize;
 
-use crate::{dll_exports::structs::CallbackInfo, output_trait::OutputTrait};
+use crate::{core::token_parser::TokenParser, dll_exports::{structs::CallbackInfo, token_parsers::TokenParserInner}, output_trait::OutputTrait};
 
-pub trait HasCallbackHandler {
-    fn get_callback_handler(&self) -> &HashMap<u32, CallbackInfo>;
-    fn get_callback_handler_mut(&mut self) -> &mut HashMap<u32, CallbackInfo>;
+#[derive(Default)]
+pub struct CallbackWrapper<P>
+where 
+    P: TokenParserInner {
 
-    fn add_callback(&mut self, callback: CallbackInfo) {
-        self.get_callback_handler_mut()
-            .insert(callback.get_id(), callback);
-    }
+    callbacks: HashMap<u32, CallbackInfo>,
+    token_parser: P,
 
-    fn remove_callback(&mut self, callback_id: u32) {
-        self.get_callback_handler_mut().remove(&callback_id);
-    }
 }
 
-pub trait CallbackClone: Sized {
-    fn clone_callbacks(self) -> Self;
+impl<P: TokenParserInner> CallbackWrapper<P> {
+
+    pub fn add_callback(&mut self, callback: CallbackInfo) {
+        self.callbacks.insert(callback.get_id(), callback);
+    }
+
+    pub fn remove_callback(&mut self, callback_id: u32) {
+        self.callbacks.remove(&callback_id);
+    }
+
 }
 
-impl<T> CallbackClone for T
-where
-    T: Sized + HasCallbackHandler + Default,
-{
-    fn clone_callbacks(self) -> Self {
-        let mut s = Self::default();
-
-        for (_, callback) in self.get_callback_handler() {
-            s.add_callback(callback.clone());
-        }
-
-        s
+impl<P> CallbackWrapper<P>
+where 
+    P: TokenParserInner + Default {
+    
+    pub fn reset_token_parser(&mut self) {
+        self.token_parser = P::default();
     }
 }
 
-impl<O, H> OutputTrait<O> for H
-where
-    O: Serialize,
-    H: HasCallbackHandler,
-{
+impl<P: TokenParserInner> TokenParser for CallbackWrapper<P> {
+    fn parse_token(&mut self, time: Time, token: &Token) {
+        self.token_parser.parse(time, token, &self.callbacks);
+    }
+}
+
+impl<O: Serialize> OutputTrait<O> for HashMap<u32, CallbackInfo> {
     fn output(&self, data: O) {
-        for callback in self.get_callback_handler().values() {
+        for callback in self.values() {
             if let Some(event) = callback.get_event_callback() {
                 let converter = callback.get_message_type();
                 let context = callback.get_context();

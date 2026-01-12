@@ -2,7 +2,6 @@ use glr_core::seed_indexer_result::{OutputSeedIndexer, ResourceType};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler,
     output_trait::OutputTrait,
     seed_gen::consumers::{base_consumer::Consumer, key_id_consumer::KeyIDConsumer},
 };
@@ -45,9 +44,9 @@ impl ResourceGeneration {
 
 impl<O> Consumer<O> for ResourceGeneration
 where
-    O: HasCallbackHandler,
+    O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
         let mut left = self.left
             * match self.res_type {
                 ResourceType::Ammopack => 0.8f32,

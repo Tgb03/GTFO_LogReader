@@ -1,8 +1,7 @@
+use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    dll_exports::callback_handler::HasCallbackHandler, seed_gen::consumers::base_consumer::Consumer,
-};
+use crate::{output_trait::OutputTrait, seed_gen::consumers::base_consumer::Consumer};
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct IgnoreConsumer {
@@ -17,9 +16,9 @@ impl IgnoreConsumer {
 
 impl<O> Consumer<O> for IgnoreConsumer
 where
-    O: HasCallbackHandler,
+    O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, _: &mut O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, _: &O) {
         if self.count > 0 {
             let _ = seed_iter.nth(self.count - 1);
         }

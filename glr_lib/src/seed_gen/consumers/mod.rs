@@ -1,8 +1,8 @@
+use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler,
-    seed_gen::{
+    output_trait::OutputTrait, seed_gen::{
         consumers::{
             base_consumer::Consumer, consumable_consumer::ConsumableConsumer,
             ignore_consumer::IgnoreConsumer, key_consumer::KeyConsumer,
@@ -10,7 +10,7 @@ use crate::{
             resource_generation::ResourceGeneration, zone_consumer::ZoneConsumer,
         },
         zone_info::level_data::LevelData,
-    },
+    }
 };
 
 pub mod base_consumer;
@@ -37,9 +37,9 @@ pub enum ConsumerEnum {
 
 impl<O> Consumer<O> for ConsumerEnum
 where
-    O: HasCallbackHandler,
+    O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
         match self {
             ConsumerEnum::Ignore(ignore_consumer) => ignore_consumer.take(seed_iter, output),
             ConsumerEnum::KeyIDConsumer(key_idconsumer) => key_idconsumer.take(seed_iter, output),

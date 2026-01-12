@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use crate::output_trait::OutputTrait;
 use crate::seed_gen::marker_set::MarkerSetHash;
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler,
     seed_gen::zone_info::{
         generated_data::{AllocType, GeneratedZone, grab_spawn_id},
         unlock_method::ZoneLocationSpawn,
@@ -26,13 +25,13 @@ pub struct SpawnObject {
 }
 
 impl SpawnObject {
-    pub fn take<O: HasCallbackHandler>(
+    pub fn take<O: OutputTrait<OutputSeedIndexer>>(
         self,
         generated_data: &mut Vec<GeneratedZone>,
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &mut O,
+        output: &O,
     ) -> Option<()> {
         let is_container = self.alloc_type == AllocType::Container;
         let location = ZoneLocationSpawn {

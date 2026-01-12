@@ -9,13 +9,9 @@ use crate::{
         token_parser::{IterTokenParser, TokenParser}, tokenizer::{AllTokenizer, TokenizeIter, TokenizerGetIter}
     },
     dll_exports::{
-        callback_handler::{CallbackClone, HasCallbackHandler},
-        enums::{SubscribeCode, SubscriptionType},
-        token_parsers::{
-            CallbackTokenParser, token_parser_base::TokenParserBase,
-            token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns,
-            token_parser_seeds::TokenParserSeed,
-        },
+        callback_handler::CallbackWrapper, enums::{SubscribeCode, SubscriptionType}, token_parsers::{
+            TokenParserInner, token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed
+        }
     },
     readers::{file_reader::FileReader, folder_watcher::FolderWatcher},
 };
@@ -137,17 +133,12 @@ impl MainThread {
         self.folder_watcher.update_path(new_path);
     }
 
-    pub fn static_run(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
+    pub fn static_run<TP: TokenParserInner + Default>(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
+        let mut parser = CallbackWrapper::<TP>::default();
+
+        parser.add_callback(callback.clone());
+        
         while let Some(path) = paths.pop() {
-            let mut parser: Box<dyn CallbackTokenParser> = match callback.code {
-                SubscribeCode::Tokenizer => Box::new(TokenParserBase::default()),
-                SubscribeCode::RunInfo => Box::new(TokenParserRuns::default()),
-                SubscribeCode::Mapper => Box::new(TokenParserLocations::default()),
-                SubscribeCode::SeedIndexer => Box::new(TokenParserSeed::default()),
-            };
-
-            parser.add_callback(callback.clone());
-
             let Some(text) = FileReader::static_read(path.clone()) else {
                 println!("Could not read path: {:?}", path);
                 continue;
@@ -170,10 +161,10 @@ impl MainThread {
         let mut limiter = CpuLimiter::new(Duration::from_millis(200));
         let tokenizer = AllTokenizer;
 
-        let mut parser_base = TokenParserBase::default();
-        let mut parser_seeds = TokenParserSeed::default();
-        let mut parser_mapper = TokenParserLocations::default();
-        let mut parser_runs = TokenParserRuns::default();
+        let mut parser_base = CallbackWrapper::<TokenParserBase>::default();
+        let mut parser_seeds = CallbackWrapper::<TokenParserRuns>::default();
+        let mut parser_mapper = CallbackWrapper::<TokenParserLocations>::default();
+        let mut parser_runs = CallbackWrapper::<TokenParserSeed>::default();
 
         loop {
             if let Ok(()) = shutdown.try_recv() {
@@ -199,10 +190,10 @@ impl MainThread {
             }
 
             if file_reader.get_was_new_file() {
-                parser_base = parser_base.clone_callbacks();
-                parser_seeds = parser_seeds.clone_callbacks();
-                parser_mapper = parser_mapper.clone_callbacks();
-                parser_runs = parser_runs.clone_callbacks();
+                parser_base.reset_token_parser();
+                parser_seeds.reset_token_parser();
+                parser_mapper.reset_token_parser();
+                parser_runs.reset_token_parser();
             }
 
             if let Some(new_lines) = file_reader.get_new_lines() {

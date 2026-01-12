@@ -2,7 +2,7 @@ use glr_core::seed_indexer_result::OutputSeedIndexer;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler, output_trait::OutputTrait,
+    output_trait::OutputTrait,
     seed_gen::consumers::base_consumer::Consumer,
 };
 
@@ -25,9 +25,9 @@ pub struct KeyIDConsumer {
 
 impl<O> Consumer<O> for KeyIDConsumer
 where
-    O: HasCallbackHandler,
+    O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
         let out = OutputSeedIndexer::Key(
             self.name.clone(),
             self.zone,

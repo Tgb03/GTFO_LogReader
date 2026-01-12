@@ -1,12 +1,11 @@
-use glr_core::seed_indexer_result::ResourceType;
+use glr_core::seed_indexer_result::{OutputSeedIndexer, ResourceType};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    dll_exports::callback_handler::HasCallbackHandler,
-    seed_gen::consumers::{
+    output_trait::OutputTrait, seed_gen::consumers::{
         base_consumer::Consumer, ignore_consumer::IgnoreConsumer,
         resource_generation::ResourceGeneration,
-    },
+    }
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -26,9 +25,9 @@ pub struct ZoneConsumer {
 
 impl<O> Consumer<O> for ZoneConsumer
 where
-    O: HasCallbackHandler,
+    O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
         ResourceGeneration::new(self.medi, ResourceType::Healthpack, None).take(seed_iter, output);
         ResourceGeneration::new(self.disi, ResourceType::DisinfectPack, None)
             .take(seed_iter, output);
