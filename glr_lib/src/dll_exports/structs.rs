@@ -139,6 +139,8 @@ impl MainThread {
         parser.add_callback(callback.clone());
         
         while let Some(path) = paths.pop() {
+            parser.reset_token_parser();
+            
             let Some(text) = FileReader::static_read(path.clone()) else {
                 println!("Could not read path: {:?}", path);
                 continue;
