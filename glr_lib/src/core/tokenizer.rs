@@ -129,6 +129,8 @@ fn check_match(line: &str, start_id: usize, search: &str) -> bool {
 }
 
 fn check_match_end(line: &str, start_id: usize, search: &str) -> bool {
+    if line.len() < start_id { return false }
+
     line.get((line.len() - start_id)..(line.len() - start_id + search.len()))
         .is_some_and(|v| v == search)
 }
