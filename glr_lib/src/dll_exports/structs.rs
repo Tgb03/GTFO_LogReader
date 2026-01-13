@@ -136,7 +136,7 @@ impl MainThread {
     pub fn static_run<TP: TokenParserInner + Default>(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
         let mut parser = CallbackWrapper::<TP>::default();
 
-        parser.add_callback(callback.clone());
+        parser.add_callback(callback);
         
         while let Some(path) = paths.pop() {
             parser.reset_token_parser();
@@ -164,9 +164,9 @@ impl MainThread {
         let tokenizer = AllTokenizer;
 
         let mut parser_base = CallbackWrapper::<TokenParserBase>::default();
-        let mut parser_seeds = CallbackWrapper::<TokenParserRuns>::default();
+        let mut parser_seeds = CallbackWrapper::<TokenParserSeed>::default();
         let mut parser_mapper = CallbackWrapper::<TokenParserLocations>::default();
-        let mut parser_runs = CallbackWrapper::<TokenParserSeed>::default();
+        let mut parser_runs = CallbackWrapper::<TokenParserRuns>::default();
 
         loop {
             if let Ok(()) = shutdown.try_recv() {

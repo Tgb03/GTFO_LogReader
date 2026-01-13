@@ -135,30 +135,33 @@ fn check_match_end(line: &str, start_id: usize, search: &str) -> bool {
         .is_some_and(|v| v == search)
 }
 
-const fn create_check_match(start_id: usize, search: &str) -> impl Fn(&str) -> bool {
-    move |line| check_match(line, start_id, search)
-}
-
-const fn create_check_match_end(start_id: usize, search: &str) -> impl Fn(&str) -> bool {
-    move |line| check_match_end(line, start_id, search)
-}
-
 impl Tokenizer for BaseTokenizer {
     fn tokenize_single(&self, line: &str) -> Option<Token> {
-        
-        if check_match(line, 44, "SetSessionIDSeed") {
+        if line.get(44..60).is_some_and(|v| v == "SetSessionIDSeed") {
             return Some(Token::create_session_seed(line));
         }
-        if check_match(line, 29, "PlayFab.OnGetCurrentTime") {
+        if line
+            .get(29..53)
+            .is_some_and(|v| v == "PlayFab.OnGetCurrentTime")
+        {
             return Some(Token::create_utc_time(line));
         }
-        if check_match(line, 30, "SelectActiveExpedition") {
+        if line
+            .get(30..52)
+            .is_some_and(|v| v == "SelectActiveExpedition")
+        {
             return Some(Token::create_expedition(line));
         }
-        if check_match(line, 15, "OnApplicationQuit") {
+        if line.get(15..32).is_some_and(|v| v == "OnApplicationQuit") {
             return Some(Token::LogFileEnd);
         }
-        if check_match_end(line, 21, "was added to session") {
+
+        let len = line.len();
+
+        if line
+            .get(len.saturating_sub(21)..len.saturating_sub(1))
+            .is_some_and(|v| v == "was added to session")
+        {
             return Some(Token::create_player_joined(line));
         }
         if line
@@ -173,7 +176,10 @@ impl Tokenizer for BaseTokenizer {
         {
             return Some(Token::create_player_left(line));
         }
-        if check_match(line, 15, "DEBUG : Leaving session hub!") {
+        if line
+            .get(15..43)
+            .is_some_and(|v| v == "DEBUG : Leaving session hub!")
+        {
             return Some(Token::UserExitLobby);
         }
         if line.get(15..26).is_some_and(|v| v == "Player Down") {
