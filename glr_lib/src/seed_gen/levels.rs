@@ -1,25 +1,25 @@
 use std::{collections::BTreeMap, fmt::Debug};
 
 use glr_core::data::LevelDescriptor;
-use serde::Deserialize;
 
-use crate::{load_seed_consumers::LoadSeedConsumers, seed_gen::zone_info::level_data::LevelData};
+use crate::{load_seed_consumers::SEED_LEVEL_DATAS, seed_gen::zone_info::level_data::LevelData};
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct LevelDescriptors {
-    levels: BTreeMap<String, LevelData>,
+    levels: &'static Option<BTreeMap<String, LevelData>>,
 }
 
 impl Default for LevelDescriptors {
     fn default() -> Self {
         Self {
-            levels: LoadSeedConsumers::load_all().unwrap(),
+            levels: &SEED_LEVEL_DATAS,
         }
     }
 }
 
 impl LevelDescriptors {
     pub fn get_level(&self, level: &LevelDescriptor) -> Option<&LevelData> {
-        self.levels.get(&level.to_string())
+        self.levels.as_ref()?
+            .get(&level.to_string())
     }
 }

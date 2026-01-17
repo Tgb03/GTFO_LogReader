@@ -1,10 +1,15 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, sync::LazyLock};
 #[cfg(debug_assertions)]
 use std::{fs::File, io::Read};
 
 use crate::seed_gen::zone_info::level_data::LevelData;
 
 pub struct LoadSeedConsumers;
+
+pub static SEED_LEVEL_DATAS: LazyLock<Option<BTreeMap<String, LevelData>>> =
+    LazyLock::new(|| {
+        LoadSeedConsumers::load_all()
+    });
 
 impl LoadSeedConsumers {
     #[cfg(not(debug_assertions))]
