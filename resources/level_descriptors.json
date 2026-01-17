@@ -7154,7 +7154,7 @@
           "Large"
         ],
         "terminals": [],
-        "alloc_other": [],
+        "alloc_other": [4],
         "medi": 0.5,
         "disi": 0.0,
         "ammo": 0.5,
@@ -7202,7 +7202,7 @@
         "count": 1,
         "max_per_zone": 1000,
         "spawn_in_layer": false,
-        "skip_before_alloc": 0
+        "skip_before_alloc": 13
       }
     ]
   },
@@ -20213,7 +20213,7 @@
         "rooms": [
           "Huge"
         ],
-        "terminals": [],
+        "terminals": [1],
         "alloc_other": [],
         "medi": 0.0,
         "disi": 0.0,
@@ -37124,20 +37124,7 @@
         }
       ]
     ],
-    "bulk_keys_sec": [
-      [
-        {
-          "zone_id": {
-            "layer_id": 1,
-            "dimension_id": 0,
-            "zone_id": 312
-          },
-          "start_weight": 0,
-          "middle_weight": 9999,
-          "end_weight": 0
-        }
-      ]
-    ],
+    "bulk_keys_sec": [],
     "bulk_keys_ovrl": [],
     "staged_objectives": [
       {
@@ -37150,96 +37137,8 @@
                 "zone_id": 194
               },
               "start_weight": 0,
-              "middle_weight": 99999,
-              "end_weight": 0
-            }
-          ],
-          [
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 194
-              },
-              "start_weight": 0,
-              "middle_weight": 99999,
-              "end_weight": 0
-            }
-          ],
-          [
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 195
-              },
-              "start_weight": 0,
               "middle_weight": 0,
               "end_weight": 0
-            },
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 196
-              },
-              "start_weight": 0,
-              "middle_weight": 0,
-              "end_weight": 999
-            }
-          ],
-          [
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 195
-              },
-              "start_weight": 0,
-              "middle_weight": 0,
-              "end_weight": 999
-            },
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 196
-              },
-              "start_weight": 0,
-              "middle_weight": 999,
-              "end_weight": 0
-            }
-          ],
-          [
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 194
-              },
-              "start_weight": 0,
-              "middle_weight": 0,
-              "end_weight": 0
-            },
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 195
-              },
-              "start_weight": 0,
-              "middle_weight": 0,
-              "end_weight": 99
-            },
-            {
-              "zone_id": {
-                "layer_id": 0,
-                "dimension_id": 0,
-                "zone_id": 196
-              },
-              "start_weight": 0,
-              "middle_weight": 0,
-              "end_weight": 999
             }
           ]
         ],
