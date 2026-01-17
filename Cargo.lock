@@ -166,7 +166,7 @@ dependencies = [
 
 [[package]]
 name = "glr_core"
-version = "1.1.3"
+version = "1.1.4"
 dependencies = [
  "chrono",
  "num_enum",
@@ -178,7 +178,7 @@ dependencies = [
 
 [[package]]
 name = "glr_dylib"
-version = "1.1.3"
+version = "1.1.4"
 dependencies = [
  "glr_core",
  "glr_lib",
@@ -186,7 +186,7 @@ dependencies = [
 
 [[package]]
 name = "glr_lib"
-version = "1.1.3"
+version = "1.1.4"
 dependencies = [
  "bincode",
  "chrono",
