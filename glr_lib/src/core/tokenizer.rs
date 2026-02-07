@@ -27,9 +27,10 @@ pub trait TokenizerGetIter: Tokenizer {
         lines
             .split('\n')
             .map(|v| v.trim_start())
-            .map(|v| (Time::from(v), self.tokenize_single(v)))
-            .filter(|(a, b)| a.is_some() && b.is_some())
-            .map(|(a, b)| (a.unwrap(), b.unwrap()))
+            .map(|v| (v, self.tokenize_single(v)))
+            .filter(|(_, v)| v.is_some())
+            .map(|(a, b)| (Time::from(a), b.unwrap()))
+            .map(|(a, b)| (a.unwrap(), b))
     }
 }
 
@@ -128,61 +129,36 @@ fn check_match(line: &str, start_id: usize, search: &str) -> bool {
         .is_some_and(|v| v == search)
 }
 
-fn check_match_end(line: &str, start_id: usize, search: &str) -> bool {
-    if line.len() < start_id { return false }
-
-    line.get((line.len() - start_id)..(line.len() - start_id + search.len()))
-        .is_some_and(|v| v == search)
-}
-
 impl Tokenizer for BaseTokenizer {
     fn tokenize_single(&self, line: &str) -> Option<Token> {
-        if line.get(44..60).is_some_and(|v| v == "SetSessionIDSeed") {
+        if check_match(line, 44, "SetSessionIDSeed") {
             return Some(Token::create_session_seed(line));
         }
-        if line
-            .get(29..53)
-            .is_some_and(|v| v == "PlayFab.OnGetCurrentTime")
-        {
+        if check_match(line, 29, "PlayFab.OnGetCurrentTime") {
             return Some(Token::create_utc_time(line));
         }
-        if line
-            .get(30..52)
-            .is_some_and(|v| v == "SelectActiveExpedition")
-        {
+        if check_match(line, 30, "SelectActiveExpedition") {
             return Some(Token::create_expedition(line));
         }
-        if line.get(15..32).is_some_and(|v| v == "OnApplicationQuit") {
+        if check_match(line, 15, "OnApplicationQuit") {
             return Some(Token::LogFileEnd);
         }
 
         let len = line.len();
 
-        if line
-            .get(len.saturating_sub(21)..len.saturating_sub(1))
-            .is_some_and(|v| v == "was added to session")
-        {
+        if check_match(line, len.saturating_sub(21), "was added to session") {
             return Some(Token::create_player_joined(line));
         }
-        if line
-            .get(15..41)
-            .is_some_and(|v| v == "<color=green>SNET : Player")
-        {
+        if check_match(line, 15, "<color=green>SNET : Player") {
             return Some(Token::create_player_exit_elevator(line));
         }
-        if line
-            .get(15..45)
-            .is_some_and(|v| v == "DEBUG : Closed connection with")
-        {
+        if check_match(line, 15, "DEBUG : Closed connection with") {
             return Some(Token::create_player_left(line));
         }
-        if line
-            .get(15..43)
-            .is_some_and(|v| v == "DEBUG : Leaving session hub!")
-        {
+        if check_match(line, 15, "DEBUG : Leaving session hub!") {
             return Some(Token::UserExitLobby);
         }
-        if line.get(15..26).is_some_and(|v| v == "Player Down") {
+        if check_match(line, 15, "Player Down") {
             return Some(Token::create_player_down(line));
         }
 
@@ -195,70 +171,37 @@ impl Tokenizer for RunTokenizer {
         if line.contains("exits PLOC_InElevator") {
             return Some(Token::create_player(line));
         }
-        if line
-            .get(69..109)
-            .is_some_and(|v| v == ": StopElevatorRide TO: ReadyToStartLevel")
-        {
+        if check_match(line, 69, ": StopElevatorRide TO: ReadyToStartLevel") {
             return Some(Token::GameStarting);
         }
-        if line
-            .get(69..100)
-            .is_some_and(|v| v == ": ReadyToStartLevel TO: InLevel")
-        {
+        if check_match(line, 69, ": ReadyToStartLevel TO: InLevel") {
             return Some(Token::GameStarted);
         }
-        if line
-            .get(31..61)
-            .is_some_and(|v| v == "LinkedToZoneData.EventsOnEnter")
-        {
+        if check_match(line, 31, "LinkedToZoneData.EventsOnEnter") {
             return Some(Token::DoorOpen);
         }
-        if line
-            .get(15..42)
-            .is_some_and(|v| v == "BulkheadDoorController_Core")
-        {
+        if check_match(line, 15, "BulkheadDoorController_Core") {
             return Some(Token::BulkheadScanDone);
         }
-        if line
-            .get(116..141)
-            .is_some_and(|v| v == "WardenObjectiveItemSolved")
-        {
+        if check_match(line, 116, "WardenObjectiveItemSolved") {
             return Some(Token::SecondaryDone);
         }
-        if line
-            .get(112..137)
-            .is_some_and(|v| v == "WardenObjectiveItemSolved")
-        {
+        if check_match(line, 112, "WardenObjectiveItemSolved") {
             return Some(Token::OverloadDone);
         }
-        if line
-            .get(71..100)
-            .is_some_and(|v| v == "InLevel TO: ExpeditionSuccess")
-        {
+        if check_match(line, 71, "InLevel TO: ExpeditionSuccess") {
             return Some(Token::GameEndWin);
         }
-        if line
-            .get(15..63)
-            .is_some_and(|v| v == "RundownManager.OnExpeditionEnded(endState: Abort")
-        {
+        if check_match(line, 15, "RundownManager.OnExpeditionEnded(endState: Abort") {
             return Some(Token::GameEndAbort);
         }
-        if line
-            .get(15..48)
-            .is_some_and(|v| v == "CleanupAfterExpedition AfterLevel")
-        {
+        if check_match(line, 15, "CleanupAfterExpedition AfterLevel") {
             return Some(Token::GameEndAbort);
         }
-        if line
-            .get(15..58)
-            .is_some_and(|v| v == "DEBUG : Leaving session hub! : IsInHub:True")
-        {
+        if check_match(line, 15, "DEBUG : Leaving session hub! : IsInHub:True") {
             return Some(Token::GameEndAbort);
         }
-        if line
-            .get(71..97)
-            .is_some_and(|v| v == "InLevel TO: ExpeditionFail")
-        {
+        if check_match(line, 71, "InLevel TO: ExpeditionFail") {
             return Some(Token::GameEndLost);
         }
 
@@ -268,10 +211,7 @@ impl Tokenizer for RunTokenizer {
 
 impl Tokenizer for CheckpointTokenizer {
     fn tokenize_single(&self, line: &str) -> Option<Token> {
-        if line
-            .get(71..97)
-            .is_some_and(|v| v == "ExpeditionFail TO: InLevel")
-        {
+        if check_match(line, 71, "ExpeditionFail TO: InLevel") {
             return Some(Token::CheckpointReset);
         }
 
@@ -281,111 +221,41 @@ impl Tokenizer for CheckpointTokenizer {
 
 impl Tokenizer for GenerationTokenizer {
     fn tokenize_single(&self, line: &str) -> Option<Token> {
-        if line
-            .get(69..91)
-            .is_some_and(|v| v == ": Lobby TO: Generating")
-        {
+        if check_match(line, 69, ": Lobby TO: Generating") {
             return Some(Token::GeneratingLevel);
         }
-        if line
-            .get(69..109)
-            .is_some_and(|v| v == ": Generating TO: ReadyToStopElevatorRide")
-        {
+        if check_match(line, 69, ": Generating TO: ReadyToStopElevatorRide") {
             return Some(Token::GeneratingFinished);
         }
-        if line
-            .get(29..54)
-            .is_some_and(|v| v == "CreateKeyItemDistribution")
-        {
+        if check_match(line, 29, "CreateKeyItemDistribution") {
             return Some(Token::create_item_alloc(line));
         }
-        if line
-            .get(30..81)
-            .is_some_and(|v| v == "TryGetExistingGenericFunctionDistributionForSession")
-        {
+        if check_match(line, 30, "TryGetExistingGenericFunctionDistributionForSession") {
             return Some(Token::create_item_spawn(line));
         }
-        if line.get(30..102).is_some_and(|v| {
-            v == "LG_Distribute_WardenObjective.SelectZoneFromPlacementAndKeepTrackOnCount"
-        }) {
+        if check_match(line, 30, "LG_Distribute_WardenObjective.SelectZoneFromPlacementAndKeepTrackOnCount") {
             return Some(Token::create_collectable_allocated(line));
         }
-        if line.get(35..121).is_some_and(|v| v == "TryGetRandomPlacementZone.  Determine wardenobjective zone. Found zone with LocalIndex") 
-        {
+        if check_match(line, 35, "TryGetRandomPlacementZone.  Determine wardenobjective zone. Found zone with LocalIndex") {
             return Some(Token::create_hsu_alloc(line));
         }
-        if line.get(35..109).is_some_and(|v| {
-            v == "LG_Distribute_WardenObjective, placing warden objective item with function"
-        }) {
+        if check_match(line, 35, "LG_Distribute_WardenObjective, placing warden objective item with function") {
             return Some(Token::create_objective_spawned_override(line));
         }
-        if line
-            .get(30..89)
-            .is_some_and(|v| v == "LG_Distribute_WardenObjective.DistributeGatherRetrieveItems")
-        {
+        if check_match(line, 30, "LG_Distribute_WardenObjective.DistributeGatherRetrieveItems") {
             return Some(Token::create_collectable_item_id(line));
         }
-        if line
-            .get(15..67)
-            .is_some_and(|v| v == "GenericSmallPickupItem_Core.SetupFromLevelgen, seed:")
-        {
+        if check_match(line, 15, "GenericSmallPickupItem_Core.SetupFromLevelgen, seed:") {
             return Some(Token::create_collectable_item_seed(line));
         }
-        if line
-            .get(15..44)
-            .is_some_and(|v| v == "RESET placementDataIndex to 0")
-        {
+        if check_match(line, 15, "RESET placementDataIndex to 0") {
             return Some(Token::DimensionReset);
         }
-        if line
-            .get(15..47)
-            .is_some_and(|v| v == "Increment placementDataIndex to ")
-        {
+        if check_match(line, 15, "Increment placementDataIndex to ") {
             return Some(Token::DimensionIncrease);
         }
 
         None
-    }
-}
-
-pub struct GenericTokenizer {
-    tokenizers: Vec<Box<dyn Tokenizer>>,
-}
-
-impl Tokenizer for GenericTokenizer {
-    fn tokenize_single(&self, line: &str) -> Option<Token> {
-        self.tokenizers.tokenize_single(line)
-    }
-}
-
-impl Default for GenericTokenizer {
-    fn default() -> Self {
-        Self {
-            tokenizers: vec![Box::new(BaseTokenizer)],
-        }
-    }
-}
-
-impl GenericTokenizer {
-    #[allow(dead_code)]
-    pub fn add_tokenizer<T>(mut self, tokenizer: T) -> Self
-    where
-        T: Tokenizer + 'static,
-    {
-        self.tokenizers.push(Box::new(tokenizer));
-
-        self
-    }
-
-    pub fn all_tokenizers() -> Self {
-        Self {
-            tokenizers: vec![
-                Box::new(BaseTokenizer),
-                Box::new(RunTokenizer),
-                Box::new(GenerationTokenizer),
-                Box::new(CheckpointTokenizer),
-            ],
-        }
     }
 }
 
@@ -401,15 +271,12 @@ impl Tokenizer for AllTokenizer {
 #[cfg(test)]
 mod tests {
     use std::{env, fs::File, io::Read};
-
     use glr_core::data::ObjectiveFunction;
 
     use super::*;
 
-    fn create_tokenizer() -> GenericTokenizer {
-        GenericTokenizer::default()
-            .add_tokenizer(RunTokenizer)
-            .add_tokenizer(GenerationTokenizer)
+    fn create_tokenizer() -> AllTokenizer {
+        AllTokenizer
     }
 
     fn load_file(name: &str) -> Option<String> {
@@ -432,7 +299,7 @@ mod tests {
         }
     }
 
-    fn tokenize_file(name: &str, tokenizer: &GenericTokenizer) -> Vec<Token> {
+    fn tokenize_file(name: &str, tokenizer: &AllTokenizer) -> Vec<Token> {
         let file_str = load_file(name).unwrap();
 
         tokenizer

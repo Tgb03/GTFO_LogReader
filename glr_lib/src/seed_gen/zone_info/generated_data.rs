@@ -32,6 +32,13 @@ pub enum AllocType {
 
 impl GeneratedZone {
     pub fn new(build_seeds: &mut impl Iterator<Item = f32>, zone_data: &ZoneData) -> Self {
+        #[cfg(debug_assertions)]
+        {
+            println!();
+            println!("ZONE {}", zone_data.zone_id.zone_id);
+            println!();
+        }
+        
         Self {
             zone_id: zone_data.zone_id.clone(),
             alloc_containers: Self::create_container_alloc(
@@ -71,8 +78,10 @@ impl GeneratedZone {
             let mut append_res = Vec::with_capacity(room_len as usize * 2);
 
             for id in 0..room_len {
-                let big_box = (build_seeds.nth(2).unwrap() * 2f32) as u8 + 2;
-                // println!("Container generated with {} alloc", big_box);
+                let seed = build_seeds.nth(1).unwrap();
+                let big_box = (build_seeds.next().unwrap() * 2f32) as u8 + 2;
+                #[cfg(debug_assertions)]
+                println!("Container generated with {} alloc from {}", big_box, seed);
                 append_res.push((id + start, big_box));
             }
 
@@ -205,10 +214,11 @@ impl GeneratedZone {
 
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
 
-        // match _debug_str {
-        //     Some(s) => println!("s: {} from {}", seed, s),
-        //     None => println!("s: {}", seed),
-        // }
+        #[cfg(debug_assertions)]
+        match _debug_str {
+            Some(s) => println!("s: {} from {} in {}", seed, s, self.zone_id.zone_id),
+            None => println!("s: {}", seed),
+        }
         let mut room = Self::get_room(seed, &values_per_room);
         if room >= spawns_per_room.len() {
             room -= 1;
@@ -345,6 +355,7 @@ pub fn grab_spawn_id(
             debug_str,
             check_alloc,
         );
+        
         if id == -1 { 
             overflow_counter.add_to_hash(&spawn.zone_id, &alloc_type);
         }

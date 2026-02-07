@@ -39,6 +39,7 @@ pub struct StagedObjective {
     pub max_per_zone: usize,
     pub spawn_in_layer: bool,
     #[serde(default)] pub skip_before_alloc: usize,
+    #[serde(default)] pub sort_resulting: bool,
 }
 
 impl StagedObjective {
@@ -133,9 +134,9 @@ impl StagedObjective {
             choices.retain(|v| v.0 > 0);
         }
 
-        // if self.name.as_str() == "GatherSmallItems" {
-        //     result.sort_by_key(|v| v.zone_id.zone_id);
-        // }
+        if self.sort_resulting {
+            result.sort_by_key(|v| v.zone_id.zone_id);
+        }
 
         result
     }
@@ -347,7 +348,8 @@ impl LevelData {
 
         for _ in 0..zone.artifact_count {
             let build_seed = build_seeds.next().unwrap();
-            // println!("Build seed artifact: {build_seed}");
+            #[cfg(debug_assertions)]
+            println!("Build seed artifact: {build_seed}");
             let val = match build_seed > ARTIFACT_BOX_CHANCE {
                 true => ContainerOrWorldspawn::Worldspawn,
                 false => ContainerOrWorldspawn::Container,
@@ -380,7 +382,8 @@ impl LevelData {
 
         for _ in 0..zone.consumable_count {
             let build_seed = build_seeds.next().unwrap();
-            // println!("   Build seed consumable: {build_seed}");
+            #[cfg(debug_assertions)]
+            println!("   Build seed consumable: {build_seed}");
             let val = match build_seed > zone.chance_box_consumable {
                 true => ContainerOrWorldspawn::Worldspawn,
                 false => ContainerOrWorldspawn::Container,
@@ -508,9 +511,12 @@ impl LevelData {
             .iter()
             .filter(|v| v.zone_id.layer_id == layer && v.zone_id.dimension_id == dim)
         {
-            // println!();
-            // println!("Zone {}", zone.zone_id.zone_id);
-            // println!();
+            #[cfg(debug_assertions)]
+            {
+                println!();
+                println!("Zone {}", zone.zone_id.zone_id);
+                println!();
+            }
             
             let before = zone.build_seed_spawners_before as usize;
             let after = zone.build_seed_spawners_after as usize;
