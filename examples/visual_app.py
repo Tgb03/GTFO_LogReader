@@ -11,8 +11,8 @@ from collections import Counter
 from collections import defaultdict
 import base64
 
-dll_relative_path = "../target/release/glr_dylib.dll"
-# dll_relative_path = "../target/debug/glr_dylib.dll"
+# dll_relative_path = "../target/release/glr_dylib.dll"
+dll_relative_path = "../target/debug/glr_dylib.dll"
 log_folder_path = str(os.path.join(os.getenv('USERPROFILE'), 'AppData', 'LocalLow', '10 Chambers Collective', 'GTFO'))
 
 #

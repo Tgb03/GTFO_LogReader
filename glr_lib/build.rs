@@ -143,7 +143,7 @@ pub struct StagedObjective {
     pub max_per_zone: usize,
     pub spawn_in_layer: bool,
     #[serde(default)] pub skip_before_alloc: usize,
-    #[serde(default)] pub sort_resulting: bool,
+    #[serde(default)] pub is_bugged: bool,
 }
 #[derive(Serialize, Deserialize)]
 pub struct CollectableMapper {

@@ -39,7 +39,7 @@ pub struct StagedObjective {
     pub max_per_zone: usize,
     pub spawn_in_layer: bool,
     #[serde(default)] pub skip_before_alloc: usize,
-    #[serde(default)] pub sort_resulting: bool,
+    #[serde(default)] pub is_bugged: bool,
 }
 
 impl StagedObjective {
@@ -77,6 +77,11 @@ impl StagedObjective {
             }
             let (count, selected) = &mut choices[rolled_id];
             *count -= 1;
+            
+            let weights = match self.is_bugged {
+                true => &self.locations[id][rolled_id],
+                false => &selected,
+            };
 
             let result_obj = match self.spawn_in_layer {
                 true => {
@@ -116,9 +121,9 @@ impl StagedObjective {
                         } else {
                             self.name.clone()
                         },
-                        start_weight: selected.start_weight,
-                        middle_weight: selected.middle_weight,
-                        end_weight: selected.end_weight,
+                        start_weight: weights.start_weight,
+                        middle_weight: weights.middle_weight,
+                        end_weight: weights.end_weight,
                         alloc_type: sp_t,
                         zone_id: selected.zone_id,
                         skip_before_alloc: self.skip_before_alloc,
@@ -132,10 +137,6 @@ impl StagedObjective {
             }
 
             choices.retain(|v| v.0 > 0);
-        }
-
-        if self.sort_resulting {
-            result.sort_by_key(|v| v.zone_id.zone_id);
         }
 
         result
