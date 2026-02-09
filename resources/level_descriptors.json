@@ -16349,7 +16349,8 @@
         "count": 7,
         "max_per_zone": 3,
         "spawn_in_layer": false,
-        "skip_before_alloc": 0
+        "skip_before_alloc": 0,
+        "is_bugged": true
       }
     ]
   },
