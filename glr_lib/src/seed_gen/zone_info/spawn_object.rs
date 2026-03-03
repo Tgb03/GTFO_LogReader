@@ -62,6 +62,7 @@ impl SpawnObject {
 
         output.output(OutputSeedIndexer::Key(
             self.name,
+            self.zone_id.dimension_id,
             self.zone_id.zone_id,
             id as i32,
         ));

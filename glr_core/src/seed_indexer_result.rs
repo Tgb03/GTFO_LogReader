@@ -13,7 +13,7 @@ pub enum ResourceType {
 #[derive(Debug, Serialize, Deserialize)]
 pub enum OutputSeedIndexer {
     Seed(f32),
-    Key(String, i32, i32),                    // zone, id
+    Key(String, u8, i32, i32),               // dimension, zone, id
     ResourcePack(ResourceType, i32, i32, u8), // zone, id of box, pack size
     ConsumableFound(i32, bool),               // id of box, found or not
     GenerationOverflow(usize),                // how many times the build seed went over in the level

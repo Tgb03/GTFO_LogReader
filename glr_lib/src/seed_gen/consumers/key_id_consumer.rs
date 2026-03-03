@@ -12,6 +12,8 @@ pub struct KeyIDConsumer {
     name: String,
     #[serde(default)]
     zone: i32,
+    #[serde(default)]
+    dimension: u8,
 
     #[serde(default)]
     start_weight: i32,
@@ -30,6 +32,7 @@ where
     fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
         let out = OutputSeedIndexer::Key(
             self.name.clone(),
+            self.dimension,
             self.zone,
             self.get_id(seed_iter.next().unwrap()) as i32,
         );

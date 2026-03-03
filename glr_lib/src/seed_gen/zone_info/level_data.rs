@@ -105,6 +105,7 @@ impl StagedObjective {
                                 } else {
                                     self.name.clone()
                                 },
+                                selected.zone_id.dimension_id,
                                 selected.zone_id.zone_id,
                                 id as i32,
                             ));
@@ -201,6 +202,7 @@ impl LevelData {
                 let _ = build_seeds.next();
                 output.output(OutputSeedIndexer::Key(
                     format!("{name}Z{zone_id}"),
+                    zone.zone_id.dimension_id,
                     zone.zone_id.zone_id,
                     id as i32,
                 ));
@@ -236,6 +238,7 @@ impl LevelData {
             println!("Got bulk key: layer {} dim {}", layer, dim);
             output.output(OutputSeedIndexer::Key(
                 "BulkKey".to_owned(),
+                zone.zone_id.dimension_id,
                 zone.zone_id.zone_id,
                 id as i32,
             ));
@@ -376,6 +379,7 @@ impl LevelData {
 
             output.output(OutputSeedIndexer::Key(
                 name.to_owned(),
+                zone.zone_id.dimension_id,
                 zone.zone_id.zone_id,
                 id as i32,
             ));
@@ -412,6 +416,7 @@ impl LevelData {
 
             output.output(OutputSeedIndexer::Key(
                 name.to_owned(),
+                zone.zone_id.dimension_id,
                 zone.zone_id.zone_id,
                 id as i32,
             ));
@@ -451,6 +456,7 @@ impl LevelData {
 
             output.output(OutputSeedIndexer::Key(
                 pickup.name.clone(),
+                zone.zone_id.dimension_id,
                 zone.zone_id.zone_id,
                 id as i32,
             ));
@@ -486,6 +492,7 @@ impl LevelData {
 
             output.output(OutputSeedIndexer::Key(
                 pickup.name.clone(),
+                zone.zone_id.dimension_id,
                 zone.zone_id.zone_id,
                 id as i32,
             ));
