@@ -12,6 +12,8 @@ pub struct ResourceGeneration {
     res_type: ResourceType,
     #[serde(default)]
     zone: i32,
+    #[serde(default)]
+    dimension: u8,
 
     #[serde(default)]
     track_spawn: Option<KeyIDConsumer>,
@@ -70,6 +72,7 @@ where
             if let Some(t_s) = &self.track_spawn {
                 output.output(OutputSeedIndexer::ResourcePack(
                     self.res_type,
+                    self.dimension,
                     self.zone,
                     t_s.get_id(id_seed) as i32,
                     pack_size,

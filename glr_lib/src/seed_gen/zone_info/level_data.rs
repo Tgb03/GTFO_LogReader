@@ -312,6 +312,7 @@ impl LevelData {
             if l <= 0.2f32 && l > 0f32 {
                 output.output(OutputSeedIndexer::ResourcePack(
                     res_type,
+                    zone.zone_id.dimension_id,
                     zone.zone_id.zone_id,
                     id as i32,
                     pack_size + 1,
@@ -319,6 +320,7 @@ impl LevelData {
             } else {
                 output.output(OutputSeedIndexer::ResourcePack(
                     res_type,
+                    zone.zone_id.dimension_id,
                     zone.zone_id.zone_id,
                     id as i32,
                     pack_size + 1,
