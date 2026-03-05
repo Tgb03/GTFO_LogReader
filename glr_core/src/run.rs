@@ -127,4 +127,8 @@ where
     pub fn add_player_down(&mut self, name: &String) {
         self.players.get_mut(name).map(|v| v.death_count += 1);
     }
+    
+    pub fn get_utc(&self) -> &DateTime<Utc> {
+        &self.utc_time_started
+    }
 }

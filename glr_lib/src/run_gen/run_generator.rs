@@ -134,6 +134,10 @@ impl RunGenerator<NamedSplit> {
                 return Some(RunGeneratorResult::GameStarted(
                     self.last_level_name.clone(),
                     self.players.len() as u8,
+                    self.current_run.as_ref()
+                        .unwrap()
+                        .get_utc()
+                        .clone(),
                 ));
             }
             Token::DoorOpen => {
