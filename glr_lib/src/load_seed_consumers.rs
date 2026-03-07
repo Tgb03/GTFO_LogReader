@@ -14,7 +14,7 @@ pub static SEED_LEVEL_DATAS: LazyLock<Option<BTreeMap<String, LevelData>>> =
 impl LoadSeedConsumers {
     #[cfg(not(debug_assertions))]
     pub fn load_all() -> Option<BTreeMap<String, LevelData>> {
-        let file_text = include_bytes!("..\\..\\interop\\level_descriptors.bin");
+        let file_text = include_bytes!("../../interop/level_descriptors.bin");
 
         match bincode::deserialize(file_text) {
             Ok(k) => {

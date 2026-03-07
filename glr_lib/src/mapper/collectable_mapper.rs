@@ -9,7 +9,7 @@ pub struct CollectableMapper {
 
 impl CollectableMapper {
     pub fn load_from_file() -> Option<Self> {
-        let baked = include_bytes!("..\\..\\..\\interop\\collectable_maps.bin");
+        let baked = include_bytes!("../../../interop/collectable_maps.bin");
 
         bincode::deserialize(baked).ok()
     }
