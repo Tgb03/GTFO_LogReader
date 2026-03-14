@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::{data::LevelDescriptor, split::Split, time::Time};
+use crate::{data::LevelDescriptor, split::{NamedSplit, Split}, time::Time};
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct PlayerData {
@@ -130,5 +130,9 @@ where
     
     pub fn get_utc(&self) -> &DateTime<Utc> {
         &self.utc_time_started
+    }
+    
+    pub fn get_time(&self) -> Time {
+        self.total_time
     }
 }
