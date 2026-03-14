@@ -13,7 +13,7 @@ pub struct TokenParserSeed {
 impl TokenParserInner for TokenParserSeed {
     type Output = OutputSeedIndexer;
 
-    fn parse(&mut self, _: Time, token: &Token, callback_handler: &impl OutputTrait<OutputSeedIndexer>) {
+    fn parse(&mut self, _: Time, token: &Token, callback_handler: &mut impl OutputTrait<OutputSeedIndexer>) {
         if let Token::SelectExpedition(level, seed) = token {
             callback_handler.output(OutputSeedIndexer::GenerationStart(level.to_string()));
 

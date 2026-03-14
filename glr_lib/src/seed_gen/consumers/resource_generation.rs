@@ -48,7 +48,7 @@ impl<O> Consumer<O> for ResourceGeneration
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         let mut left = self.left
             * match self.res_type {
                 ResourceType::Ammopack => 0.8f32,

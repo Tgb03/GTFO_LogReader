@@ -49,7 +49,7 @@ impl StagedObjective {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Vec<SpawnObject> {
         let mut new_vec: Vec<Vec<(usize, ZoneLocationSpawn)>> = self
             .locations
@@ -153,7 +153,7 @@ impl LevelData {
         dim: u8,
         seed_iter: &mut dyn Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Option<Vec<ZoneLocationSpawn>> {
         let result = self
             .zones
@@ -267,7 +267,7 @@ impl LevelData {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
         res_type: ResourceType,
     ) -> Option<()> {
         let (weights, mut left) = match res_type {
@@ -343,7 +343,7 @@ impl LevelData {
         zone: &ZoneData,
         seed_iter: &mut dyn Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Option<()> {
         let location = ZoneLocationSpawn {
             zone_id: zone.zone_id,
@@ -433,7 +433,7 @@ impl LevelData {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Option<()> {
         for pickup in &zone.big_pickups {
             let location = ZoneLocationSpawn {
@@ -473,7 +473,7 @@ impl LevelData {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Option<()> {
         for pickup in &zone.small_pickups {
             let id = grab_spawn_id(
@@ -511,7 +511,7 @@ impl LevelData {
         dim: u8,
         seed_iter: &mut dyn Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Option<Vec<SpawnObject>> {
         let cell_iter =
             self.do_layer_keys(generated_zones, build_seeds, layer, dim, seed_iter, overflow_counter, output)?;
@@ -614,7 +614,7 @@ impl<O> Consumer<O> for LevelData
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         // println!("Skipped {} build seeds", self.build_seed_gate_count);
         let mut build_seeds = UnityRandom::from(self.build_seed).skip(self.build_seed_gate_count);
 

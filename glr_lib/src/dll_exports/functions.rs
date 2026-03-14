@@ -6,7 +6,7 @@ use std::{
 use glr_core::{data::LevelDescriptor, time::Time, token::Token};
 
 use crate::{core::token_parser::TokenParser, dll_exports::{
-    callback_handler::CallbackWrapper, enums::SubscribeCode, structs::{CallbackInfo, MainThread}, token_parsers::{token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed}
+    callback_handler::CallbackWrapper, enums::SubscribeCode, structs::{CallbackInfo, MainThread}, token_parsers::{TokenParserInner, token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed}
 }};
 
 static MAIN_THREAD: OnceLock<Mutex<Option<MainThread>>> = OnceLock::new();
@@ -53,6 +53,14 @@ pub fn process_paths(paths: Vec<PathBuf>, callback: CallbackInfo) {
         SubscribeCode::Mapper => MainThread::static_run::<TokenParserLocations>(paths, callback),
         SubscribeCode::SeedIndexer => MainThread::static_run::<TokenParserSeed>(paths, callback),
     }
+}
+
+pub fn process_paths_collect<TP: TokenParserInner + Default>(paths: Vec<PathBuf>) -> Vec<TP::Output> {
+    let mut result = Vec::new();
+    
+    MainThread::static_run_collect::<TP>(paths, &mut result);
+    
+    result
 }
 
 pub fn process_seed(seed: i32, callback: CallbackInfo) {

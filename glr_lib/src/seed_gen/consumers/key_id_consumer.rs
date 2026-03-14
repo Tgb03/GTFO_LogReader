@@ -29,7 +29,7 @@ impl<O> Consumer<O> for KeyIDConsumer
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         let out = OutputSeedIndexer::Key(
             self.name.clone(),
             self.dimension,

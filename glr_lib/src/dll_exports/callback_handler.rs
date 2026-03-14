@@ -38,12 +38,12 @@ where
 
 impl<P: TokenParserInner> TokenParser for CallbackWrapper<P> {
     fn parse_token(&mut self, time: Time, token: &Token) {
-        self.token_parser.parse(time, token, &self.callbacks);
+        self.token_parser.parse(time, token, &mut self.callbacks);
     }
 }
 
 impl<O: Serialize> OutputTrait<O> for HashMap<u32, CallbackInfo> {
-    fn output(&self, data: O) {
+    fn output(&mut self, data: O) {
         for callback in self.values() {
             if let Some(event) = callback.get_event_callback() {
                 let converter = callback.get_message_type();

@@ -13,7 +13,7 @@ pub struct TokenParserRuns {
 impl TokenParserInner for TokenParserRuns {
     type Output = RunGeneratorResult;
 
-    fn parse(&mut self, time: Time, token: &Token, callback_handler: &impl OutputTrait<RunGeneratorResult>) {
+    fn parse(&mut self, time: Time, token: &Token, callback_handler: &mut impl OutputTrait<RunGeneratorResult>) {
         if let Some(res) = self.run_parser.accept_token(time, &token) {
             callback_handler.output(res)
         }

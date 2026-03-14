@@ -27,7 +27,7 @@ impl<O> Consumer<O> for ZoneConsumer
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         ResourceGeneration::new(self.medi, ResourceType::Healthpack, None).take(seed_iter, output);
         ResourceGeneration::new(self.disi, ResourceType::DisinfectPack, None)
             .take(seed_iter, output);

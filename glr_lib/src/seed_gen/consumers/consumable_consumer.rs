@@ -17,7 +17,7 @@ impl<O> Consumer<O> for ConsumableConsumer
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         let mut found_counters = HashSet::<i32>::new();
 
         for _ in 0..self.consumable_count {

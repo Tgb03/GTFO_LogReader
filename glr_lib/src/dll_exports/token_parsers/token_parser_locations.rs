@@ -16,7 +16,7 @@ pub struct TokenParserLocations {
 impl TokenParserInner for TokenParserLocations {
     type Output = Location;
 
-    fn parse(&mut self, _: Time, token: &Token, callback_handler: &impl OutputTrait<Location>) {
+    fn parse(&mut self, _: Time, token: &Token, callback_handler: &mut impl OutputTrait<Location>) {
         if let Some(key) = self.key_gen.accept_token(&token) {
             callback_handler.output(key)
         }

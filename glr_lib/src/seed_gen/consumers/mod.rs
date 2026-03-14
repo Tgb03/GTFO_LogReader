@@ -39,7 +39,7 @@ impl<O> Consumer<O> for ConsumerEnum
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         match self {
             ConsumerEnum::Ignore(ignore_consumer) => ignore_consumer.take(seed_iter, output),
             ConsumerEnum::KeyIDConsumer(key_idconsumer) => key_idconsumer.take(seed_iter, output),

@@ -31,7 +31,7 @@ impl SpawnObject {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         overflow_counter: &mut MarkerSetHash,
-        output: &O,
+        output: &mut O,
     ) -> Option<()> {
         let is_container = self.alloc_type == AllocType::Container;
         let location = ZoneLocationSpawn {

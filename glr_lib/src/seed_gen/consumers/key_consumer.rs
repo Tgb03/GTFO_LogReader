@@ -33,7 +33,7 @@ impl<O> Consumer<O> for KeyConsumer
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         let zone = (seed_iter.nth(self.get_first_id()).unwrap() * self.zones.len() as f32) as usize;
         self.zones[zone].take(seed_iter, output);
     }

@@ -16,7 +16,7 @@ impl<O> Consumer<O> for ObjectiveConsumer
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
         for it in self.objectives_in_zones.iter() {
             let it = &it[(seed_iter.next().unwrap() * it.len() as f32) as usize];
 

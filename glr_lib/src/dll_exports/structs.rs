@@ -132,6 +132,27 @@ impl MainThread {
     pub fn change_logs_folder(&self, new_path: PathBuf) {
         self.folder_watcher.update_path(new_path);
     }
+    
+    pub fn static_run_collect<TP: TokenParserInner + Default>(
+        mut paths: Vec<PathBuf>, 
+        collector: &mut Vec<TP::Output>
+    ) {
+        while let Some(path) = paths.pop() {
+            let Some(text) = FileReader::static_read(path.clone()) else {
+                println!("Could not read: {:?}", path);
+                continue;
+            };
+            
+            let tok_iter = TokenizeIter::new(
+                text, 
+                AllTokenizer
+            );
+            
+            let mut token_parser = TP::default();
+            
+            token_parser.parse_tokens(tok_iter, collector);
+        }
+    }
 
     pub fn static_run<TP: TokenParserInner + Default>(mut paths: Vec<PathBuf>, callback: CallbackInfo) {
         let mut parser = CallbackWrapper::<TP>::default();

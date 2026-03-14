@@ -10,9 +10,9 @@ pub struct TokenParserBase;
 
 
 impl TokenParserInner for TokenParserBase {
-    fn parse(&mut self, _: Time, token: &Token, callback_handler: &impl OutputTrait<Token>) {
+    type Output = Token;
+    
+    fn parse(&mut self, _: Time, token: &Token, callback_handler: &mut impl OutputTrait<Token>) {
         callback_handler.output(token.clone());
     }
-    
-    type Output = Token;
 }

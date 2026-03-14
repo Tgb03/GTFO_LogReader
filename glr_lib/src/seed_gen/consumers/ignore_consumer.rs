@@ -18,7 +18,7 @@ impl<O> Consumer<O> for IgnoreConsumer
 where
     O: OutputTrait<OutputSeedIndexer>,
 {
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, _: &O) {
+    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, _: &mut O) {
         if self.count > 0 {
             let _ = seed_iter.nth(self.count - 1);
         }
