@@ -119,7 +119,7 @@ def my_event_callback(context, message):
             reset_counter_label.pack()
 
         if "Key" in data:
-            name, zone, id = data["Key"]
+            name, dim, zone, id = data["Key"]
             if name in ["ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
                 return
             
@@ -153,16 +153,12 @@ def my_event_callback(context, message):
             labels.append(label)
 
         if "ResourcePack" in data:
-            name, zone, id, size = data["ResourcePack"]
+            name, dim, zone, id, size = data["ResourcePack"]
             
             if zone not in [144, 146, 150]:
                 return
             
-            if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
-                        "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
-                groups[(zone, name)].append(id)
-                # counter.add(zone)
-                return
+            
             label = Label(frame, text=f"{name} in ZONE_{zone} of size {size} at {id}")
             label.pack()
             labels.append(label)

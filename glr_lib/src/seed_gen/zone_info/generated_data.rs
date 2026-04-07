@@ -78,6 +78,7 @@ impl GeneratedZone {
             let mut append_res = Vec::with_capacity(room_len as usize * 2);
 
             for id in 0..room_len {
+                #[allow(unused)]
                 let seed = build_seeds.nth(1).unwrap();
                 let big_box = (build_seeds.next().unwrap() * 2f32) as u8 + 2;
                 #[cfg(debug_assertions)]
@@ -109,6 +110,7 @@ impl GeneratedZone {
             let mut append_res = Vec::with_capacity(room_len as usize);
 
             for id in 0..room_len {
+                #[allow(unused)]
                 let seed = build_seeds.next().unwrap();
                 // println!("Small pickup seed: {}", (seed * 2147483647f32) as usize);
                 append_res.push((id + start, 1));
@@ -176,6 +178,7 @@ impl GeneratedZone {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         _debug_str: Option<&str>,
+        #[allow(unused)]
         check_alloc: bool,
     ) -> isize {
         // disabled for now as ALL of this is just testing

@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use crate::{data::LevelDescriptor, split::{NamedSplit, Split}, time::Time};
+use crate::{data::LevelDescriptor, split::Split, time::Time};
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct PlayerData {
