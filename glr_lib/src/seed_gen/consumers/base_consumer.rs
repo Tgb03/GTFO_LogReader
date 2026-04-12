@@ -3,7 +3,6 @@ use glr_core::seed_indexer_result::OutputSeedIndexer;
 
 use crate::{
     output_trait::OutputTrait,
-    seed_gen::consumers::ConsumerEnum,
 };
 use std::{collections::VecDeque, fmt::Debug};
 
@@ -16,17 +15,6 @@ where
 }
 
 impl<O> Consumer<O> for VecDeque<Box<dyn Consumer<O>>>
-where
-    O: OutputTrait<OutputSeedIndexer>,
-{
-    fn take(&self, seed_iter: &mut dyn Iterator<Item = f32>, output: &mut O) {
-        for it in self {
-            it.take(seed_iter, output);
-        }
-    }
-}
-
-impl<O> Consumer<O> for VecDeque<ConsumerEnum>
 where
     O: OutputTrait<OutputSeedIndexer>,
 {

@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use crate::{
     output_trait::OutputTrait,
     seed_gen::{
-        consumers::base_consumer::Consumer, marker_set::MarkerSetHash, unity_random::UnityRandom, zone_info::{
-            generated_data::{grab_spawn_id, AllocType, GeneratedZone},
+            consumers::base_consumer::Consumer, marker_set::MarkerSetHash, unity_random::UnityRandom, zone_info::{
+            generated_data::{AllocType, GeneratedZone, grab_spawn_id},
             spawn_object::SpawnObject,
             unlock_method::{UnlockMethodType, ZoneLocationSpawn},
             zone_data::{ContainerOrWorldspawn, ZoneData},
