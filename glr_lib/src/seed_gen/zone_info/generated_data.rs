@@ -1,4 +1,5 @@
 
+use glr_core::seed_indexer_result::LockState;
 use serde::{Deserialize, Serialize};
 
 use crate::seed_gen::{marker_set::MarkerSetHash, zone_info::{
@@ -17,6 +18,8 @@ pub struct GeneratedZone {
 
     alloc_terminals: Vec<Vec<(u8, u8)>>,
     alloc_other: Vec<Vec<(u8, u8)>>,
+    
+    lock_types: Vec<LockState>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
@@ -39,13 +42,19 @@ impl GeneratedZone {
             println!();
         }
         
+        let (
+            alloc_containers,
+            lock_types
+        ) = Self::create_container_alloc(
+            build_seeds,
+            &zone_data.rooms,
+            zone_data.allow_containers_alloc,
+        );
+        
         Self {
             zone_id: zone_data.zone_id.clone(),
-            alloc_containers: Self::create_container_alloc(
-                build_seeds,
-                &zone_data.rooms,
-                zone_data.allow_containers_alloc,
-            ),
+            alloc_containers,
+            lock_types,
             alloc_small_pickups: Self::create_small_pickups_alloc(
                 build_seeds,
                 &zone_data.rooms,
@@ -65,12 +74,17 @@ impl GeneratedZone {
         build_seeds: &mut impl Iterator<Item = f32>,
         rooms: &Vec<RoomSize>,
         generate: bool,
-    ) -> Vec<Vec<(u8, u8)>> {
+    ) -> (Vec<Vec<(u8, u8)>>, Vec<LockState>) {
         if !generate {
-            return Vec::new();
+            return (Vec::new(), Vec::new());
         }
 
         let mut result = Vec::with_capacity(rooms.len());
+        let mut lock_states = Vec::with_capacity(
+            rooms.iter()
+                .map(|rs| rs.into_containers() as usize)
+                .sum()
+        );
         let mut start = 0;
 
         for room in rooms {
@@ -78,19 +92,24 @@ impl GeneratedZone {
             let mut append_res = Vec::with_capacity(room_len as usize * 2);
 
             for id in 0..room_len {
-                #[allow(unused)]
-                let seed = build_seeds.nth(1).unwrap();
+                let lock_seed = build_seeds.nth(1).unwrap();
                 let big_box = (build_seeds.next().unwrap() * 2f32) as u8 + 2;
                 #[cfg(debug_assertions)]
-                println!("Container generated with {} alloc from {}", big_box, seed);
+                println!("Container generated with {} alloc from {}", big_box, lock_seed);
                 append_res.push((id + start, big_box));
+                lock_states.push(
+                    match lock_seed > 0.5 {
+                        true => LockState::BreakLock,
+                        false => LockState::HackLock,
+                    }
+                );
             }
 
             start += room_len;
             result.push(append_res);
         }
 
-        result
+        (result, lock_states)
     }
 
     fn create_small_pickups_alloc(
