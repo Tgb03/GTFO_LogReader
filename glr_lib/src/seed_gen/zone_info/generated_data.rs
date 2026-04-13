@@ -178,8 +178,7 @@ impl GeneratedZone {
         seed_iter: &mut dyn Iterator<Item = f32>,
         build_seeds: &mut impl Iterator<Item = f32>,
         _debug_str: Option<&str>,
-        #[allow(unused)]
-        check_alloc: bool,
+        _check_alloc: bool,
     ) -> isize {
         // disabled for now as ALL of this is just testing
         // if *alloc_type == AllocType::BigPickup && check_alloc {
