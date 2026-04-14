@@ -19,7 +19,7 @@ pub struct GeneratedZone {
     alloc_terminals: Vec<Vec<(u8, u8)>>,
     alloc_other: Vec<Vec<(u8, u8)>>,
     
-    lock_types: Vec<LockState>,
+    default_lock: Vec<LockState>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
@@ -44,7 +44,7 @@ impl GeneratedZone {
         
         let (
             alloc_containers,
-            lock_types
+            default_lock
         ) = Self::create_container_alloc(
             build_seeds,
             &zone_data.rooms,
@@ -54,7 +54,7 @@ impl GeneratedZone {
         Self {
             zone_id: zone_data.zone_id.clone(),
             alloc_containers,
-            lock_types,
+            default_lock,
             alloc_small_pickups: Self::create_small_pickups_alloc(
                 build_seeds,
                 &zone_data.rooms,
@@ -189,6 +189,19 @@ impl GeneratedZone {
 
         result
     }
+    
+    pub fn grab_container_lock(
+        &mut self,
+        is_locked: bool,
+        id: impl Into<usize>,
+    ) -> LockState {
+        if is_locked == false {
+            return LockState::Unlocked
+        }
+        let id = id.into();
+        
+        self.default_lock[id]
+    }
 
     pub fn spawn_id(
         &mut self,
@@ -235,11 +248,11 @@ impl GeneratedZone {
 
         let values_per_room = Self::calculate_values_per_room(&spawns_per_room, weights);
 
-        #[cfg(debug_assertions)]
-        match _debug_str {
-            Some(s) => println!("s: {} from {} in {}", seed, s, self.zone_id.zone_id),
-            None => println!("s: {}", seed),
-        }
+        // #[cfg(debug_assertions)]
+        // match _debug_str {
+        //     Some(s) => println!("s: {} from {} in {}", seed, s, self.zone_id.zone_id),
+        //     None => println!("s: {}", seed),
+        // }
         let mut room = Self::get_room(seed, &values_per_room);
         if room >= spawns_per_room.len() {
             room -= 1;
@@ -351,6 +364,20 @@ impl GeneratedZone {
 
         values_per_id
     }
+}
+
+pub fn grab_lock_type(
+    zones: &mut Vec<GeneratedZone>,
+    zone_id: &ZoneIdentifier,
+    id: i32,
+    is_locked: bool,
+) -> Option<LockState> {    
+    zones
+        .iter_mut()
+        .filter(|v| v.zone_id == *zone_id)
+        .next()?
+        .grab_container_lock(is_locked, id as usize)
+        .into()
 }
 
 pub fn grab_spawn_id(

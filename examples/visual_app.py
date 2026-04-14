@@ -118,21 +118,10 @@ def my_event_callback(context, message):
             reset_counter_label = Label(frame, text=f"Reset counter: {reset_counter}")
             reset_counter_label.pack()
 
-        if "Key" in data:
-            name, dim, zone, id = data["Key"]
-            if name in ["ConsumableContainer", "ArtifactWorldspawn", "ArtifactContainer"]:
-                return
-            
-            if name in ["ID", "ConsumableWorldspawn", "ConsumableContainer", "ArtifactWorldspawn", 
-                        "ArtifactContainer", "Ammopack", "Healthpack", "ToolRefillpack", "DisinfectPack"]:
-                groups[(name, zone)].append(id)
-                # counter.add(zone)
-                return
+        if "LockStateChange" in data:
+            _, zone, id, lock_state = data["LockStateChange"]
 
-            # if name == "ArtifactWorldspawn":
-            #     return
-
-            text = f"{name} in ZONE_{zone} at {id}"
+            text = f"{lock_state} in ZONE_{zone} at {id}"
             label = Label(frame, text=text)
             label.pack()
             labels.append(label)
@@ -144,24 +133,6 @@ def my_event_callback(context, message):
             b = bytes(data['GenerationOverflowHash'])
             b64 = b.hex()
             print(b64)
-            
-        if "ConsumableFound" in data:
-            c_id, found = data["ConsumableFound"]
-            text = f"Container {c_id}: {found}"
-            label = Label(frame, text=text)
-            label.pack()
-            labels.append(label)
-
-        if "ResourcePack" in data:
-            name, dim, zone, id, size = data["ResourcePack"]
-            
-            if zone not in [144, 146, 150]:
-                return
-            
-            
-            label = Label(frame, text=f"{name} in ZONE_{zone} of size {size} at {id}")
-            label.pack()
-            labels.append(label)
 
         if "ZoneGenEnded" in data:
             zone_id = data["ZoneGenEnded"]

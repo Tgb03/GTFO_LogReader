@@ -27,7 +27,6 @@ pub enum OutputSeedIndexer {
     GenerationOverflow(usize),                // how many times the build seed went over in the level
     GenerationOverflowHash([u8; 32]),         // the hash for the generation overflow
     LockStateChange(u8, i32, i32, LockState), // dimension, zone, id
-    LastContainerStateChange(LockState),      // dimension, zone, id
     GenerationEnd,
     GenerationStart(String),
     ZoneGenEnded(u32),

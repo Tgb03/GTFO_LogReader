@@ -5,7 +5,7 @@ use crate::{
     output_trait::OutputTrait,
     seed_gen::{
             consumers::base_consumer::Consumer, marker_set::MarkerSetHash, unity_random::UnityRandom, zone_info::{
-            generated_data::{AllocType, GeneratedZone, grab_spawn_id},
+            generated_data::{AllocType, GeneratedZone, grab_lock_type, grab_spawn_id},
             spawn_object::SpawnObject,
             unlock_method::{UnlockMethodType, ZoneLocationSpawn},
             zone_data::{ContainerOrWorldspawn, ZoneData},
@@ -13,7 +13,10 @@ use crate::{
     },
 };
 
-const ARTIFACT_BOX_CHANCE: f32 = 0.15f32;
+pub const ARTIFACT_BOX_CHANCE: f32 = 0.15f32;
+pub const RESOURCE_LOCKED_CHANCE: f32 = 0.8f32;
+pub const CONSUMABLE_UNLOCKED_CHANCE: f32 = 0.85f32;
+pub const OBJECTIVE_UNLOCKED_CHANCE: f32 = 0.75f32;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LevelData {
@@ -206,6 +209,13 @@ impl LevelData {
                     zone.zone_id.zone_id,
                     id as i32,
                 ));
+                output.output(OutputSeedIndexer::LockStateChange(
+                    zone.zone_id.dimension_id, 
+                    zone.zone_id.zone_id, 
+                    id as i32, 
+                    grab_lock_type(generated_zones, &zone.zone_id, id as i32, true)
+                        .unwrap_or_default()
+                ));
 
                 None
             })
@@ -241,6 +251,13 @@ impl LevelData {
                 zone.zone_id.dimension_id,
                 zone.zone_id.zone_id,
                 id as i32,
+            ));
+            output.output(OutputSeedIndexer::LockStateChange(
+                zone.zone_id.dimension_id, 
+                zone.zone_id.zone_id, 
+                id as i32, 
+                grab_lock_type(generated_zones, &zone.zone_id, id as i32, true)
+                    .unwrap_or_default()
             ));
         });
 
@@ -282,7 +299,7 @@ impl LevelData {
         }
 
         loop {
-            let _number_seed = seed_iter.next()?;
+            let chance_locked_seed = seed_iter.next()?;
             let take_seed = seed_iter.next()?;
             // println!("  res seed {_number_seed}");
             let id = grab_spawn_id(
@@ -326,6 +343,26 @@ impl LevelData {
                     pack_size + 1,
                 ));
             }
+            
+            println!("id: {id}: {:?} from {}", grab_lock_type(
+                generated_zones, 
+                &zone.zone_id, 
+                id as i32, 
+                chance_locked_seed < RESOURCE_LOCKED_CHANCE
+            )
+                .unwrap_or_default(), chance_locked_seed);
+            output.output(OutputSeedIndexer::LockStateChange(
+                zone.zone_id.dimension_id, 
+                zone.zone_id.zone_id, 
+                id as i32, 
+                grab_lock_type(
+                    generated_zones, 
+                    &zone.zone_id, 
+                    id as i32, 
+                    chance_locked_seed < RESOURCE_LOCKED_CHANCE
+                )
+                    .unwrap_or_default()
+            ));
 
             left = l;
 
@@ -409,8 +446,26 @@ impl LevelData {
 
             let name = match val {
                 ContainerOrWorldspawn::Container => {
-                    let _number_seed = seed_iter.next()?;
-                    // println!("  cons seed {_number_seed}");
+                    let chance_locked_seed = seed_iter.next()?;
+                    println!("id: {id}: {:?} from {}", grab_lock_type(
+                        generated_zones, 
+                        &zone.zone_id, 
+                        id as i32, 
+                        chance_locked_seed > CONSUMABLE_UNLOCKED_CHANCE
+                    )
+                        .unwrap_or_default(), chance_locked_seed);
+                    output.output(OutputSeedIndexer::LockStateChange(
+                        zone.zone_id.dimension_id, 
+                        zone.zone_id.zone_id, 
+                        id as i32, 
+                        grab_lock_type(
+                            generated_zones, 
+                            &zone.zone_id, 
+                            id as i32, 
+                            chance_locked_seed > CONSUMABLE_UNLOCKED_CHANCE
+                        )
+                            .unwrap_or_default()
+                    ));
                     "ConsumableContainer"
                 }
                 ContainerOrWorldspawn::Worldspawn => "ConsumableWorldspawn",

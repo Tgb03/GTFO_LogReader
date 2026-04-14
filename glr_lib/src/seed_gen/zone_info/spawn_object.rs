@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::output_trait::OutputTrait;
 use crate::seed_gen::marker_set::MarkerSetHash;
+use crate::seed_gen::zone_info::generated_data::grab_lock_type;
+use crate::seed_gen::zone_info::level_data::OBJECTIVE_UNLOCKED_CHANCE;
 use crate::{
     seed_gen::zone_info::{
         generated_data::{AllocType, GeneratedZone, grab_spawn_id},
@@ -56,9 +58,10 @@ impl SpawnObject {
             false,
         )?;
 
-        if is_container {
-            let _ = seed_iter.next();
-        }
+        let locked_seed = match is_container {
+            true => Some(seed_iter.next().unwrap()),
+            false => None,
+        };
 
         output.output(OutputSeedIndexer::Key(
             self.name,
@@ -66,6 +69,19 @@ impl SpawnObject {
             self.zone_id.zone_id,
             id as i32,
         ));
+        if let Some(locked_seed) = locked_seed {
+            output.output(OutputSeedIndexer::LockStateChange(
+                self.zone_id.dimension_id, 
+                self.zone_id.zone_id, 
+                id as i32, 
+                grab_lock_type(
+                    generated_data,
+                    &self.zone_id,
+                    id as i32,
+                    locked_seed > OBJECTIVE_UNLOCKED_CHANCE
+                ).unwrap_or_default()
+            ));
+        }
 
         Some(())
     }
