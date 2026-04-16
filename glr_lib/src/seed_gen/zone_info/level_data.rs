@@ -447,13 +447,6 @@ impl LevelData {
             let name = match val {
                 ContainerOrWorldspawn::Container => {
                     let chance_locked_seed = seed_iter.next()?;
-                    println!("id: {id}: {:?} from {}", grab_lock_type(
-                        generated_zones, 
-                        &zone.zone_id, 
-                        id as i32, 
-                        chance_locked_seed > CONSUMABLE_UNLOCKED_CHANCE
-                    )
-                        .unwrap_or_default(), chance_locked_seed);
                     output.output(OutputSeedIndexer::LockStateChange(
                         zone.zone_id.dimension_id, 
                         zone.zone_id.zone_id, 

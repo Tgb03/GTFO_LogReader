@@ -20,6 +20,7 @@ pub struct GeneratedZone {
     alloc_other: Vec<Vec<(u8, u8)>>,
     
     default_lock: Vec<LockState>,
+    last_overflow_lock: Option<LockState>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
@@ -65,6 +66,7 @@ impl GeneratedZone {
                 &zone_data.rooms,
                 zone_data.allow_big_pickups,
             ),
+            last_overflow_lock: None,
             alloc_terminals: Self::initial_allocations_from_vec(&zone_data.terminals, 1),
             alloc_other: Self::initial_allocations_from_vec(&zone_data.alloc_other, 1),
         }
@@ -193,14 +195,23 @@ impl GeneratedZone {
     pub fn grab_container_lock(
         &mut self,
         is_locked: bool,
-        id: impl Into<usize>,
-    ) -> LockState {
-        if is_locked == false {
-            return LockState::Unlocked
+        id: i32,
+    ) -> Option<LockState> {
+        if id == -1 {
+            #[cfg(debug_assertions)]
+            println!("caught it uwu");
+            let state = self.last_overflow_lock.take();
+            return match is_locked {
+                true => state,
+                false => Some(LockState::Unlocked),
+            }
         }
-        let id = id.into();
         
-        self.default_lock[id]
+        if is_locked == false {
+            return LockState::Unlocked.into()
+        }
+        
+        self.default_lock.get(id as usize).cloned()
     }
 
     pub fn spawn_id(
@@ -236,7 +247,20 @@ impl GeneratedZone {
         if total == 0 {
             // println!("     extra allocation done");
             let _ = match alloc_type {
-                AllocType::Container => build_seeds.nth(3),
+                AllocType::Container => {
+                    let lock_seed = build_seeds.nth(1).unwrap();
+                    self.last_overflow_lock = Some(
+                        match lock_seed > 0.5 {
+                            true => LockState::BreakLock,
+                            false => LockState::HackLock,
+                        }
+                    );
+                    
+                    #[cfg(debug_assertions)]
+                    println!("added fucking overflow break lock uwu");
+                    
+                    build_seeds.nth(1)
+                },
                 AllocType::SmallPickup => build_seeds.nth(1),
                 AllocType::BigPickup => build_seeds.next(),
                 AllocType::Terminal => None,
@@ -376,8 +400,7 @@ pub fn grab_lock_type(
         .iter_mut()
         .filter(|v| v.zone_id == *zone_id)
         .next()?
-        .grab_container_lock(is_locked, id as usize)
-        .into()
+        .grab_container_lock(is_locked, id)
 }
 
 pub fn grab_spawn_id(
