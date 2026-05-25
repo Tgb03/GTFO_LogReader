@@ -66,7 +66,7 @@ pub extern "C" fn remove_callback(code: u8, channel_id: u32) {
     glr_lib::dll_exports::functions::remove_callback(code, channel_id);
 }
 
-
+/*
 #[unsafe(no_mangle)]
 pub extern "C" fn process_seed(
     seed: i32,
@@ -88,7 +88,7 @@ pub extern "C" fn process_seed(
     let callback_info = CallbackInfo::new(code, message_type, 0, context.into(), event_callback);
     // glr_lib::dll_exports::functions::process_seed(seed, callback_info);
 }
-
+*/
 
 #[unsafe(no_mangle)]
 pub extern "C" fn process_paths(
