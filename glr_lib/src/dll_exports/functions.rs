@@ -63,9 +63,9 @@ pub fn process_paths_collect<TP: TokenParserInner + Default>(paths: Vec<PathBuf>
     result
 }
 
-pub fn process_seed(seed: i32, callback: CallbackInfo) {
+pub fn process_seed(level: LevelDescriptor, seed: i32, callback: CallbackInfo) {
     let mut parser = CallbackWrapper::<TokenParserSeed>::default();
     
     parser.add_callback(callback);
-    parser.parse_token(Time::default(), &Token::SelectExpedition(LevelDescriptor::default(), seed));
+    parser.parse_token(Time::default(), &Token::SelectExpedition(level, seed));
 }

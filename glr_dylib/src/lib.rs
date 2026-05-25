@@ -86,7 +86,7 @@ pub extern "C" fn process_seed(
     };
     
     let callback_info = CallbackInfo::new(code, message_type, 0, context.into(), event_callback);
-    glr_lib::dll_exports::functions::process_seed(seed, callback_info);
+    // glr_lib::dll_exports::functions::process_seed(seed, callback_info);
 }
 
 
