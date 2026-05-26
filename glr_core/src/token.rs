@@ -28,6 +28,8 @@ pub enum Token {
     DimensionIncrease,
     DimensionReset,
     SelectExpedition(LevelDescriptor, i32), // level info and seed
+    ReadyToStopElevatorRide,
+    StopElevatorRide,
     GameStarting,
     GameStarted,
     PlayerDroppedInLevel(u32),

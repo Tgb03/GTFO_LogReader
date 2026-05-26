@@ -59,7 +59,7 @@ def my_event_callback(context, message):
 
 
 # Add a callback with dummy values
-code = 2          # e.g., SubscribeCode::Tokenizer
+code = 1          # e.g., SubscribeCode::Tokenizer
 msg_type = 1      # e.g., SubscriptionType::JSON
 channel_id = 1    # your app-defined channel ID
 callback_fn_ptr = ctypes.cast(my_event_callback, c_void_p)

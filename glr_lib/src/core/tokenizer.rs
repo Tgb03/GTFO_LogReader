@@ -171,6 +171,12 @@ impl Tokenizer for RunTokenizer {
         if line.contains("exits PLOC_InElevator") {
             return Some(Token::create_player(line));
         }
+        if check_match(line, 69, ": Generating TO: ReadyToStopElevatorRide") {
+            return Some(Token::ReadyToStopElevatorRide);
+        }
+        if check_match(line, 69, ": ReadyToStopElevatorRide TO: StopElevatorRide") {
+            return Some(Token::StopElevatorRide);
+        }
         if check_match(line, 69, ": StopElevatorRide TO: ReadyToStartLevel") {
             return Some(Token::GameStarting);
         }

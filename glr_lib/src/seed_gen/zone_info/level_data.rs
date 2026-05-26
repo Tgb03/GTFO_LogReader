@@ -343,7 +343,8 @@ impl LevelData {
                     pack_size + 1,
                 ));
             }
-            
+
+            #[cfg(debug_assertions)]
             println!("id: {id}: {:?} from {}", grab_lock_type(
                 generated_zones, 
                 &zone.zone_id, 
