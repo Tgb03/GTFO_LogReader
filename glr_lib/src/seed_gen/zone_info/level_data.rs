@@ -189,6 +189,7 @@ impl LevelData {
                     UnlockMethodType::ColoredKey => ("Key", 2),
                     UnlockMethodType::BulkheadKey => ("BulkKey", 1),
                 };
+                #[cfg(debug_assertions)]
                 println!("Got key");
                 let zone = key.grab_zone(seed_iter.nth(useless_seeds)?);
                 let id = grab_spawn_id(

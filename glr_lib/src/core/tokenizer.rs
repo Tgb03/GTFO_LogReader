@@ -124,6 +124,7 @@ pub struct CheckpointTokenizer;
 #[derive(Default)]
 pub struct AllTokenizer;
 
+#[inline]
 fn check_match(line: &str, start_id: usize, search: &str) -> bool {
     line.get(start_id..(start_id + search.len()))
         .is_some_and(|v| v == search)
@@ -142,6 +143,9 @@ impl Tokenizer for BaseTokenizer {
         }
         if check_match(line, 15, "OnApplicationQuit") {
             return Some(Token::LogFileEnd);
+        }
+        if check_match(line, 15, "SNet ERROR : Bad packet") {
+            return Some(Token::create_session_seed(line));
         }
 
         let len = line.len();

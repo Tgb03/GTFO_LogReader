@@ -42,6 +42,7 @@ pub enum Token {
     GameEndLost,
     GameEndAbort,
     LogFileEnd,
+    BadPacketSentByPlayer(String),
 
     Invalid,
 }
@@ -54,6 +55,19 @@ fn nth_space_index(s: &str, n: usize) -> Option<usize> {
 }
 
 impl Token {
+    pub fn create_bad_packet(line: &str) -> Token {
+        let prefix = "Bad packet sent by player ";
+        let suffix = " in current SessionHub.";
+
+        let start = line.find(prefix).map(|i| i + prefix.len());
+        let end = line.rfind(suffix);
+
+        match (start, end) {
+            (Some(s), Some(e)) if s < e => Token::PlayerJoinedLobby(line[s..e].to_owned()),
+            _ => Token::Invalid,
+        }
+    }
+    
     pub fn create_utc_time(line: &str) -> Token {
         match Self::utc_time_getter(line) {
             Ok(t) => t,
