@@ -49,10 +49,8 @@ def my_event_callback(context, message):
     
     data = json.loads(message)
     
-    if "SelectExpedition" in data: 
-        level = data["SelectExpedition"][0]
-        if level["rundown"] == "R1" and level["tier"] == 0 and level["level"] == 0:
-            count += 1
+    if "LevelRun" in data: 
+        print(json.dumps(data["LevelRun"], indent=2))
 
 file_paths = filedialog.askopenfilenames(title="Select files to process")
 encoded_paths = [path.encode('utf-8') for path in file_paths]
@@ -61,9 +59,7 @@ c_paths = (c_char_p * len(encoded_paths))(*encoded_paths)
 # Add a callback with dummy values
 callback_fn_ptr = ctypes.cast(my_event_callback, c_void_p)
 length = c_uint32(len(encoded_paths))
-code = 1          # e.g., SubscribeCode::Tokenizer
+code = 2          # e.g., SubscribeCode::Tokenizer
 msg_type = 1      # e.g., SubscriptionType::JSON
 
 lib.process_paths(c_paths, length, code, msg_type, 0, callback_fn_ptr)
-
-print(f"Done: {count}")

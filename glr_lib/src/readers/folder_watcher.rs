@@ -59,7 +59,7 @@ impl FolderWatcher {
     ) {
         let mut limiter = CpuLimiter::new(Duration::from_secs(1));
         let mut counter: u8 = 0;
-        let mut last_path = None;
+        let mut last_metadata = None;
 
         loop {
             if let Ok(()) = shutdown.try_recv() {
@@ -68,7 +68,7 @@ impl FolderWatcher {
 
             if let Ok(path) = update_folder_path.try_recv() {
                 folder_path = Some(path);
-                last_path = None;
+                last_metadata = None;
 
                 while let Ok(_) = update_folder_path.try_recv() {}
 
@@ -77,7 +77,7 @@ impl FolderWatcher {
 
             if counter == 10 {
                 // not using notify cause of issues with large folders just in case
-                let path = folder_path
+                let metadata = folder_path
                     .as_ref()
                     .map(|f| fs::read_dir(&f).ok())
                     .flatten()
@@ -101,19 +101,20 @@ impl FolderWatcher {
                                 Ok(metadata) => metadata.modified().ok(),
                                 Err(_) => Default::default(),
                             })
-                            .map(|v| v.path())
                     })
-                    .flatten();
+                    .flatten()
+                    .filter(|meta| last_metadata
+                        .as_ref()
+                        .is_none_or(|lm: &fs::DirEntry| lm.path() != meta.path())
+                    );
 
-                if path != last_path {
-                    if let Some(path) = path {
-                        match sender.send(path.clone()) {
-                            Ok(_) => {}
-                            Err(_) => break,
-                        }
-                        println!("File sent");
-                        last_path = Some(path);
+                if let Some(metadata) = metadata {
+                    match sender.send(metadata.path()) {
+                        Ok(_) => {}
+                        Err(_) => break,
                     }
+                    println!("File sent");
+                    last_metadata = Some(metadata);
                 }
 
                 counter = 0;
