@@ -7,7 +7,7 @@ use glr_core::{
     run_gen_result::RunGeneratorResult,
     split::{NamedSplit, Split},
     time::Time,
-    token::Token,
+    token::{GameState, Token},
 };
 use regex::Regex;
 
@@ -122,7 +122,7 @@ impl RunGenerator<NamedSplit> {
             Token::UserExitLobby => {
                 self.players.clear();
             }
-            Token::GameStarted => {
+            Token::GameStateManagerChange(_, GameState::InLevel) => {
                 self.last_split_time = time;
                 self.door_count = 0;
                 self.bulk_count = 0;
@@ -199,7 +199,7 @@ impl RunGenerator<NamedSplit> {
                 self.current_run.as_mut().map(|v| v.did_overload());
                 return Some(RunGeneratorResult::OverloadDone);
             }
-            Token::GameEndWin => {
+            Token::GameStateManagerChange(_, GameState::ExpeditionSuccess) => {
                 self.current_run.as_mut().map(|v| v.add_win());
                 let split = NamedSplit::new(time - self.last_split_time, "WIN".to_owned());
 
@@ -209,7 +209,7 @@ impl RunGenerator<NamedSplit> {
                     return Some(RunGeneratorResult::LevelRun(run));
                 }
             }
-            Token::GameEndLost => {
+            Token::GameStateManagerChange(_, GameState::ExpeditionFail) => {
                 self.in_death_screen = true;
                 let split = NamedSplit::new(time - self.last_split_time, "LOSS".to_owned());
 

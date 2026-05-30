@@ -1,13 +1,14 @@
-use std::error::Error;
+use std::{error::Error, str::FromStr};
 
 use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use strum::EnumString;
 
 use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
 
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize, EnumString)]
 pub enum GameState {
     Startup,
     Offline,
@@ -38,9 +39,9 @@ pub enum Token {
     UserExitLobby,
 
     GameStateManagerChange(GameState, GameState),
+    PlayerStateChange(String, GameState),
     TimeSessionStart(DateTime<Utc>),
     SessionSeed(u64),
-    GeneratingFinished,
     ItemAllocated(KeyDescriptor),                     // name
     ItemSpawn(u64, u32),                              // zone, id
     CollectableAllocated(u64),                        // zone
@@ -50,18 +51,12 @@ pub enum Token {
     DimensionIncrease,
     DimensionReset,
     SelectExpedition(LevelDescriptor, i32), // level info and seed
-    ReadyToStopElevatorRide,
-    StopElevatorRide,
-    GameStarting,
-    GameStarted,
     PlayerDroppedInLevel(u32),
     DoorOpen,
     CheckpointReset,
     BulkheadScanDone,
     SecondaryDone,
     OverloadDone,
-    GameEndWin,
-    GameEndLost,
     GameEndAbort,
     LogFileEnd,
     BadPacketSentByPlayer(String),
@@ -77,6 +72,41 @@ fn nth_space_index(s: &str, n: usize) -> Option<usize> {
 }
 
 impl Token {
+    pub fn create_player_state_change(line: &str) -> Token {
+        let player_start_id = 56usize;
+        let Some(player_end_id) = line.rfind(' ') else {
+            return Token::Invalid;
+        };
+        let state_end_id = line.len() - 9;
+        let Some(player_name) = line.get(player_start_id..player_end_id) else {
+            return Token::Invalid;
+        };
+
+        line.get((player_end_id + 1)..(state_end_id))
+            .map(|l| GameState::from_str(l).ok())
+            .flatten()
+            .map(|gs| Token::PlayerStateChange(player_name.to_owned(), gs))
+            .unwrap_or(Token::Invalid)
+    }
+    
+    pub fn create_game_state_change(line: &str) -> Token {
+        let mut iter = line.split(' ');
+        let first_state = iter.nth(9)
+            .map(|s| GameState::from_str(s).ok())
+            .flatten();
+        let second_state = iter.nth(1)
+            .map(|s| s.get(0..(s.len() - 9)))
+            .flatten()
+            .map(|s| GameState::from_str(s).ok())
+            .flatten();
+
+        match (first_state, second_state) {
+            (Some(first_state), Some(second_state)) => 
+                Token::GameStateManagerChange(first_state, second_state),
+            _ => Token::Invalid
+        }
+    }
+    
     pub fn create_bad_packet(line: &str) -> Token {
         let prefix = "Bad packet sent by player ";
         let suffix_1 = " in current SessionHub.";

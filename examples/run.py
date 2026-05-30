@@ -3,6 +3,7 @@
 import ctypes
 import os
 import json
+import time
 from pathlib import Path
 from ctypes import c_char_p, c_void_p, c_uint8, c_uint32, CFUNCTYPE
 
@@ -59,7 +60,7 @@ def my_event_callback(context, message):
 
 
 # Add a callback with dummy values
-code = 1          # e.g., SubscribeCode::Tokenizer
+code = 2          # e.g., SubscribeCode::Tokenizer
 msg_type = 1      # e.g., SubscriptionType::JSON
 channel_id = 1    # your app-defined channel ID
 callback_fn_ptr = ctypes.cast(my_event_callback, c_void_p)
@@ -69,7 +70,6 @@ lib.add_callback(code, msg_type, channel_id, 0, callback_fn_ptr)
 # Start the listener thread
 lib.start_listener(log_folder_path.encode('utf-8'))
 
-import time
 print("Waiting for callbacks from .dll")
 
 while True:

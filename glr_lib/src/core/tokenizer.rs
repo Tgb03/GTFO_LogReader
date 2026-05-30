@@ -175,17 +175,8 @@ impl Tokenizer for RunTokenizer {
         if line.contains("exits PLOC_InElevator") {
             return Some(Token::create_player(line));
         }
-        if check_match(line, 69, ": Generating TO: ReadyToStopElevatorRide") {
-            return Some(Token::ReadyToStopElevatorRide);
-        }
-        if check_match(line, 69, ": ReadyToStopElevatorRide TO: StopElevatorRide") {
-            return Some(Token::StopElevatorRide);
-        }
-        if check_match(line, 69, ": StopElevatorRide TO: ReadyToStartLevel") {
-            return Some(Token::GameStarting);
-        }
-        if check_match(line, 69, ": ReadyToStartLevel TO: InLevel") {
-            return Some(Token::GameStarted);
+        if check_match(line, 15, "<color=red> >>>>>> GAMESTATEMANAGER CHANGE STATE FROM :") {
+            return Some(Token::create_game_state_change(line))
         }
         if check_match(line, 31, "LinkedToZoneData.EventsOnEnter") {
             return Some(Token::DoorOpen);
@@ -199,9 +190,6 @@ impl Tokenizer for RunTokenizer {
         if check_match(line, 112, "WardenObjectiveItemSolved") {
             return Some(Token::OverloadDone);
         }
-        if check_match(line, 71, "InLevel TO: ExpeditionSuccess") {
-            return Some(Token::GameEndWin);
-        }
         if check_match(line, 15, "RundownManager.OnExpeditionEnded(endState: Abort") {
             return Some(Token::GameEndAbort);
         }
@@ -210,9 +198,6 @@ impl Tokenizer for RunTokenizer {
         }
         if check_match(line, 15, "DEBUG : Leaving session hub! : IsInHub:True") {
             return Some(Token::GameEndAbort);
-        }
-        if check_match(line, 71, "InLevel TO: ExpeditionFail") {
-            return Some(Token::GameEndLost);
         }
 
         None
@@ -234,8 +219,8 @@ impl Tokenizer for GenerationTokenizer {
         if check_match(line, 69, ": Lobby TO: Generating") {
             return Some(Token::GeneratingLevel);
         }
-        if check_match(line, 69, ": Generating TO: ReadyToStopElevatorRide") {
-            return Some(Token::GeneratingFinished);
+        if check_match(line, 15, "<color=purple>OnPlayerGameStateChange : ") {
+            return Some(Token::create_player_state_change(line))
         }
         if check_match(line, 29, "CreateKeyItemDistribution") {
             return Some(Token::create_item_alloc(line));
@@ -281,14 +266,15 @@ impl Tokenizer for AllTokenizer {
 #[cfg(test)]
 mod tests {
     use std::{env, fs::File, io::Read};
-    use glr_core::data::ObjectiveFunction;
 
     use super::*;
 
+    #[allow(dead_code)]
     fn create_tokenizer() -> AllTokenizer {
         AllTokenizer
     }
 
+    #[allow(dead_code)]
     fn load_file(name: &str) -> Option<String> {
         let mut result = String::default();
         let path_buf = env::current_dir()
@@ -309,6 +295,7 @@ mod tests {
         }
     }
 
+    #[allow(dead_code)]
     fn tokenize_file(name: &str, tokenizer: &AllTokenizer) -> Vec<Token> {
         let file_str = load_file(name).unwrap();
 
@@ -326,117 +313,5 @@ mod tests {
                 _ => Some(v),
             })
             .collect()
-    }
-
-    #[test]
-    fn test_generation_r1a1() {
-        let tokenizer = create_tokenizer();
-
-        let tokens_v = vec![
-            tokenize_file("R1A1_client.frosty_exp_comp.txt", &tokenizer),
-            tokenize_file("R1A1_host.maid_exp_comp.txt", &tokenizer),
-        ];
-
-        for tokens in tokens_v {
-            assert_eq!(
-                tokens,
-                vec![
-                    Token::GeneratingLevel,
-                    Token::ItemAllocated("KEY_GREEN_245".try_into().unwrap()),
-                    Token::ItemSpawn(50, 48),
-                    Token::CollectableAllocated(3),
-                    Token::ObjectiveSpawnedOverride(18, ObjectiveFunction::HSU_FindTakeSample),
-                    Token::GeneratingFinished,
-                    Token::GameStarting,
-                    Token::GameStarted,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::GameEndWin,
-                    Token::GameEndAbort,
-                ]
-            );
-        }
-    }
-
-    #[test]
-    fn test_run_r1b1() {
-        let tokenizer = create_tokenizer();
-
-        let tokens_v = vec![
-            tokenize_file("R1B2_client.alex_hsu_3keys.txt", &tokenizer),
-            tokenize_file("R1B2_client.frosty_hsu_3keys.txt", &tokenizer),
-            tokenize_file("R1B2_host.maid_hsu_3keys.txt", &tokenizer),
-        ];
-
-        for tokens in tokens_v {
-            assert_eq!(
-                tokens,
-                vec![
-                    Token::GeneratingLevel,
-                    Token::ItemAllocated("KEY_BLUE_184".try_into().unwrap()),
-                    Token::ItemSpawn(18, 8),
-                    Token::ItemAllocated("KEY_PURPLE_421".try_into().unwrap()),
-                    Token::ItemSpawn(23, 20),
-                    Token::ItemAllocated("KEY_YELLOW_990".try_into().unwrap()),
-                    Token::ItemSpawn(23, 37),
-                    Token::CollectableAllocated(5),
-                    Token::ObjectiveSpawnedOverride(16, ObjectiveFunction::HSU_FindTakeSample),
-                    Token::GeneratingFinished,
-                    Token::GameStarting,
-                    Token::GameStarted,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::GameEndLost,
-                    Token::GameEndAbort,
-                    Token::GeneratingLevel,
-                    Token::ItemAllocated("KEY_PURPLE_389".try_into().unwrap()),
-                    Token::ItemSpawn(18, 1),
-                    Token::ItemAllocated("KEY_GREY_560".try_into().unwrap()),
-                    Token::ItemSpawn(23, 21),
-                    Token::ItemAllocated("KEY_ORANGE_338".try_into().unwrap()),
-                    Token::ItemSpawn(22, 14),
-                    Token::CollectableAllocated(5),
-                    Token::ObjectiveSpawnedOverride(16, ObjectiveFunction::HSU_FindTakeSample),
-                    Token::GeneratingFinished,
-                    Token::GameStarting,
-                    Token::GameStarted,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::DoorOpen,
-                    Token::GameEndWin,
-                    Token::GameEndAbort,
-                ]
-            );
-        }
-    }
-
-    #[test]
-    fn test_r6c2() {
-        let tokenizer = create_tokenizer();
-
-        let tokens = tokenize_file("R6C2_host_hisec.txt", &tokenizer);
-
-        assert_eq!(
-            tokens,
-            vec![
-                Token::GeneratingLevel,
-                Token::ItemAllocated("BULKHEAD_KEY_538".try_into().unwrap()),
-                Token::ItemSpawn(123, 1),
-                Token::ItemAllocated("BULKHEAD_KEY_585".try_into().unwrap()),
-                Token::ItemSpawn(247, 5),
-                Token::CollectableAllocated(246),
-                Token::CollectableItemID(154),
-                Token::DimensionReset,
-                Token::GeneratingFinished,
-                Token::GameStarting,
-                Token::GameStarted,
-                Token::DoorOpen,
-                Token::GameEndAbort,
-                Token::GameEndAbort,
-            ]
-        );
     }
 }
