@@ -145,7 +145,7 @@ impl Tokenizer for BaseTokenizer {
             return Some(Token::LogFileEnd);
         }
         if check_match(line, 15, "SNet ERROR : Bad packet") {
-            return Some(Token::create_session_seed(line));
+            return Some(Token::create_bad_packet(line));
         }
 
         let len = line.len();

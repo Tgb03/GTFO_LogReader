@@ -6,6 +6,27 @@ use serde::{Deserialize, Serialize};
 
 use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
 
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize)]
+pub enum GameState {
+    Startup,
+    Offline,
+    NoLobby,
+    Lobby,
+    Slim,
+    FakeLobby,
+    Generating,
+    ReadyToStopElevatorRide,
+    StopElevatorRide,
+    ReadyToStartLevel,
+    InLevel,
+    AfterLevel,
+    CaptureRecall,
+    ExpeditionFail,
+    ExpeditionSuccess,
+    ExpeditionAbort,
+}
+
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub enum Token {
     GeneratingLevel,
@@ -16,6 +37,7 @@ pub enum Token {
     PlayerExitElevator(String),
     UserExitLobby,
 
+    GameStateManagerChange(GameState, GameState),
     TimeSessionStart(DateTime<Utc>),
     SessionSeed(u64),
     GeneratingFinished,
@@ -57,13 +79,15 @@ fn nth_space_index(s: &str, n: usize) -> Option<usize> {
 impl Token {
     pub fn create_bad_packet(line: &str) -> Token {
         let prefix = "Bad packet sent by player ";
-        let suffix = " in current SessionHub.";
+        let suffix_1 = " in current SessionHub.";
+        let suffix_2 = " not in sessionHub, but in lobby.";
 
         let start = line.find(prefix).map(|i| i + prefix.len());
-        let end = line.rfind(suffix);
+        let end = line.rfind(suffix_1)
+            .or_else(|| line.rfind(suffix_2));
 
         match (start, end) {
-            (Some(s), Some(e)) if s < e => Token::PlayerJoinedLobby(line[s..e].to_owned()),
+            (Some(s), Some(e)) if s < e => Token::BadPacketSentByPlayer(line[s..e].to_owned()),
             _ => Token::Invalid,
         }
     }
