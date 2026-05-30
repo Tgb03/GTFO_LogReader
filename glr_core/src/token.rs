@@ -112,13 +112,13 @@ impl Token {
     }
 
     pub fn create_player_left(line: &str) -> Token {
-        line.get(46..line.len().saturating_sub(1))
+        line.get(46..line.len())
             .map(|v| Token::PlayerLeftLobby(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_down(line: &str) -> Token {
-        line.get(28..line.len().saturating_sub(1))
+        line.get(28..line.len())
             .map(|v| Token::PlayerDown(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
@@ -129,7 +129,7 @@ impl Token {
             return Token::Invalid;
         }
 
-        line.get(start.unwrap() + 1..line.len().saturating_sub(54))
+        line.get(start.unwrap() + 1..line.len().saturating_sub(53))
             .map(|v| Token::PlayerExitElevator(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }

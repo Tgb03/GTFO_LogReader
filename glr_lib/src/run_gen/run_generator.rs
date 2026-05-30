@@ -124,6 +124,8 @@ impl RunGenerator<NamedSplit> {
             }
             Token::GameStarted => {
                 self.last_split_time = time;
+                self.door_count = 0;
+                self.bulk_count = 0;
                 self.current_run = Some(TimedRun::new(
                     self.last_level_name.clone(),
                     self.players.iter().map(|(v, _)| v.clone()).collect(),
