@@ -10,6 +10,7 @@ use super::data::{KeyDescriptor, LevelDescriptor, ObjectiveFunction, Rundown};
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy, Serialize, Deserialize, EnumString)]
 pub enum GameState {
+    Inactive,
     Startup,
     Offline,
     NoLobby,
@@ -26,6 +27,7 @@ pub enum GameState {
     ExpeditionFail,
     ExpeditionSuccess,
     ExpeditionAbort,
+    Invalid,
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
@@ -77,12 +79,11 @@ impl Token {
         let Some(player_end_id) = line.rfind(' ') else {
             return Token::Invalid;
         };
-        let state_end_id = line.len() - 9;
         let Some(player_name) = line.get(player_start_id..player_end_id) else {
             return Token::Invalid;
         };
 
-        line.get((player_end_id + 1)..(state_end_id))
+        line.strip_suffix("</color>")
             .map(|l| GameState::from_str(l).ok())
             .flatten()
             .map(|gs| Token::PlayerStateChange(player_name.to_owned(), gs))
@@ -95,16 +96,15 @@ impl Token {
             .map(|s| GameState::from_str(s).ok())
             .flatten();
         let second_state = iter.nth(1)
-            .map(|s| s.get(0..(s.len() - 9)))
+            .map(|s| s.strip_suffix("</color>"))
             .flatten()
             .map(|s| GameState::from_str(s).ok())
             .flatten();
 
-        match (first_state, second_state) {
-            (Some(first_state), Some(second_state)) => 
-                Token::GameStateManagerChange(first_state, second_state),
-            _ => Token::Invalid
-        }
+        Token::GameStateManagerChange(
+            first_state.unwrap_or(GameState::Invalid),
+            second_state.unwrap_or(GameState::Invalid)
+        )
     }
     
     pub fn create_bad_packet(line: &str) -> Token {

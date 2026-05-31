@@ -81,7 +81,7 @@ impl RunGenerator<NamedSplit> {
                 self.utc_time_started = utc_time.clone();
                 self.utc_time_stamp = time;
             }
-            Token::GeneratingLevel => {
+            Token::GameStateManagerChange(_, GameState::Generating) => {
                 self.players.clear();
             }
             Token::PlayerExitElevator(name) => {
