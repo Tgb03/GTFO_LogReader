@@ -75,7 +75,11 @@ fn nth_space_index(s: &str, n: usize) -> Option<usize> {
 
 impl Token {
     pub fn create_player_state_change(line: &str) -> Token {
-        let player_start_id = 56usize;
+        let Some(line) = line.trim_end().strip_suffix("</color>") else {
+            return Token::Invalid;
+        };
+        
+        let player_start_id = 55usize;
         let Some(player_end_id) = line.rfind(' ') else {
             return Token::Invalid;
         };
@@ -83,11 +87,11 @@ impl Token {
             return Token::Invalid;
         };
 
-        line.strip_suffix("</color>")
-            .map(|l| GameState::from_str(l).ok())
+        line.split(' ').last()
+            .map(|state| GameState::from_str(state).ok())
             .flatten()
             .map(|gs| Token::PlayerStateChange(player_name.to_owned(), gs))
-            .unwrap_or(Token::Invalid)
+            .unwrap()
     }
     
     pub fn create_game_state_change(line: &str) -> Token {
