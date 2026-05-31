@@ -91,7 +91,7 @@ impl Token {
     }
     
     pub fn create_game_state_change(line: &str) -> Token {
-        let mut iter = line.split(' ');
+        let mut iter = line.trim_end().split(' ');
         let first_state = iter.nth(9)
             .map(|s| GameState::from_str(s).ok())
             .flatten();
