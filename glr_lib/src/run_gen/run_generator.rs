@@ -215,7 +215,7 @@ impl RunGenerator<NamedSplit> {
 
                 self.current_run.as_mut().map(|r| r.add_split(split));
             }
-            Token::GameEndAbort | Token::LogFileEnd => {
+            Token::GameEndAbort | Token::GameStateManagerChange(GameState::InLevel, GameState::ExpeditionAbort) | Token::LogFileEnd => {
                 if let Some(mut run) = self.current_run.take() {
                     let split = NamedSplit::new(time - self.last_split_time, "STOP".to_owned());
 
