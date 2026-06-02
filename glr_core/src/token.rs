@@ -178,24 +178,31 @@ impl Token {
     }
 
     pub fn create_player_joined(line: &str) -> Token {
+        let line = line.trim_end();
+        
         line.get(22..line.len().saturating_sub(22))
             .map(|v| Token::PlayerJoinedLobby(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_left(line: &str) -> Token {
+        let line = line.trim_end();
+        
         line.get(46..line.len())
             .map(|v| Token::PlayerLeftLobby(v.to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_down(line: &str) -> Token {
+        let line = line.trim_end();
+        
         line.get(28..line.len())
-            .map(|v| Token::PlayerDown(v.to_owned()))
+            .map(|v| Token::PlayerDown(v.trim().to_owned()))
             .unwrap_or_else(|| Token::Invalid)
     }
 
     pub fn create_player_exit_elevator(line: &str) -> Token {
+        let line = line.trim_end();
         let start = nth_space_index(line, 5);
         if let None = start {
             return Token::Invalid;

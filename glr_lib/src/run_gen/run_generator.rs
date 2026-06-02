@@ -117,6 +117,7 @@ impl RunGenerator<NamedSplit> {
                     self.players.get_mut(&name).map(|v| *v = time);
 
                     self.current_run.as_mut().map(|v| v.add_player_down(&name));
+                    return Some(RunGeneratorResult::PlayerDeath(name.to_owned()))
                 }
             }
             Token::UserExitLobby => {
