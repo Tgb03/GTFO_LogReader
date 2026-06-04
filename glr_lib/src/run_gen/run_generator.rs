@@ -112,7 +112,7 @@ impl RunGenerator<NamedSplit> {
                     .players
                     .get(&name)
                     .cloned()
-                    .is_some_and(|t| (time - t) > Time::from_stamp(6000))
+                    .is_some_and(|t| (time - t) > Time::from_stamp(8000))
                 {
                     self.players.get_mut(&name).map(|v| *v = time);
 
