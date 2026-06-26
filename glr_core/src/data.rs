@@ -56,7 +56,7 @@ pub struct LevelDescriptor {
 }
 
 impl LevelDescriptor {
-    pub fn new(rundown: Rundown, tier: u8, level: u8) -> Self {
+    pub const fn new(rundown: Rundown, tier: u8, level: u8) -> Self {
         Self {
             rundown,
             tier,
