@@ -7,13 +7,11 @@ use might_sleep::prelude::CpuLimiter;
 use crate::{
     core::{
         token_parser::{IterTokenParser, TokenParser}, tokenizer::{AllTokenizer, TokenizeIter, TokenizerGetIter}
-    },
-    dll_exports::{
+    }, dll_exports::{
         callback_handler::CallbackWrapper, enums::{SubscribeCode, SubscriptionType}, token_parsers::{
             TokenParserInner, token_parser_base::TokenParserBase, token_parser_locations::TokenParserLocations, token_parser_runs::TokenParserRuns, token_parser_seeds::TokenParserSeed
         }
-    },
-    readers::{file_reader::FileReader, folder_watcher::FolderWatcher},
+    }, output_trait::OutputTrait, readers::{file_reader::FileReader, folder_watcher::FolderWatcher},
 };
 
 pub type EventCallback = extern "C" fn(context: *const c_void, message: *const c_char);
@@ -135,7 +133,7 @@ impl MainThread {
     
     pub fn static_run_collect<TP: TokenParserInner + Default>(
         mut paths: Vec<PathBuf>, 
-        collector: &mut Vec<TP::Output>
+        collector: &mut impl OutputTrait<TP::Output>
     ) {
         while let Some(path) = paths.pop() {
             let Some(text) = FileReader::static_read(path.clone()) else {
